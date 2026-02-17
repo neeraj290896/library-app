@@ -1,0 +1,69 @@
+<style>
+  .btn-add-members:hover { background-color: #16a34a; }
+  .btn-import:hover { background-color: #f9fafb; }
+  .btn-edit:hover { background-color: #4b5563; }
+  .btn-delete:hover { background-color: #dc2626; }
+  tbody tr:hover { background-color: #f9fafb; }
+</style>
+
+<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+  <div style="background-color: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">Members</h2>
+        <p style="font-size: 0.875rem; color: #6b7280;">Manage teachers and students who can borrow books</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="position: relative;">
+            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 1rem;">🔍</span>
+            <input pInputText type="text" placeholder="Search Member" [(ngModel)]="searchTerm" (input)="onSearch(searchTerm)" style="padding-left: 2.5rem; padding-right: 1rem; padding-top: 0.5rem; padding-bottom: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; outline: none;" />
+          </div>
+          <button pButton class="btn-add-members" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background-color: #22c55e; color: white; border: none; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease;">
+            <span>➕</span>
+            Add Members
+          </button>
+          <button pButton class="btn-import" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border: 1px solid #e5e7eb; background: transparent; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; transition: all 0.2s ease;">
+            <span>⬇️</span>
+            Import
+          </button>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; font-size: 0.875rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid #e5e7eb;">
+            <th style="text-align: left; padding: 0.75rem; color: #6b7280; font-weight: 500;">Member ID</th>
+            <th style="text-align: left; padding: 0.75rem; color: #6b7280; font-weight: 500;">Register ID</th>
+            <th style="text-align: left; padding: 0.75rem; color: #6b7280; font-weight: 500;">Member</th>
+            <th style="text-align: left; padding: 0.75rem; color: #6b7280; font-weight: 500;">Type</th>
+            <th style="text-align: left; padding: 0.75rem; color: #6b7280; font-weight: 500;">Email ID</th>
+            <th style="text-align: left; padding: 0.75rem; color: #6b7280; font-weight: 500;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (member of filteredMembers(); track member.memberId) {
+            <tr style="border-bottom: 1px solid #e5e7eb; transition: background-color 0.2s ease;">
+              <td style="padding: 1rem 0.75rem;">{{ member.memberId }}</td>
+              <td style="padding: 1rem 0.75rem;">{{ member.registerId }}</td>
+              <td style="padding: 1rem 0.75rem;">{{ member.member }}</td>
+              <td style="padding: 1rem 0.75rem;">
+                <span style="padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;"
+                      [style]="{'background-color': member.type === 'Teacher' ? '#dbeafe' : '#fed7aa', 'color': member.type === 'Teacher' ? '#1e40af' : '#92400e'}">
+                  {{ member.type }}
+                </span>
+              </td>
+              <td style="padding: 1rem 0.75rem;">{{ member.email }}</td>
+              <td style="padding: 1rem 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <button class="btn-edit" style="padding: 0.25rem 0.75rem; background-color: #6b7280; color: white; border: none; border-radius: 0.25rem; font-size: 0.75rem; cursor: pointer; transition: background-color 0.2s;">Edit</button>
+                  <button class="btn-delete" style="padding: 0.25rem 0.75rem; background-color: #ef4444; color: white; border: none; border-radius: 0.25rem; font-size: 0.75rem; cursor: pointer; transition: background-color 0.2s;">Cancel</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+  <div style="background-color: white; border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+    <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">Settings</h2>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1.5rem;">Manage your application settings</p>
+
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      <div style="border-bottom: 1px solid #e5e7eb; padding-bottom: 1.5rem;">
+        <h3 style="font-weight: 600; margin-bottom: 1rem;">Account Settings</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Email</label>
+            <input type="email" placeholder="your@email.com" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; outline: none;" />
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Phone</label>
+            <input type="tel" placeholder="+1 (555) 000-0000" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; font-size: 0.875rem; outline: none;" />
+          </div>
+        </div>
+      </div>
+
+      <div style="border-bottom: 1px solid #e5e7eb; padding-bottom: 1.5rem;">
+        <h3 style="font-weight: 600; margin-bottom: 1rem;">Notification Settings</h3>
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <input type="checkbox" id="email-notif" checked style="cursor: pointer;" />
+            <label for="email-notif" style="font-size: 0.875rem; color: #374151; cursor: pointer;">Enable email notifications</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <input type="checkbox" checked style="cursor: pointer;" />
+            <label style="font-size: 0.875rem; color: #374151; cursor: pointer;">Enable overdue book alerts</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <input type="checkbox" checked style="cursor: pointer;" />
+            <label style="font-size: 0.875rem; color: #374151; cursor: pointer;">Weekly summary report</label>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding-bottom: 1.5rem;">
+        <h3 style="font-weight: 600; margin-bottom: 1rem;">Danger Zone</h3>
+        <button style="padding: 0.75rem 1.5rem; background-color: #ef4444; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500; transition: all 0.2s;" class="btn-danger">
+          Reset Password
+        </button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 1rem; justify-content: flex-end; border-top: 1px solid #e5e7eb; padding-top: 1.5rem;">
+        <button style="padding: 0.75rem 1.5rem; background-color: white; color: #374151; border: 1px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; font-weight: 500; transition: all 0.2s;" class="btn-cancel">
+          Cancel
+        </button>
+        <button style="padding: 0.75rem 1.5rem; background-color: #22c55e; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500; transition: all 0.2s;" class="btn-save">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

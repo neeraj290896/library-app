@@ -1,0 +1,11 @@
+/* Help component styles */
+
+.expanded-answer {
+  display: block !important;
+}
+
+button span {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+

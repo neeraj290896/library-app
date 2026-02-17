@@ -1,0 +1,19 @@
+/* Checkout Books component styles */
+
+.btn-primary {
+  background-color: #22c55e;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #16a34a;
+}
+
+.btn-secondary {
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #f9fafb;
+}
+

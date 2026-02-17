@@ -1,0 +1,28 @@
+/* Settings component styles */
+
+.btn-danger {
+  background-color: #ef4444;
+  transition: background-color 0.2s ease;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-cancel {
+  transition: background-color 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #f9fafb;
+}
+
+.btn-save {
+  background-color: #22c55e;
+  transition: background-color 0.2s ease;
+}
+
+.btn-save:hover {
+  background-color: #16a34a;
+}
+
