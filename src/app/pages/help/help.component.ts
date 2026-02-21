@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
   standalone: true,
   imports: [ButtonModule],
   templateUrl: './help.component.html',
-  styleUrl: './help.component.css'
+  styleUrl: './help.component.scss'
 })
 export class HelpComponent {
   faqs = signal([

@@ -1,0 +1,56 @@
+/* Settings component styles */
+
+$color-primary: #22c55e;
+$color-primary-dark: #16a34a;
+$color-danger: #ef4444;
+$color-danger-dark: #dc2626;
+
+.btn-danger {
+  background-color: $color-danger !important;
+  border-color: $color-danger !important;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: $color-danger-dark !important;
+    border-color: $color-danger-dark !important;
+  }
+}
+
+.btn-cancel {
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f9fafb !important;
+  }
+}
+
+.btn-save {
+  background-color: $color-primary !important;
+  border-color: $color-primary !important;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: $color-primary-dark !important;
+    border-color: $color-primary-dark !important;
+  }
+}
+
+.form-control {
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  
+  &:focus {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+  }
+}
+
+.form-check-input {
+  cursor: pointer;
+  
+  &:checked {
+    background-color: $color-primary;
+    border-color: $color-primary;
+  }
+}

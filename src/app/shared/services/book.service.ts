@@ -4,18 +4,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class BookService {
-  getCheckoutStatistics() {
-    return [
-      { day: 'Mon', borrowed: 3200, returned: 2800 },
-      { day: 'Tue', borrowed: 4200, returned: 2400 },
-      { day: 'Wed', borrowed: 3500, returned: 4600 },
-      { day: 'Thu', borrowed: 4000, returned: 3800 },
-      { day: 'Fri', borrowed: 3800, returned: 4200 },
-      { day: 'Sat', borrowed: 3600, returned: 3200 },
-      { day: 'Sun', borrowed: 3800, returned: 2800 },
-    ];
-  }
-
   getOverdueBooks() {
     return [
       { memberId: '#48964', title: 'Magnolia Palace', isbn: '3234', dueDate: '5', fine: '$10' },
@@ -23,24 +11,6 @@ export class BookService {
       { memberId: '#48964', title: 'Alice\'s Adventures in...', isbn: '3234', dueDate: '5', fine: '$10' },
       { memberId: '#48964', title: 'Pride and Prejudice', isbn: '3234', dueDate: '5', fine: '$10' },
       { memberId: '#48964', title: 'Treasure Island', isbn: '3234', dueDate: '5', fine: '$10' },
-    ];
-  }
-
-  getRecentCheckouts() {
-    return [
-      { id: '#48964', isbn: '3234', title: 'Magnolia Palace', author: 'Fiona Davis', member: 'Phillip Workman', issuedDate: '5/2/2023', returnDate: '15/2/2023' },
-      { id: '#48964', isbn: '3234', title: 'Don Quixote', author: 'Miguel de Cervantes', member: 'Kianna Donin', issuedDate: '5/2/2023', returnDate: '15/2/2023' },
-      { id: '#48964', isbn: '3234', title: 'Alice\'s Adventures in Wonder...', author: 'Lewis Carroll', member: 'Cristofer Bator', issuedDate: '3/2/2023', returnDate: '13/2/2023' },
-      { id: '#48964', isbn: '3234', title: 'Pride and Prejudice', author: 'Hanna Gouse', member: 'Livia Kenter', issuedDate: '3/2/2023', returnDate: '13/2/2023' },
-      { id: '#48964', isbn: '3234', title: 'Treasure Island', author: 'Phillip Siphnon', member: 'Tatiana Arcand', issuedDate: '2/2/2023', returnDate: '12/2/2023' },
-    ];
-  }
-
-  getTopBooks() {
-    return [
-      { title: 'Magnolia Palace', author: 'Cristofer Bator', status: 'Available' },
-      { title: 'Don Quixote', author: 'Aspen Siphron', status: 'Available' },
-      { title: 'Pride and Prejudice', author: 'Kianna Geidt', status: 'Available' },
     ];
   }
 

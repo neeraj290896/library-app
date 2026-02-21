@@ -2,39 +2,49 @@ import { Component, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookService } from '../../shared/services/book.service';
 import { CardModule } from 'primeng/card';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { PaginatorModule } from 'primeng/paginator';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, CardModule],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+    selector: 'app-dashboard',
+    standalone: true,
+    imports: [CommonModule, CardModule, TableModule, ButtonModule, FormsModule, InputTextModule, PaginatorModule],
+    templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
-  private bookService = inject(BookService);
+    private bookService = inject(BookService);
 
-  statsData = signal([
-    { label: 'Borrowed Books', value: '2405', change: '+23%', trend: 'up' },
-    { label: 'Returned Books', value: '783', change: '-14%', trend: 'down' },
-    { label: 'Overdue Books', value: '45', change: '+11%', trend: 'up' },
-    { label: 'Missing Books', value: '12', change: '+11%', trend: 'up' },
-    { label: 'Total Books', value: '32345', change: '+11%', trend: 'up' },
-    { label: 'Visitors', value: '1504', change: '+3', trend: 'up' },
-    { label: 'New Members', value: '34', change: '-10%', trend: 'down' },
-    { label: 'Pending Fees', value: '$765', change: '+56%', trend: 'up' },
-  ]);
+    currentDate = new Date();
+    searchTerm = '';
+    activeFilter = 'overview';
 
-  chartData = signal<any[]>([]);
-  overdueHistory = signal<any[]>([]);
-  recentCheckouts = signal<any[]>([]);
-  topBooks = signal<any[]>([]);
+    statsData = signal([
+        { label: 'Total Books', value: '32345', change: '+11%', trend: 'up' },
+        { label: 'Borrowed Books', value: '2405', change: '+23%', trend: 'up' },
+        { label: 'Overdue Books', value: '45', change: '+11%', trend: 'up' },
+        { label: 'Total Users', value: '34', change: '-10%', trend: 'down' }
+    ]);
 
-  constructor() {
-    effect(() => {
-      this.chartData.set(this.bookService.getCheckoutStatistics());
-      this.overdueHistory.set(this.bookService.getOverdueBooks());
-      this.recentCheckouts.set(this.bookService.getRecentCheckouts());
-      this.topBooks.set(this.bookService.getTopBooks());
-    });
-  }
+    chartData = signal<any[]>([]);
+    overdueHistory = signal<any[]>([]);
+    recentCheckouts = signal<any[]>([]);
+    topBooks = signal<any[]>([]);
+
+    constructor() {
+        effect(() => {
+            this.overdueHistory.set(this.bookService.getOverdueBooks());
+        });
+    }
+
+    setFilter(filter: string) {
+        this.activeFilter = filter;
+    }
+
+    onSearch(term: string) {
+        this.searchTerm = term;
+    }
 }

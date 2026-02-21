@@ -4,8 +4,18 @@
   display: block !important;
 }
 
-button span {
+.faq-arrow {
   transition: transform 0.2s ease;
   display: inline-block;
+  
+  &.expanded {
+    transform: rotate(180deg);
+  }
 }
 
+.btn-link {
+  &:hover,
+  &:focus {
+    color: inherit;
+  }
+}

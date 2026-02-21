@@ -1,0 +1,50 @@
+/* Staff component styles */
+
+$color-primary: #22c55e;
+$color-primary-dark: #16a34a;
+
+.btn-add-staff {
+    background-color: $color-primary !important;
+    border-color: $color-primary !important;
+    font-size: 0.875rem !important;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: $color-primary-dark !important;
+        border-color: $color-primary-dark !important;
+    }
+}
+
+.table-row {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #f9fafb;
+    }
+}
+
+.bg-success-subtle {
+    background-color: #dcfce7 !important;
+}
+
+.text-success {
+    color: #166534 !important;
+}
+
+.bg-danger-subtle {
+    background-color: #fee2e2 !important;
+}
+
+.text-danger {
+    color: #991b1b !important;
+}
+
+.btn-sm {
+    font-size: 0.875rem !important;
+}
+
+.active-filter {
+    background-color: $color-primary !important;
+    color: white !important;
+    border-color: $color-primary !important;
+}

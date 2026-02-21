@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
   standalone: true,
   imports: [FormsModule, ButtonModule, InputTextModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.scss'
 })
 export class LoginComponent {
   private authService = inject(AuthService);
