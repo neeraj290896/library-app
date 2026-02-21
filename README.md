@@ -8,22 +8,20 @@ This is a Library Management Application.
 src/
 ├── app/
 │   ├── pages/
-│   │   ├── layout/          # Main layout with sidebar
-│   │   ├── login/           # Login page
-│   │   ├── dashboard/       # Dashboard with statistics
-│   │   ├── members/         # Members management
-│   │   ├── add-books/       # Add new books
-│   │   ├── checkout-books/  # Book checkout
-│   │   ├── staff/           # Staff management
-│   │   ├── settings/        # Application settings
+│   │   ├── layout/          # Main Layout With Sidebar
+│   │   ├── login/           # Login Page
+│   │   ├── dashboard/       # Dashboard
+│   │   ├── books/           # Manage Books
+│   │   ├── checkout/        # Manage Check-In/Out Books
+│   │   ├── admin/           # Manage Admin
+│   │   ├── settings/        # Application Settings
 │   │   └── help/            # Help & FAQ
 │   ├── shared/
 │   │   ├── services/
 │   │   │   ├── auth.service.ts     # Authentication service
-│   │   │   ├── book.service.ts     # Book data service
-│   │   │   └── auth.guard.ts       # Route guard
-│   │   └── utils/
-│   │       └── primeng-import.ts   # Primeng Imports
+│   │   │   └── book.service.ts     # Book data service
+│   │   └── guards/
+│   │       └── auth.guard.ts       # Route guard
 │   ├── app.routes.ts        # Application routing
 │   ├── app.config.ts        # Application config
 │   └── app.component.ts     # Root component
@@ -32,13 +30,13 @@ src/
 
 ## Features
 
-- **Login Page**: Secure authentication with demo credentials
-- **Dashboard**: Real-time statistics and charts
-- **Members Management**: View and manage library members
-- **Book Management**: Add new books and manage checkouts
-- **Staff Management**: Manage library staff (Librarian only)
+- **Login**: Secure authentication
+- **Dashboard**: Dashboard data
+- **Book**: Add books
+- **Admin**: Manage users
+- **Checkout**: Manage checkouts
 - **Settings**: User preferences and account settings
-- **Help Section**: FAQ and support information
+- **Help**: FAQ and support information
 
 ## Demo Credentials
 
