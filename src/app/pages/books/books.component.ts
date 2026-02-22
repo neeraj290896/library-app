@@ -6,6 +6,7 @@ import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { PaginatorModule } from 'primeng/paginator';
+import { TabViewModule } from 'primeng/tabview';
 
 interface Book {
     sno: number;
@@ -18,13 +19,13 @@ interface Book {
 @Component({
     selector: 'app-books',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, TagModule, PaginatorModule],
+    imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, TagModule, PaginatorModule, TabViewModule],
     templateUrl: './books.component.html',
     styleUrl: './books.component.scss'
 })
 export class BooksComponent {
     searchTerm = '';
-    activeFilter = 'overview';
+    activeTab = 0;
 
     // Mock data
     allBooks = signal<Book[]>([
@@ -51,8 +52,8 @@ export class BooksComponent {
 
     totalBooks = computed(() => this.filteredBooks().length);
 
-    setFilter(filter: string) {
-        this.activeFilter = filter;
+    setFilter(tabIndex: number) {
+        this.activeTab = tabIndex;
     }
 
     onSearch(term: string) {

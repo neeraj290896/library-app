@@ -37,9 +37,3 @@ $color-primary: #22c55e;
     width: 2rem !important;
     height: 2rem !important;
 }
-
-:host ::ng-deep .books-table {
-    .p-datatable-tbody>tr:hover {
-        background-color: #f9fafb;
-    }
-}

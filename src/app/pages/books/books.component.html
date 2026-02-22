@@ -13,21 +13,15 @@
             </div>
         </div>
 
-        <!-- Filter Buttons -->
-        <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
-            <button pButton [label]="'Overview - ' + totalBooks()" class="p-button-outlined btn-sm"
-                (click)="setFilter('overview')" [ngClass]="{'active-filter': activeFilter === 'overview'}"></button>
-            <button pButton label="Manage Books" class="p-button-outlined btn-sm" (click)="setFilter('books')"
-                [ngClass]="{'active-filter': activeFilter === 'books'}"></button>
-            <button pButton label="Manage Author" class="p-button-outlined btn-sm" (click)="setFilter('author')"
-                [ngClass]="{'active-filter': activeFilter === 'author'}"></button>
-            <button pButton label="Manage Publisher" class="p-button-outlined btn-sm" (click)="setFilter('publisher')"
-                [ngClass]="{'active-filter': activeFilter === 'publisher'}"></button>
-            <button pButton label="Manage Category" class="p-button-outlined btn-sm" (click)="setFilter('category')"
-                [ngClass]="{'active-filter': activeFilter === 'category'}"></button>
-            <button pButton label="Manage Language" class="p-button-outlined btn-sm" (click)="setFilter('language')"
-                [ngClass]="{'active-filter': activeFilter === 'language'}"></button>
-        </div>
+        <!-- Filter Tabs -->
+        <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
+            <p-tabPanel [header]="'Overview - ' + totalBooks()"></p-tabPanel>
+            <p-tabPanel header="Manage Books"></p-tabPanel>
+            <p-tabPanel header="Manage Author"></p-tabPanel>
+            <p-tabPanel header="Manage Publisher"></p-tabPanel>
+            <p-tabPanel header="Manage Category"></p-tabPanel>
+            <p-tabPanel header="Manage Language"></p-tabPanel>
+        </p-tabView>
 
         <!-- Books Table -->
         <div class="table-responsive">

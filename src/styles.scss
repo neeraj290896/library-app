@@ -51,19 +51,43 @@ body {
 }
 
 // PrimeNG Table Styles - Reduce whitespace and gaps
-.p-datatable .p-datatable-thead>tr>th {
-    background-color: $color-primary !important;
-    color: $color-white !important;
-    border-color: $color-primary-dark !important;
+.p-datatable {
+    .p-datatable-thead>tr>th {
+        background-color: $color-primary !important;
+        color: $color-white !important;
+        border-color: $color-primary-dark !important;
+        text-transform: uppercase;
+        font-weight: bold !important;
+    }
+
+    .p-datatable-tbody>tr>td {
+        padding: 0.5rem 0.75rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .p-datatable-tbody>tr {
+        height: auto !important;
+
+        &:hover {
+            background-color: #f3f4f6 !important;
+        }
+    }
 }
 
-.p-datatable .p-datatable-tbody>tr>td {
-    padding: 0.5rem 0.75rem !important;
-    line-height: 1.2 !important;
-}
+.p-tabs {
+    .p-tab {
+        padding: 0.75rem 2rem !important;
+        font-size: 0.875rem !important;
 
-.p-datatable .p-datatable-tbody>tr {
-    height: auto !important;
+        &.p-tab-active {
+            background-color: $color-primary !important;
+            color: $color-white !important;
+        }
+
+        &:not(.p-tab-active):hover {
+            background-color: #f3f4f6 !important;
+        }
+    }
 }
 
 // Tailwind-like utilities for styling
