@@ -8,6 +8,16 @@
             <button pButton icon="pi pi-plus" label="Add User" class="p-button-outlined btn-sm active-filter"></button>
         </div>
 
+        <!-- Filter Tabs -->
+        <p-tabView [(activeIndex)]="activeTab" class="admin-tabs">            
+            <p-tabPanel header="Manage Users"></p-tabPanel>
+            <p-tabPanel header="Manage Role"></p-tabPanel>
+            <p-tabPanel header="Manage Organization"></p-tabPanel>
+            <p-tabPanel header="Manage Department"></p-tabPanel>
+            <p-tabPanel header="Manage TransactionType"></p-tabPanel>            
+        </p-tabView>
+
+          <!-- Users Table -->
         <div class="table-responsive">
             <p-table [value]="staffMembers()" styleClass="compact-table"
                 [tableStyle]="{'width':'100%','font-size':'0.875rem'}">
