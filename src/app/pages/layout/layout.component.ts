@@ -20,23 +20,14 @@ export class LayoutComponent {
     userName = this.authService.userName;
     sidebarCollapsed = signal(true);
 
-    private readonly menuItems = [
+    public readonly menuItems = [
         { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar' },
         { path: '/books', label: 'Books', icon: 'pi pi-book' },
         { path: '/checkout', label: 'Check-In/Out', icon: 'pi pi-sync' },
-        { path: '/admin', label: 'Admin', icon: 'pi pi-shield', librarianOnly: true },
+        { path: '/admin', label: 'Admin', icon: 'pi pi-shield' },
         { path: '/settings', label: 'Settings', icon: 'pi pi-cog' },
         { path: '/help', label: 'Help', icon: 'pi pi-question-circle' },
     ];
-
-    filteredMenuItems = computed(() =>
-        this.menuItems.filter(item => {
-            if (item.librarianOnly && this.userRole() !== 'librarian') {
-                return false;
-            }
-            return true;
-        })
-    );
 
     constructor() {
         effect(() => {

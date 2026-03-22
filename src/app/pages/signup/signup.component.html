@@ -1,0 +1,104 @@
+<div class="login-wrapper min-vh-100 d-flex">
+    <p-dialog header="OTP Verification" [modal]="true" [draggable]="false" [resizable]="false" [closable]="false"
+        [style]="{ width: '28rem' }" [visible]="otpDialogVisible()" (visibleChange)="otpDialogVisible.set($event)">
+        <div class="d-flex flex-column gap-3">
+            <p class="small text-muted mb-0">Enter the OTP sent to your registered email/mobile.</p>
+            <input pInputText type="text" [(ngModel)]="otp" [ngModelOptions]="{standalone: true}" inputmode="numeric"
+                maxlength="8" placeholder="Enter OTP" class="form-control login-input" (input)="onOtpInput($event)" />
+            @if (otpValidationError()) {
+            <div class="text-danger small">{{ otpValidationError() }}</div>
+            }
+            <button pButton type="button" (click)="onVerifyOtp()" [disabled]="verifyingOtp()"
+                class="btn btn-primary btn-signin w-100">
+                {{ verifyingOtp() ? 'Verifying OTP...' : 'Verify OTP' }}
+            </button>
+        </div>
+    </p-dialog>
+    <!-- Left Half - Logo Display -->
+    <div class="logo-section d-flex align-items-center justify-content-center">
+        <div class="logo-display text-center">
+            <img src="assets/images/logo.png" alt="School Logo" class="school-logo mb-5">
+            <h1 class="fs-1 fw-bold text-white mb-3">Library</h1>
+            <p class="text-white-50 fs-5">Mystic Falls High School</p>
+        </div>
+    </div>
+
+    <!-- Right Half - Signup Form -->
+    <div class="form-section d-flex justify-content-center p-4">
+        <div class="login-form-container my-4">
+            <h2 class="fs-4 fw-semibold mb-4 text-center text-dark">Sign Up</h2>
+
+            <form (ngSubmit)="handleSignup($event)" class="d-flex flex-column gap-3">
+
+                <div class="mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-2">Full Name</label>
+                    <div class="position-relative">
+                        <span class="input-icon">👤</span>
+                        <input pInputText type="text" [(ngModel)]="fullName" [ngModelOptions]="{standalone: true}"
+                            autocomplete="off" placeholder="Enter your full name" class="form-control login-input ps-5"
+                            required />
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-2">Email</label>
+                    <div class="position-relative">
+                        <span class="input-icon">✉️</span>
+                        <input pInputText type="email" [(ngModel)]="mailId" [ngModelOptions]="{standalone: true}"
+                            autocomplete="off" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
+                            placeholder="Enter your email" class="form-control login-input ps-5" required />
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-2">Mobile No.</label>
+                    <div class="position-relative">
+                        <span class="input-icon">📱</span>
+                        <input pInputText type="text" [(ngModel)]="mobileNo" [ngModelOptions]="{standalone: true}"
+                            (input)="onMobileInput($event)" autocomplete="off" inputmode="numeric" maxlength="10"
+                            pattern="[0-9]{10}" placeholder="Enter 10-digit mobile number"
+                            class="form-control login-input ps-5" required />
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-2">Gender</label>
+                    <p-select [(ngModel)]="gender" [ngModelOptions]="{standalone: true}" [options]="genderOptions"
+                        optionLabel="label" optionValue="value" placeholder="Select gender"
+                        styleClass="w-100 login-input" required />
+                </div>
+
+                <div class="mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-2">Date of Birth</label>
+                    <p-datepicker [(ngModel)]="dob" [ngModelOptions]="{standalone: true}" appendTo="body"
+                        [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd-mm-yy"
+                        placeholder="Select date of birth" styleClass="w-100" inputStyleClass="w-100 login-input"
+                        required />
+                </div>
+
+                <div class="mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-2">Role</label>
+                    <p-select [(ngModel)]="selectedRoleId" [ngModelOptions]="{standalone: true}" [options]="roles()"
+                        optionLabel="RoleName" optionValue="RoleId" placeholder="Select a role"
+                        styleClass="w-100 login-input" required />
+                </div>
+
+                <button pButton type="submit" [disabled]="loading()"
+                    class="btn btn-primary btn-signin w-100 py-2 fw-medium mt-1">
+                    {{ loading() ? 'Creating Account...' : 'Sign Up' }}
+                </button>
+
+                @if (validationError()) {
+                <div class="text-danger small text-center mt-1">{{ validationError() }}</div>
+                }
+            </form>
+
+            <div class="mt-4 pt-4 border-top text-center">
+                <p class="small text-muted mb-0">
+                    Already have an account?
+                    <a routerLink="/login" class="text-primary fw-medium text-decoration-none">Sign In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

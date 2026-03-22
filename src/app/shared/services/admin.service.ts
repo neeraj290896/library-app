@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { SettingDetails } from '../models/api.models';
+import { SettingDetails, AccessRequestDetails } from '../models/api.models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -26,5 +26,13 @@ export class AdminService {
 
     deleteSettingDetails(payload: SettingDetails): Observable<any> {
         return this.http.post(`${this.baseUrl}/DeleteSettingDetails`, payload);
+    }
+
+    getAccessRequestDetails(): Observable<any> {
+        return this.http.get(`${this.baseUrl}/GetAccessRequestDetails`);
+    }
+
+    updateAccessRequestDetails(payload: AccessRequestDetails[]): Observable<any> {
+        return this.http.post(`${this.baseUrl}/UpdateAccessRequestDetails`, payload);
     }
 }
