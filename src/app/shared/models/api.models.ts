@@ -1,3 +1,14 @@
+export interface AccessRequestDetails {
+    UserId: number;
+    RoleId: number;
+    RoleName?: string | null;
+    FullName?: string | null;
+    MobileNo?: string | null;
+    MaildId?: string | null;
+    Status?: string | null;
+    CreatedDate: string;
+}
+
 export interface SettingDetails {
     SettingId: number;
     CutOffDays: number;
@@ -215,6 +226,38 @@ export interface TransactionTypeDetails {
     TypeId: number;
     TypeName?: string | null;
     IsActive: boolean;
+}
+
+export interface TransactionDetails {
+    TransactionId: number;
+    UserId: number;
+    UserName?: string | null;
+    TypeId: number;
+    TypeName?: string | null;
+    BookCirculationId: number;
+    BookId: number;
+    BookName?: string | null;
+    IssuedDate: string;
+    IssuedByUserId: number;
+    IssuedByUserName?: string | null;
+    BookCirculationStatus?: string | null;
+    Comments?: string | null;
+    OverDueId?: number | null;
+    FineAmount?: number | null;
+    OverDueFrom?: string | null;
+    OverDueDays?: number | null;
+    OverDueStatus?: string | null;
+    SytemUpdatedDate?: string | null;
+    PaidAmount?: number | null;
+    PaidOn?: string | null;
+    TransactionStatus?: string | null;
+    ReturnDate?: string | null;
+    PaidByUserId?: number | null;
+    PaidByUserName?: string | null;
+    ReceivedByUserId?: number | null;
+    ReceivedByUserName?: string | null;
+    UpdatedByUserId?: number | null;
+    UpdatedByUserName?: string | null;
 }
 
 export interface UserDetails {

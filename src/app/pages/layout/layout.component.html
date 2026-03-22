@@ -20,7 +20,7 @@
         </div>
 
         <nav class="flex-grow-1 px-3 overflow-auto">
-            @for (item of filteredMenuItems(); track item.path) {
+            @for (item of menuItems; track item.path) {
             <a [routerLink]="item.path" [routerLinkActive]="'nav-link-active'"
                 [routerLinkActiveOptions]="{ exact: true }" class="nav-link" [class.collapsed]="sidebarCollapsed()"
                 [pTooltip]="sidebarCollapsed() ? item.label : ''">
