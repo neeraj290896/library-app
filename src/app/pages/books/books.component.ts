@@ -1,12 +1,14 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
-import { TagModule } from 'primeng/tag';
-import { PaginatorModule } from 'primeng/paginator';
 import { TabViewModule } from 'primeng/tabview';
+import { BooksOverdueComponent } from './books-overdue/books-overdue.component';
+import { BooksManageBooksComponent } from './books-manage-books/books-manage-books.component';
+import { BooksManageAuthorComponent } from './books-manage-author/books-manage-author.component';
+import { BooksManagePublisherComponent } from './books-manage-publisher/books-manage-publisher.component';
+import { BooksManageCategoryComponent } from './books-manage-category/books-manage-category.component';
+import { BooksManageLanguageComponent } from './books-manage-language/books-manage-language.component';
 
 interface Book {
     sno: number;
@@ -19,7 +21,18 @@ interface Book {
 @Component({
     selector: 'app-books',
     standalone: true,
-    imports: [CommonModule, FormsModule, ButtonModule, TableModule, InputTextModule, TagModule, PaginatorModule, TabViewModule],
+    imports: [
+        CommonModule,
+        FormsModule,
+        InputTextModule,
+        TabViewModule,
+        BooksOverdueComponent,
+        BooksManageBooksComponent,
+        BooksManageAuthorComponent,
+        BooksManagePublisherComponent,
+        BooksManageCategoryComponent,
+        BooksManageLanguageComponent
+    ],
     templateUrl: './books.component.html',
     styleUrl: './books.component.scss'
 })
@@ -58,22 +71,5 @@ export class BooksComponent {
 
     onSearch(term: string) {
         this.searchTerm = term;
-    }
-
-    editBook(book: Book) {
-        console.log('Edit book:', book);
-    }
-
-    deleteBook(book: Book) {
-        console.log('Delete book:', book);
-    }
-
-    getStatusSeverity(status: string): 'success' | 'warning' | 'info' {
-        switch (status) {
-            case 'Available': return 'success';
-            case 'Borrowed': return 'warning';
-            case 'Reserved': return 'info';
-            default: return 'info';
-        }
     }
 }

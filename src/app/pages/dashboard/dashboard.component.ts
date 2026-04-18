@@ -20,7 +20,7 @@ export class DashboardComponent {
 
     currentDate = new Date();
     searchTerm = '';
-    activeFilter = 'overview';
+    activeFilter = 'overdue';
 
     statsData = signal([
         { label: 'Total Books', value: '32345', change: '+11%', trend: 'up' },

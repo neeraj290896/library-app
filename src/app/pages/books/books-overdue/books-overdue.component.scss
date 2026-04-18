@@ -1,0 +1,44 @@
+$color-primary: #22c55e;
+
+::ng-deep {
+    .overdue-container {
+        .p-datatable {
+            .p-datatable-table {
+                table-layout: fixed;
+
+                .p-datatable-thead>tr>th {
+                    padding: 0.35rem 1rem;
+                }
+
+                .p-datatable-tbody>tr>td {
+                    padding: 0.25rem 1rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .p-tag {
+            padding: 0rem 0.5rem;
+        }
+
+        .table-clear-filter {
+            position: absolute;
+            margin-top: 0.3rem;
+            z-index: 1;
+
+            .p-button {
+                background: transparent !important;
+                border-color: $color-primary !important;
+                color: $color-primary !important;
+                transition: background-color 0.2s ease;
+
+                &:hover {
+                    background-color: $color-primary !important;
+                    color: white !important;
+                }
+            }
+        }
+    }
+}

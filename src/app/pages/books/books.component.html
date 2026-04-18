@@ -1,5 +1,5 @@
-<div class="d-flex flex-column gap-4">
-    <div class="card border-0 shadow-sm rounded p-4">
+<div class="books-container d-flex flex-column gap-4">
+    <div class="card border-0 shadow-sm rounded p-4 card-container">
         <!-- Header -->
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
@@ -15,54 +15,30 @@
 
         <!-- Filter Tabs -->
         <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
-            <p-tabPanel [header]="'Overview - ' + totalBooks()"></p-tabPanel>
-            <p-tabPanel header="Manage Books"></p-tabPanel>
-            <p-tabPanel header="Manage Author"></p-tabPanel>
-            <p-tabPanel header="Manage Publisher"></p-tabPanel>
-            <p-tabPanel header="Manage Category"></p-tabPanel>
-            <p-tabPanel header="Manage Language"></p-tabPanel>
+            <p-tabPanel [header]="'Overdue - ' + totalBooks()">
+                <app-books-overdue *ngIf="activeTab === 0" [totalBooks]="totalBooks()" [books]="filteredBooks()">
+                </app-books-overdue>
+            </p-tabPanel>
+
+            <p-tabPanel header="Manage Books">
+                <app-books-manage-books *ngIf="activeTab === 1"></app-books-manage-books>
+            </p-tabPanel>
+
+            <p-tabPanel header="Manage Author">
+                <app-books-manage-author *ngIf="activeTab === 2"></app-books-manage-author>
+            </p-tabPanel>
+
+            <p-tabPanel header="Manage Publisher">
+                <app-books-manage-publisher *ngIf="activeTab === 3"></app-books-manage-publisher>
+            </p-tabPanel>
+
+            <p-tabPanel header="Manage Category">
+                <app-books-manage-category *ngIf="activeTab === 4"></app-books-manage-category>
+            </p-tabPanel>
+
+            <p-tabPanel header="Manage Language">
+                <app-books-manage-language *ngIf="activeTab === 5"></app-books-manage-language>
+            </p-tabPanel>
         </p-tabView>
-
-        <!-- Books Table -->
-        <div class="table-responsive">
-            <p-table [value]="filteredBooks()" styleClass="compact-table"
-                [tableStyle]="{'width':'100%','font-size':'0.875rem'}">
-                <ng-template pTemplate="header">
-                    <tr class="border-bottom">
-                        <th class="text-start text-muted fw-medium" style="width: 80px;">S.no</th>
-                        <th class="text-start text-muted fw-medium">Title</th>
-                        <th class="text-start text-muted fw-medium">Author</th>
-                        <th class="text-start text-muted fw-medium">Publisher</th>
-                        <th class="text-start text-muted fw-medium">Status</th>
-                        <th class="text-start text-muted fw-medium" style="width: 120px;">Action</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-book>
-                    <tr class="border-bottom table-row">
-                        <td>{{ book.sno }}</td>
-                        <td>{{ book.title }}</td>
-                        <td>{{ book.author }}</td>
-                        <td>{{ book.publisher }}</td>
-                        <td>
-                            <p-tag [value]="book.status" [severity]="getStatusSeverity(book.status)"></p-tag>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <button pButton icon="pi pi-pencil" (click)="editBook(book)"
-                                    class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
-                                <button pButton icon="pi pi-trash" (click)="deleteBook(book)"
-                                    class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"></button>
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="d-flex align-items-center justify-content-center mt-4 gap-3">
-            <button pButton label="< PREVIOUS" class="p-button-outlined btn-sm"></button>
-            <button pButton label="NEXT >>" class="p-button-outlined btn-sm"></button>
-        </div>
     </div>
 </div>
