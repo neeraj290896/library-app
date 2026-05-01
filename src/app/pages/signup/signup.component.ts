@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 import { RoleService } from '../../shared/services/role.service';
 import { UserService } from '../../shared/services/user.service';
-import { OtpDetails, RoleDetails, UserDetails } from '../../shared/models/api.models';
+import { RoleDetails, UserDetails } from '../../shared/models/api.models';
 
 @Component({
     selector: 'app-signup',
@@ -33,16 +33,9 @@ export class SignupComponent implements OnInit {
     roles = signal<RoleDetails[]>([]);
     validationError = signal('');
     loading = signal(false);
-    otpDialogVisible = signal(false);
-    otp = signal('');
-    otpValidationError = signal('');
-    verifyingOtp = signal(false);
-    pendingEmail = signal('');
-    pendingMobile = signal('');
     readonly genderOptions = [
-        { label: 'Male', value: 'Male' },
-        { label: 'Female', value: 'Female' },
-        { label: 'Other', value: 'Other' }
+        { label: 'Male', value: 'M' },
+        { label: 'Female', value: 'F' }
     ];
 
     ngOnInit(): void {
@@ -102,8 +95,8 @@ export class SignupComponent implements OnInit {
             MobileNo: mobile,
             DOB: this.formatDate(this.dob()!),
             MailId: email,
-            ProfilePhoto: null,
-            Status: 'Pending Approval',
+            ProfilePhoto: '',
+            Status: 'Pending',
             CreatedByUserId: 0,
             CreatedByUserName: this.fullName().trim(),
             LastLogInTime: null,
@@ -112,63 +105,30 @@ export class SignupComponent implements OnInit {
 
         this.loading.set(true);
         this.userService.addUserDetails(payload).subscribe({
-            next: () => {
+            next: (res: any) => {
                 this.loading.set(false);
-                this.pendingEmail.set(email);
-                this.pendingMobile.set(mobile);
-                this.otp.set('');
-                this.otpValidationError.set('');
-                this.otpDialogVisible.set(true);
-                this.messageService.add({
-                    severity: 'info',
-                    summary: 'OTP Verification Required',
-                    detail: 'Enter the OTP sent to your registered contact details.'
-                });
+
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Signup Failed',
+                        detail: res ? res.Message : 'Registration failed. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Signup Successful',
+                        detail: 'Registration successful. Sent for approval.'
+                    });
+                }
             },
             error: () => {
                 this.loading.set(false);
+
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Signup Failed',
                     detail: 'Registration failed. Please try again.'
-                });
-            }
-        });
-    }
-
-    onVerifyOtp(): void {
-        this.otpValidationError.set('');
-        const otpValue = this.otp().trim();
-
-        if (!/^\d{4,8}$/.test(otpValue)) {
-            this.otpValidationError.set('Please enter a valid OTP.');
-            return;
-        }
-
-        const payload: OtpDetails = {
-            MailId: this.pendingEmail(),
-            MobileNo: this.pendingMobile(),
-            Otp: otpValue
-        };
-
-        this.verifyingOtp.set(true);
-        this.userService.verifyOtpDetails(payload).subscribe({
-            next: () => {
-                this.verifyingOtp.set(false);
-                this.otpDialogVisible.set(false);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Signup Successful',
-                    detail: 'Account created successfully and pending for approval. You can login once your account is approved.'
-                });
-                setTimeout(() => this.router.navigate(['/login']), 1500);
-            },
-            error: () => {
-                this.verifyingOtp.set(false);
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'OTP Verification Failed',
-                    detail: 'Invalid OTP. Please try again.'
                 });
             }
         });
@@ -181,15 +141,6 @@ export class SignupComponent implements OnInit {
             input.value = digitsOnly;
         }
         this.mobileNo.set(digitsOnly);
-    }
-
-    onOtpInput(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        const digitsOnly = input.value.replace(/\D/g, '').slice(0, 8);
-        if (input.value !== digitsOnly) {
-            input.value = digitsOnly;
-        }
-        this.otp.set(digitsOnly);
     }
 
     private isValidEmail(value: string): boolean {

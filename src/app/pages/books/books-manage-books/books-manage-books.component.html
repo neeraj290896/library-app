@@ -1,0 +1,165 @@
+<div class="manage-books-container">
+    <div class="table-clear-filter">
+        <p-button variant="outlined" label="Clear" icon="pi pi-filter-slash" (onClick)="clear()"></p-button>
+    </div>
+    <p-table [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" scrollable="true" scrollHeight="600px"
+        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <ng-template pTemplate="header">
+            <tr class="border-bottom">
+                <th class="text-start text-muted fw-medium" style="width: 5%; min-width: 50px;">
+                    <div class="d-flex align-items-center gap-2">S.No</div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 12%; min-width: 120px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
+                            Book
+                            <p-sortIcon field="BookName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'" (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%; min-width: 100px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="AuthorName">
+                            Author
+                            <p-sortIcon field="AuthorName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedAuthorNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'" (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%; min-width: 100px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="PublisherName">
+                            Publisher
+                            <p-sortIcon field="PublisherName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedPublisherNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'" (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 9%; min-width: 90px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="CategoryName">
+                            Category
+                            <p-sortIcon field="CategoryName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedCategoryNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'" (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 9%; min-width: 90px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="LanguageName">
+                            Language
+                            <p-sortIcon field="LanguageName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedLanguageNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'" (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 8%; min-width: 80px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="PublishedYear">
+                            Year
+                            <p-sortIcon field="PublishedYear"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedPublishedYearList.length > 0 ? 'pi-filter-fill' : 'pi-filter'" (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 7%; min-width: 70px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                            Status
+                            <p-sortIcon field="IsActive"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'" (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 6%; min-width: 60px;">Action</th>
+            </tr>
+            @if (showFt) {
+            <tr>
+                <th></th>
+                <th>
+                    <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList" (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body" placeholder="All"></p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="AuthorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="authorNameList" [(ngModel)]="selectedAuthorNameList" (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body" placeholder="All"></p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="PublisherName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="publisherNameList" [(ngModel)]="selectedPublisherNameList" (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body" placeholder="All"></p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="CategoryName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="categoryNameList" [(ngModel)]="selectedCategoryNameList" (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body" placeholder="All"></p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="LanguageName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="languageNameList" [(ngModel)]="selectedLanguageNameList" (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body" placeholder="All"></p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="PublishedYear" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="publishedYearList" [(ngModel)]="selectedPublishedYearList" (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body" placeholder="All"></p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList" (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body" placeholder="All"></p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+            </tr>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="body" let-book let-index="rowIndex">
+            <tr class="border-bottom">
+                <td>{{ index + 1 }}</td>
+                <td>{{ book.BookName }}</td>
+                <td>{{ book.AuthorName }}</td>
+                <td>{{ book.PublisherName }}</td>
+                <td>{{ book.CategoryName }}</td>
+                <td>{{ book.LanguageName }}</td>
+                <td>{{ book.PublishedYear }}</td>
+                <td>
+                    <p-tag [value]="book.IsActive ? 'Active' : 'Inactive'" [severity]="getStatusSeverity(book.IsActive)"></p-tag>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                        <button pButton icon="pi pi-pencil" (click)="editBook(book)" class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
+                        <button pButton icon="pi pi-trash" (click)="deleteBook(book)" class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="9" class="text-center">
+                    No books found.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

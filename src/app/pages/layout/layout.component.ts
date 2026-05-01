@@ -30,11 +30,11 @@ export class LayoutComponent {
     ];
 
     constructor() {
-        effect(() => {
-            if (!this.userRole()) {
-                this.router.navigate(['/login']);
-            }
-        });
+        // effect(() => {
+        //     if (!this.userRole()) {
+        //         this.router.navigate(['/login']);
+        //     }
+        // });
     }
 
     logout(): void {

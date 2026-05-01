@@ -52,31 +52,72 @@ body {
 
 // PrimeNG Table Styles - Reduce whitespace and gaps
 .p-datatable {
-    .p-datatable-thead>tr>th {
-        background-color: $color-primary !important;
-        color: $color-white !important;
-        border-color: $color-primary-dark !important;
-        text-transform: uppercase;
-        font-weight: bold !important;
-    }
+    .p-datatable-thead>tr {
+        &>th {
+            background-color: $color-primary !important;
+            color: $color-white !important;
+            border-color: $color-primary !important;
+            text-transform: uppercase !important;
+            font-weight: bold !important;
+            font-size: 0.875rem !important;
+            line-height: 2 !important;
 
-    .p-datatable-tbody>tr>td {
-        padding: 0.5rem 0.75rem !important;
-        line-height: 1.2 !important;
+            .p-datatable-sortable-column {
+                background-color: #22c55e !important;
+                color: white !important;
+
+                .p-iconwrapper {
+                    display: flex;
+                    
+                    .p-icon {
+                        height: 0.875rem !important;
+                        width: 0.875rem !important;
+                    }
+                }
+            }
+
+            .p-datatable-filter {
+                .p-fluid {
+                    width: 100%;
+
+                    .p-multiselect {
+                        width: 100%;
+                    }
+                }
+            }
+
+            .pi {
+                font-size: 0.875rem !important;
+                cursor: pointer;
+            }
+        }
     }
 
     .p-datatable-tbody>tr {
-        height: auto !important;
+        transition: background-color 0.2s ease;
+
+        &>td {
+            line-height: 2;
+            font-size: 0.875rem;
+        }
 
         &:hover {
             background-color: #f3f4f6 !important;
         }
     }
+
+    .p-paginator {
+        padding: 0.5rem !important;
+        background-color: transparent !important;
+        border: none !important;
+        font-size: 0.75rem;
+        justify-content: flex-end;
+    }
 }
 
 .p-tabs {
     .p-tab {
-        padding: 0.75rem 2rem !important;
+        padding: 0.5rem 2rem !important;
         font-size: 0.875rem !important;
 
         &.p-tab-active {
@@ -87,6 +128,53 @@ body {
         &:not(.p-tab-active):hover {
             background-color: #f3f4f6 !important;
         }
+    }
+
+    .p-tabpanels {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+
+.p-multiselect {
+    .p-multiselect-label {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+    }
+
+    .p-multiselect-trigger {
+        font-size: 0.875rem;
+    }
+}
+
+.p-multiselect-overlay {
+    font-size: 0.875rem;
+    max-width: 80rem;
+
+    .p-inputtext {
+        font-size: 0.875rem;
+    }
+
+    .p-checkbox {
+        transform: scale(0.85);
+    }
+
+    .p-multiselect-option {
+        span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+.p-button {
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+
+    .p-button-icon {
+        font-size: 0.875rem !important;
     }
 }
 

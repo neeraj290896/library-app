@@ -61,10 +61,11 @@ export class LoginComponent {
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.loading.set(false);
+
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Login Failed',
-                        detail: res ? res.Message : 'Invalid username or password.'
+                        detail: res ? res.Message : 'Invalid username or password. Please try again.'
                     });
                     return;
                 }
@@ -78,6 +79,7 @@ export class LoginComponent {
                     },
                     error: () => {
                         this.loading.set(false);
+
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Login Failed',
@@ -88,6 +90,7 @@ export class LoginComponent {
             },
             error: () => {
                 this.loading.set(false);
+
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Login Failed',
