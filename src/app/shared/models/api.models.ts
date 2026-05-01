@@ -212,8 +212,10 @@ export interface ResetCredPassword {
 
 export interface RoleDetails {
     RoleId: number;
-    RoleName?: string | null;
+    RoleName?: string | null;    
     IsActive: boolean;
+    UserHasEditAccess: boolean;
+    UserCanLogin: boolean;
 }
 
 export interface StateDetails {

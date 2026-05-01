@@ -1,5 +1,5 @@
-<div class="d-flex flex-column gap-4">
-    <div class="card border-0 shadow-sm rounded p-4">
+<div class="d-flex flex-column gap-3">
+    <div class="card border-0 shadow-sm rounded p-3">
         <!-- Header -->
         <div class="d-flex align-items-center justify-content-between">
             <div>
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="card border-0 shadow-sm rounded p-4">
+    <div class="card border-0 shadow-sm rounded p-3">
         <h3 class="fs-5 fw-semibold mb-3">Quick Actions</h3>
         <div class="d-flex gap-2 flex-wrap">
             <button pButton label="Overdue" class="p-button-outlined btn-sm" (click)="setFilter('overdue')"
@@ -50,7 +50,7 @@
     </div>
 
     <!-- Overdue Books -->
-    <div class="card border-0 shadow-sm rounded p-4">
+    <div class="card border-0 shadow-sm rounded p-3">
         <h3 class="fs-5 fw-semibold mb-3">Overdue Books - {{ overdueHistory().length }}</h3>
         <div class="table-responsive">
             <p-table [value]="overdueHistory()" [tableStyle]="{'width':'100%','font-size':'0.875rem'}"
