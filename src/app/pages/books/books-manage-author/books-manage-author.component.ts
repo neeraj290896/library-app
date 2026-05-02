@@ -48,7 +48,7 @@ export class BooksManageAuthorComponent implements OnInit {
         this.authorNameList = [...new Set(this.authors.map(author => author.AuthorName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.authors.map(author => author.IsActive))]
-            .map(e => ({ label: e ? 'Active' : 'Inactive', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
     }
 
     showFilter(): void {

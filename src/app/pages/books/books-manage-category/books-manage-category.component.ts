@@ -48,7 +48,7 @@ export class BooksManageCategoryComponent implements OnInit {
         this.categoryNameList = [...new Set(this.categories.map(cat => cat.CategoryName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.categories.map(cat => cat.IsActive))]
-            .map(e => ({ label: e ? 'Active' : 'Inactive', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
     }
 
     showFilter(): void {

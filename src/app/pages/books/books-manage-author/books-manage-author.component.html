@@ -1,6 +1,7 @@
 <div class="manage-author-container">
     <div class="table-clear-filter">
-        <p-button variant="outlined" label="Clear" icon="pi pi-filter-slash" (onClick)="clear()"></p-button>
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
     </div>
     <p-table [value]="authors" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
@@ -72,15 +73,15 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ author.AuthorName }}</td>
                 <td>
-                    <p-tag [value]="author.IsActive ? 'Active' : 'Inactive'"
+                    <p-tag [value]="author.IsActive ? 'Active' : 'In-active'"
                         [severity]="getStatusSeverity(author.IsActive)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <button pButton icon="pi pi-pencil" (click)="editAuthor(author)"
-                            class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-sm"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteAuthor(author)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm"></button>
                     </div>
                 </td>
             </tr>

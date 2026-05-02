@@ -20,7 +20,7 @@
                     <div class="position-relative">
                         <span class="input-icon">👤</span>
                         <input pInputText type="text" [(ngModel)]="fullName" [ngModelOptions]="{standalone: true}"
-                            autocomplete="off" placeholder="Enter your full name" class="form-control login-input ps-5"
+                            autocomplete="off" placeholder="Enter your full name" class="form-control ps-5"
                             required />
                     </div>
                 </div>
@@ -31,7 +31,7 @@
                         <span class="input-icon">✉️</span>
                         <input pInputText type="email" [(ngModel)]="mailId" [ngModelOptions]="{standalone: true}"
                             autocomplete="off" maxlength="254" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-                            placeholder="Enter your email" class="form-control login-input ps-5" required />
+                            placeholder="Enter your email" class="form-control ps-5" required />
                     </div>
                 </div>
 
@@ -42,7 +42,7 @@
                         <input pInputText type="text" [(ngModel)]="mobileNo" [ngModelOptions]="{standalone: true}"
                             (input)="onMobileInput($event)" autocomplete="off" inputmode="numeric" maxlength="10"
                             pattern="[0-9]{10}" placeholder="Enter 10-digit mobile number"
-                            class="form-control login-input ps-5" required />
+                            class="form-control ps-5" required />
                     </div>
                 </div>
 
@@ -50,14 +50,14 @@
                     <label class="d-block small fw-medium text-secondary mb-2">Gender</label>
                     <p-select [(ngModel)]="gender" [ngModelOptions]="{standalone: true}" [options]="genderOptions"
                         optionLabel="label" optionValue="value" placeholder="Select gender"
-                        styleClass="w-100 login-input" required />
+                        styleClass="w-100" required />
                 </div>
 
                 <div class="mb-2">
                     <label class="d-block small fw-medium text-secondary mb-2">Date of Birth</label>
                     <p-datepicker [(ngModel)]="dob" [ngModelOptions]="{standalone: true}" appendTo="body"
                         [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd-mm-yy"
-                        placeholder="Select date of birth" styleClass="w-100" inputStyleClass="w-100 login-input"
+                        placeholder="Select date of birth" styleClass="w-100" inputStyleClass="w-100"
                         required />
                 </div>
 
@@ -65,7 +65,7 @@
                     <label class="d-block small fw-medium text-secondary mb-2">Role</label>
                     <p-select [(ngModel)]="selectedRoleId" [ngModelOptions]="{standalone: true}" [options]="roles()"
                         optionLabel="RoleName" optionValue="RoleId" placeholder="Select a role"
-                        styleClass="w-100 login-input" required />
+                        styleClass="w-100" required />
                 </div>
 
                 <button pButton type="submit" [disabled]="loading()"

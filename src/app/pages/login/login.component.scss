@@ -71,19 +71,6 @@ $color-primary-dark: #16a34a;
     }
 }
 
-.login-input {
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    transition: box-shadow 0.2s ease;
-    border: 1px solid #e5e7eb;
-
-    &:focus {
-        outline: none;
-        border-color: $color-primary;
-        box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
-    }
-}
-
 .input-icon {
     position: absolute;
     left: 0.75rem;
