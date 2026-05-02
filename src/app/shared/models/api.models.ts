@@ -150,7 +150,7 @@ export interface FloorDetails {
 export interface LanguageDetails {
     LanguageId: number;
     LanguageName?: string | null;
-    IsActive: boolean;
+    IsActive: boolean | null;
 }
 
 export interface LoggedInUserDetails {

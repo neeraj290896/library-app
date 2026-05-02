@@ -69,7 +69,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.publishedYearList = [...new Set(this.books.map(book => book.PublishedYear))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.books.map(book => book.IsActive))]
-            .map(e => ({ label: e ? 'Active' : 'Inactive', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
     }
 
     showFilter(): void {
