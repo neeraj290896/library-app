@@ -285,3 +285,17 @@ export interface RoleDetails {
    RoleName?: string | null;
    IsActive: boolean;
 }
+
+export interface DepartmentDetails {
+   DepartmentId: number;
+   DepartmentName?: string | null;
+   IsActive: boolean;
+}
+
+
+
+export interface TransactionTypeDetails {
+   TypeId: number;
+   TypeName?: string | null;
+   IsActive: boolean;
+}
