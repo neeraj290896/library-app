@@ -20,13 +20,14 @@ import { BuildingService } from '@app/shared/services/building.service';
 import { FloorService } from '@app/shared/services/floor.service';
 import { RackService } from '@app/shared/services/rack.service';
 import { DatePickerModule } from 'primeng/datepicker';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-books-manage-books',
     standalone: true,
     imports: [CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
-        SelectModule, FormsModule, DatePickerModule],
+        SelectModule, FormsModule, DatePickerModule, TooltipModule],
     templateUrl: './books-manage-books.component.html',
     styleUrl: './books-manage-books.component.scss'
 })

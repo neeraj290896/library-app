@@ -76,7 +76,11 @@
         <ng-template pTemplate="body" let-language let-index="rowIndex">
             <tr class="border-bottom">
                 <td>{{ index + 1 }}</td>
-                <td>{{ language.LanguageName }}</td>
+                <td>
+                    <span [pTooltip]="language.LanguageName">
+                        {{ language.LanguageName }}
+                    </span>
+                </td>
                 <td>
                     <p-tag [value]="language.IsActive ? 'Active' : 'In-active'"
                         [severity]="getStatusSeverity(language.IsActive)"></p-tag>

@@ -12,13 +12,14 @@ import { FormsModule } from '@angular/forms';
 import { PublisherService } from '@services/publisher.service';
 import { PublisherDetails } from '@app/shared/models/api.models';
 import { MessageService } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-books-manage-publisher',
     standalone: true,
     imports: [CommonModule, ButtonModule, TableModule, TagModule, 
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, 
-        SelectModule, FormsModule],
+        SelectModule, FormsModule, TooltipModule],
     templateUrl: './books-manage-publisher.component.html',
     styleUrl: './books-manage-publisher.component.scss'
 })

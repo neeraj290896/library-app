@@ -303,6 +303,12 @@ label {
     }
 }
 
+.p-tooltip {
+    font-size: 0.875rem !important;
+    max-width: 80rem;
+    word-wrap: break-word
+}
+
 // Tailwind-like utilities for styling
 .bg-white {
     background-color: $color-white;

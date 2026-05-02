@@ -76,7 +76,11 @@
         <ng-template pTemplate="body" let-category let-index="rowIndex">
             <tr class="border-bottom">
                 <td>{{ index + 1 }}</td>
-                <td>{{ category.CategoryName }}</td>
+                <td>
+                    <span [pTooltip]="category.CategoryName">
+                        {{ category.CategoryName }}
+                    </span>
+                </td>
                 <td>
                     <p-tag [value]="category.IsActive ? 'Active' : 'In-active'"
                         [severity]="getStatusSeverity(category.IsActive)"></p-tag>

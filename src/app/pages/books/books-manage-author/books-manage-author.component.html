@@ -75,7 +75,11 @@
         <ng-template pTemplate="body" let-author let-index="rowIndex">
             <tr class="border-bottom">
                 <td>{{ index + 1 }}</td>
-                <td>{{ author.AuthorName }}</td>
+                <td>
+                    <span [pTooltip]="author.AuthorName">
+                        {{ author.AuthorName }}
+                    </span>
+                </td>
                 <td>
                     <p-tag [value]="author.IsActive ? 'Active' : 'In-active'"
                         [severity]="getStatusSeverity(author.IsActive)"></p-tag>

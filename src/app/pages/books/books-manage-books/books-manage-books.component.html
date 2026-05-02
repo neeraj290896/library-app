@@ -177,11 +177,27 @@
         <ng-template pTemplate="body" let-book let-index="rowIndex">
             <tr class="border-bottom">
                 <td>{{ index + 1 }}</td>
-                <td>{{ book.BookName }}</td>
+                <td>
+                    <span [pTooltip]="book.BookName">
+                        {{ book.BookName }}
+                    </span>
+                </td>
                 <td>{{ book.AuthorName }}</td>
-                <td>{{ book.PublisherName }}</td>
-                <td>{{ book.CategoryName }}</td>
-                <td>{{ book.LanguageName }}</td>
+                <td>
+                    <span [pTooltip]="book.PublisherName">
+                        {{ book.PublisherName }}
+                    </span>
+                </td>
+                <td>
+                    <span [pTooltip]="book.CategoryName">
+                        {{ book.CategoryName }}
+                    </span>
+                </td>
+                <td>
+                    <span [pTooltip]="book.LanguageName">
+                        {{ book.LanguageName }}
+                    </span>
+                </td>
                 <td>{{ book.PublishedYear }}</td>
                 <td>
                     <p-tag [value]="book.IsActive ? 'Active' : 'In-active'"
