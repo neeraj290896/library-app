@@ -12,13 +12,14 @@ import { LanguageService } from '@services/language.service';
 import { LanguageDetails } from '@app/shared/models/api.models';
 import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-books-manage-language',
     standalone: true,
     imports: [CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
-        FormsModule, SelectModule],
+        FormsModule, SelectModule, TooltipModule],
     templateUrl: './books-manage-language.component.html',
     styleUrl: './books-manage-language.component.scss'
 })
@@ -35,6 +36,7 @@ export class BooksManageLanguageComponent implements OnInit {
     public selectedLanguageNameList: string[] = [];
     public selectedStatusList: boolean[] = [];
     public languageDialogVisible = false;
+    public header: string = '';
     public currentLanguage: LanguageDetails = { LanguageId: 0, LanguageName: '', IsActive: null };
     public errors: { LanguageName: string, IsActive: string } = {
         LanguageName: '',
@@ -86,9 +88,11 @@ export class BooksManageLanguageComponent implements OnInit {
     editLanguage(language: LanguageDetails | null = null): void {
         if (language) {
             this.currentLanguage = { ...language };
+            this.header = 'Edit Language';
         }
         else {
             this.currentLanguage = { LanguageId: 0, LanguageName: '', IsActive: null };
+            this.header = 'Add Language';
         }
         this.errors = { LanguageName: '', IsActive: '' };
         this.languageDialogVisible = true;
@@ -100,7 +104,7 @@ export class BooksManageLanguageComponent implements OnInit {
         switch (key) {
             case 'LanguageName':
                 if (!this.currentLanguage.LanguageName?.trim()) {
-                    this.errors.LanguageName = 'Language name is required.';
+                    this.errors.LanguageName = 'Language is required.';
                     isValid = false;
                 }
                 else {
@@ -126,7 +130,9 @@ export class BooksManageLanguageComponent implements OnInit {
     }
 
     validateLanguage(): boolean {
-        return this.validateInput('LanguageName') && this.validateInput('IsActive');
+        const isNameValid = this.validateInput('LanguageName');
+        const isStatusValid = this.validateInput('IsActive');
+        return isNameValid && isStatusValid;
     }
 
     saveLanguage(): void {
@@ -152,7 +158,6 @@ export class BooksManageLanguageComponent implements OnInit {
                 }
 
                 this.loadLanguages();
-                this.errors = { LanguageName: '', IsActive: '' };
                 this.languageDialogVisible = false;
             },
             error: () => {

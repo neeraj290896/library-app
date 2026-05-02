@@ -15,7 +15,7 @@
 
             <form (ngSubmit)="handleLogin($event)" class="d-flex flex-column gap-3">
                 <div class="mb-3">
-                    <label class="d-block small fw-medium text-secondary mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-1">
                         Email or Mobile
                     </label>
                     <div class="position-relative">
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="d-block small fw-medium text-secondary mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-1">
                         Password
                     </label>
                     <p-password [(ngModel)]="password" name="password" [feedback]="false" [toggleMask]="true"

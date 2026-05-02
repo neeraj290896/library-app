@@ -16,7 +16,7 @@
             <form (ngSubmit)="handleSignup($event)" class="d-flex flex-column gap-3">
 
                 <div class="mb-2">
-                    <label class="d-block small fw-medium text-secondary mb-2">Full Name</label>
+                    <label class="d-block small fw-medium text-secondary mb-1">Full Name</label>
                     <div class="position-relative">
                         <span class="input-icon">👤</span>
                         <input pInputText type="text" [(ngModel)]="fullName" [ngModelOptions]="{standalone: true}"
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="mb-2">
-                    <label class="d-block small fw-medium text-secondary mb-2">Email</label>
+                    <label class="d-block small fw-medium text-secondary mb-1">Email</label>
                     <div class="position-relative">
                         <span class="input-icon">✉️</span>
                         <input pInputText type="email" [(ngModel)]="mailId" [ngModelOptions]="{standalone: true}"
@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="mb-2">
-                    <label class="d-block small fw-medium text-secondary mb-2">Mobile No.</label>
+                    <label class="d-block small fw-medium text-secondary mb-1">Mobile No.</label>
                     <div class="position-relative">
                         <span class="input-icon">📱</span>
                         <input pInputText type="text" [(ngModel)]="mobileNo" [ngModelOptions]="{standalone: true}"
@@ -47,14 +47,14 @@
                 </div>
 
                 <div class="mb-2">
-                    <label class="d-block small fw-medium text-secondary mb-2">Gender</label>
+                    <label class="d-block small fw-medium text-secondary mb-1">Gender</label>
                     <p-select [(ngModel)]="gender" [ngModelOptions]="{standalone: true}" [options]="genderOptions"
                         optionLabel="label" optionValue="value" placeholder="Select gender"
                         styleClass="w-100" required />
                 </div>
 
                 <div class="mb-2">
-                    <label class="d-block small fw-medium text-secondary mb-2">Date of Birth</label>
+                    <label class="d-block small fw-medium text-secondary mb-1">Date of Birth</label>
                     <p-datepicker [(ngModel)]="dob" [ngModelOptions]="{standalone: true}" appendTo="body"
                         [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd-mm-yy"
                         placeholder="Select date of birth" styleClass="w-100" inputStyleClass="w-100"
@@ -62,7 +62,7 @@
                 </div>
 
                 <div class="mb-2">
-                    <label class="d-block small fw-medium text-secondary mb-2">Role</label>
+                    <label class="d-block small fw-medium text-secondary mb-1">Role</label>
                     <p-select [(ngModel)]="selectedRoleId" [ngModelOptions]="{standalone: true}" [options]="roles()"
                         optionLabel="RoleName" optionValue="RoleId" placeholder="Select a role"
                         styleClass="w-100" required />

@@ -274,6 +274,41 @@ label {
     }
 }
 
+.p-datepicker {
+    &:has(.p-datepicker-dropdown) {
+        .p-datepicker-input {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+    }
+
+    &:has(.p-datepicker-input:focus) {
+        .p-datepicker-dropdown {
+            outline: none !important;
+            border-color: $color-primary !important;
+            box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25) !important;
+        }
+    }
+}
+
+.p-datepicker-panel {
+    font-size: 0.875rem !important;
+
+    .p-datepicker-day-view {
+        font-size: 0.875rem !important;
+
+        th {
+            text-align: center !important;
+        }
+    }
+}
+
+.p-tooltip {
+    font-size: 0.875rem !important;
+    max-width: 80rem;
+    word-wrap: break-word
+}
+
 // Tailwind-like utilities for styling
 .bg-white {
     background-color: $color-white;
@@ -511,4 +546,11 @@ table {
 // Gradient background
 .bg-gradient {
     background: linear-gradient(135deg, #ecf5f0 0%, #f3f4f6 100%);
+}
+
+:root {
+    --p-progressspinner-color-one: #16a34a !important;
+    --p-progressspinner-color-two: #16a34a !important;
+    --p-progressspinner-color-three: #16a34a !important;
+    --p-progressspinner-color-four: #16a34a !important;
 }
