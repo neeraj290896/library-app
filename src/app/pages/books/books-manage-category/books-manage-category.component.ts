@@ -13,14 +13,13 @@ import { CategoryService } from '@services/category.service';
 import { CategoryDetails } from '@app/shared/models/api.models';
 import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
-import { AutoFocus } from "primeng/autofocus";
 
 @Component({
     selector: 'app-books-manage-category',
     standalone: true,
     imports: [CommonModule, ButtonModule, TableModule, TagModule,
     PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
-    SelectModule, FormsModule, TooltipModule, AutoFocus],
+    SelectModule, FormsModule, TooltipModule],
     templateUrl: './books-manage-category.component.html',
     styleUrl: './books-manage-category.component.scss'
 })
