@@ -4,14 +4,17 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { MessageService } from 'primeng/api';
 import Lara from '@primeng/themes/aura';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { loadingInterceptor } from './shared/interceptors/loading.interceptor';
 
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
     providers: [
         provideRouter(routes),
-        provideHttpClient(),
+        provideHttpClient(
+            withInterceptors([loadingInterceptor])
+        ),
         MessageService,
         provideAnimationsAsync(),
         providePrimeNG({

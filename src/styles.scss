@@ -541,3 +541,10 @@ table {
 .bg-gradient {
     background: linear-gradient(135deg, #ecf5f0 0%, #f3f4f6 100%);
 }
+
+:root {
+    --p-progressspinner-color-one: #16a34a !important;
+    --p-progressspinner-color-two: #16a34a !important;
+    --p-progressspinner-color-three: #16a34a !important;
+    --p-progressspinner-color-four: #16a34a !important;
+}
