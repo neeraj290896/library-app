@@ -278,3 +278,10 @@ export interface UserDetails {
     LastLogInTime?: string | null;
     IsActive?: boolean | null;
 }
+
+
+export interface RoleDetails {
+   RoleId: number;
+   RoleName?: string | null;
+   IsActive: boolean;
+}

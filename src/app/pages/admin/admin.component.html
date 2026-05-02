@@ -10,14 +10,25 @@
 
         <!-- Filter Tabs -->
         <p-tabView [(activeIndex)]="activeTab" class="admin-tabs">            
-            <p-tabPanel header="Manage Users"></p-tabPanel>
-            <p-tabPanel header="Manage Role"></p-tabPanel>
-            <p-tabPanel header="Manage Organization"></p-tabPanel>
-            <p-tabPanel header="Manage Department"></p-tabPanel>
-            <p-tabPanel header="Manage TransactionType"></p-tabPanel>            
+            <p-tabPanel header="Manage Users">
+                <app-manage-users *ngIf="activeTab === 0"></app-manage-users>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Role">
+                <app-manage-role *ngIf="activeTab === 1"></app-manage-role>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Organization">
+                <app-manage-organization *ngIf="activeTab === 2"></app-manage-organization>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Department">
+                <app-manage-department *ngIf="activeTab === 3"></app-manage-department>
+            </p-tabPanel>
+            <p-tabPanel header="Manage TransactionType">
+                <app-manage-transactiontype *ngIf="activeTab === 4"></app-manage-transactiontype>
+            </p-tabPanel>            
         </p-tabView>
 
-          <!-- Users Table -->
+          <!-- Users Table-->
+        <!--
         <div class="table-responsive">
             <p-table [value]="staffMembers()" styleClass="compact-table"
                 [tableStyle]="{'width':'100%','font-size':'0.875rem'}">
@@ -57,12 +68,12 @@
                     </tr>
                 </ng-template>
             </p-table>
-        </div>
+        </div> -->
 
         <!-- Pagination -->
-        <div class="d-flex align-items-center justify-content-center mt-4 gap-3">
+        <!-- <div class="d-flex align-items-center justify-content-center mt-4 gap-3">
             <button pButton label="< PREVIOUS" class="p-button-outlined btn-sm"></button>
             <button pButton label="NEXT >>" class="p-button-outlined btn-sm"></button>
-        </div>
+        </div> -->
     </div>
 </div>

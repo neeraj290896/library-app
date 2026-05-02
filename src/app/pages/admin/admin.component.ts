@@ -8,11 +8,18 @@ import { UserService } from '../../shared/services/user.service';
 import { RoleService } from '../../shared/services/role.service';
 import { OrganizationService } from '../../shared/services/organization.service';
 import { TransactionService } from '../../shared/services/transaction.service';
+import { ManageUsersComponent } from './manage-users/manage-users.component';
+import { ManageRoleComponent } from './manage-role/manage-role.component';
+import { ManageOrganizationComponent } from './manage-organization/manage-organization.component';
+import { ManageDepartmentComponent } from './manage-department/manage-department.component';
+import { ManageTransactiontypeComponent } from './manage-transactiontype/manage-transactiontype.component';
 
 @Component({
     selector: 'app-admin',
     standalone: true,
-    imports: [CommonModule, ButtonModule, TableModule, PaginatorModule, TabViewModule],
+    imports: [CommonModule, ButtonModule, TableModule, PaginatorModule, TabViewModule, ManageUsersComponent, 
+                ManageRoleComponent, ManageOrganizationComponent, ManageDepartmentComponent, 
+                ManageTransactiontypeComponent],
     templateUrl: './admin.component.html',
     styleUrl: './admin.component.scss'
 })
