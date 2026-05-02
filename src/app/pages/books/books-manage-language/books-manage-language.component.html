@@ -101,10 +101,10 @@
         </ng-template>
     </p-table>
 
-    <p-dialog header="Edit Language" [(visible)]="languageDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
+    <p-dialog [header]="header" [(visible)]="languageDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
         <div class="row">
             <div class="col-6">
-                <label class="d-block small fw-medium text-secondary mb-2" for="languageName">
+                <label class="d-block small fw-medium text-secondary mb-1" for="languageName">
                     Language<sup>*</sup>
                 </label>
                 <input id="languageName" type="text" class="form-control" pInputText
@@ -113,7 +113,7 @@
                 <div *ngIf="errors.LanguageName" class="text-danger mt-1 small">{{ errors.LanguageName }}</div>
             </div>
             <div class="col-6">
-                <label class="d-block small fw-medium text-secondary mb-2" for="isActive">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
                     Status<sup>*</sup>
                 </label>
                 <p-select id="isActive" [(ngModel)]="currentLanguage.IsActive" [ngModelOptions]="{standalone: true}"

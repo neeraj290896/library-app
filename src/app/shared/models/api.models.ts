@@ -35,7 +35,7 @@ export interface AreaDetails {
 export interface AuthorDetails {
     AuthorId: number;
     AuthorName?: string | null;
-    IsActive: boolean;
+    IsActive: boolean | null;
 }
 
 export interface BookDetails {
@@ -61,7 +61,7 @@ export interface BookDetails {
     RackNumber?: number | null;
     RackLabel?: string | null;
     BookBarcode?: string | null;
-    IsActive: boolean;
+    IsActive: boolean | null;
 }
 
 export interface BookCirculationDetails {
@@ -105,7 +105,7 @@ export interface BuildingDetails {
 export interface CategoryDetails {
     CategoryId: number;
     CategoryName?: string | null;
-    IsActive: boolean;
+    IsActive: boolean | null;
 }
 
 export interface CityDetails {
@@ -189,7 +189,7 @@ export interface OtpDetails {
 export interface PublisherDetails {
     PublisherId: number;
     PublisherName?: string | null;
-    IsActive: boolean;
+    IsActive: boolean | null;
 }
 
 export interface RackDetails {

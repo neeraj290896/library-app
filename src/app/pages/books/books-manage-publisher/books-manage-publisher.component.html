@@ -9,7 +9,7 @@
 
         <ng-template pTemplate="header">
             <tr class="border-bottom">
-                <th class="text-start text-muted fw-medium" style="width: 25%;">
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
                             S.No
@@ -27,7 +27,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 25%;">
+                <th class="text-start text-muted fw-medium" style="width: 40%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
                             Status
@@ -37,7 +37,11 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 25%;">Action</th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="pi pi-plus-circle" (click)="editPublisher()"></span>
+                    </div>
+                </th>
             </tr>
             @if (showFt) {
             <tr>
@@ -78,7 +82,7 @@
                         [severity]="getStatusSeverity(publisher.IsActive)"></p-tag>
                 </td>
                 <td>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center justify-content-center gap-2">
                         <button pButton icon="pi pi-pencil" (click)="editPublisher(publisher)"
                             class="p-button-rounded p-button-text p-button-sm"></button>
                         <button pButton icon="pi pi-trash" (click)="deletePublisher(publisher)"
@@ -96,4 +100,35 @@
             </tr>
         </ng-template>
     </p-table>
+
+    <p-dialog [header]="header" [(visible)]="publisherDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
+        <div class="row">
+            <div class="col-6">
+                <label class="d-block small fw-medium text-secondary mb-1" for="publisherName">
+                    Publisher<sup>*</sup>
+                </label>
+                <input id="publisherName" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentPublisher.PublisherName" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter publisher" (ngModelChange)="validateInput('PublisherName')" />
+                <div *ngIf="errors.PublisherName" class="text-danger mt-1 small">{{ errors.PublisherName }}</div>
+            </div>
+            <div class="col-6">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="isActive" [(ngModel)]="currentPublisher.IsActive" [ngModelOptions]="{standalone: true}"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="publisherDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="savePublisher()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
 </div>

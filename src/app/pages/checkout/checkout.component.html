@@ -6,21 +6,21 @@
         <form (ngSubmit)="handleSubmit($event)" class="d-flex flex-column gap-4">
             <div class="row g-4">
                 <div class="col-md-4">
-                    <label class="d-block small fw-medium text-secondary mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-1">
                         Member ID *
                     </label>
                     <input pInputText type="text" [(ngModel)]="formData.memberId" name="memberId"
                         placeholder="Enter member ID" class="form-control" required />
                 </div>
                 <div class="col-md-4">
-                    <label class="d-block small fw-medium text-secondary mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-1">
                         Book ISBN *
                     </label>
                     <input pInputText type="text" [(ngModel)]="formData.isbn" name="isbn" placeholder="Enter ISBN"
                         class="form-control" required />
                 </div>
                 <div class="col-md-4">
-                    <label class="d-block small fw-medium text-secondary mb-2">
+                    <label class="d-block small fw-medium text-secondary mb-1">
                         Return Date *
                     </label>
                     <p-calendar [(ngModel)]="formData.returnDate" name="returnDate" dateFormat="yy-mm-dd"
