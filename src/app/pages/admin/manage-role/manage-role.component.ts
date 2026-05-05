@@ -110,7 +110,12 @@ export class ManageRoleComponent {
                 if (!this.currentRole.RoleName?.trim()) {
                     this.errors.RoleName = 'Role name is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(this.roles.filter(x => x.RoleId != this.currentRole.RoleId && x.RoleName?.trim() == this.currentRole.RoleName?.trim()).length >0){
+                    this.errors.RoleName = 'The "'+this.currentRole.RoleName?.trim()+'" Role name exists already.';
+                    isValid = false;
+                }
+                else {
                     this.errors.RoleName = '';
                 }
                 break;

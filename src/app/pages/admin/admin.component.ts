@@ -13,13 +13,14 @@ import { ManageRoleComponent } from './manage-role/manage-role.component';
 import { ManageOrganizationComponent } from './manage-organization/manage-organization.component';
 import { ManageDepartmentComponent } from './manage-department/manage-department.component';
 import { ManageTransactiontypeComponent } from './manage-transactiontype/manage-transactiontype.component';
+import { ManageAccessrequestComponent } from './manage-accessrequest/manage-accessrequest.component';
 
 @Component({
     selector: 'app-admin',
     standalone: true,
     imports: [CommonModule, ButtonModule, TableModule, PaginatorModule, TabViewModule, ManageUsersComponent, 
                 ManageRoleComponent, ManageOrganizationComponent, ManageDepartmentComponent, 
-                ManageTransactiontypeComponent],
+                ManageTransactiontypeComponent, ManageAccessrequestComponent],
     templateUrl: './admin.component.html',
     styleUrl: './admin.component.scss'
 })

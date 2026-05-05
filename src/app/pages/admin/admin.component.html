@@ -1,11 +1,10 @@
 <div class="d-flex flex-column gap-4">
-    <div class="card border-0 shadow-sm rounded p-4">
+    <div class="card border-0 shadow-sm rounded p-3">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div>
                 <h2 class="fs-4 fw-semibold mb-1">Admin</h2>
                 <p class="small text-muted mb-0">Manage access for users</p>
-            </div>
-            <button pButton icon="pi pi-plus" label="Add User" class="p-button-outlined btn-sm active-filter"></button>
+            </div>          
         </div>
 
         <!-- Filter Tabs -->
@@ -13,17 +12,20 @@
             <p-tabPanel header="Manage Users">
                 <app-manage-users *ngIf="activeTab === 0"></app-manage-users>
             </p-tabPanel>
+            <p-tabPanel header="Manage Access Request">
+                <app-manage-accessrequest *ngIf="activeTab === 1"></app-manage-accessrequest>
+            </p-tabPanel>
             <p-tabPanel header="Manage Role">
-                <app-manage-role *ngIf="activeTab === 1"></app-manage-role>
+                <app-manage-role *ngIf="activeTab === 2"></app-manage-role>
             </p-tabPanel>
             <p-tabPanel header="Manage Organization">
-                <app-manage-organization *ngIf="activeTab === 2"></app-manage-organization>
+                <app-manage-organization *ngIf="activeTab === 3"></app-manage-organization>
             </p-tabPanel>
             <p-tabPanel header="Manage Department">
-                <app-manage-department *ngIf="activeTab === 3"></app-manage-department>
+                <app-manage-department *ngIf="activeTab === 4"></app-manage-department>
             </p-tabPanel>
             <p-tabPanel header="Manage TransactionType">
-                <app-manage-transactiontype *ngIf="activeTab === 4"></app-manage-transactiontype>
+                <app-manage-transactiontype *ngIf="activeTab === 5"></app-manage-transactiontype>
             </p-tabPanel>            
         </p-tabView>
 

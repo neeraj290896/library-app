@@ -4,9 +4,12 @@ export interface AccessRequestDetails {
     RoleName?: string | null;
     FullName?: string | null;
     MobileNo?: string | null;
-    MaildId?: string | null;
+    MailId?: string | null;
     Status?: string | null;
     CreatedDate: string;
+    ApprovedBy?: number | null;
+    ApprovedByUserName?: string | null;
+    ApprovedDate?: string | null;
 }
 
 export interface SettingDetails {

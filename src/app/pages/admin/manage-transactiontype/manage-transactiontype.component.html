@@ -35,7 +35,11 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 25%;">Action</th>
+                 <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="pi pi-plus-circle" (click)="editTransactionType()"></span>
+                    </div>
+                </th>
             </tr>
             @if (showFt) {
             <tr>
@@ -76,7 +80,7 @@
                         [severity]="getStatusSeverity(transactionType.IsActive)"></p-tag>
                 </td>
                 <td>
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-2 justify-content-center">
                         <button pButton icon="pi pi-pencil" (click)="editTransactionType(transactionType)"
                             class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteTransactionType(transactionType)"
@@ -94,4 +98,34 @@
             </tr>
         </ng-template>
     </p-table>
+     <p-dialog [header]="header" [(visible)]="transactionTypeDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
+        <div class="row">
+            <div class="col-6">
+                <label class="d-block small fw-medium text-secondary mb-1" for="typeName">
+                    Type Name<sup>*</sup>
+                </label>
+                <input id="transactionTypeName" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentTransactionType.TypeName" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Type Name" (ngModelChange)="validateInput('TypeName')" />
+                <div *ngIf="errors.TypeName" class="text-danger mt-1 small">{{ errors.TypeName }}</div>
+            </div>
+            <div class="col-6">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="isActive" [(ngModel)]="currentTransactionType.IsActive" [ngModelOptions]="{standalone: true}"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="transactionTypeDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveTransactionType()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
 </div>

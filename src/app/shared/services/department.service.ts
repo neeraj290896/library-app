@@ -16,15 +16,15 @@ export class DepartmentService {
         return this.http.get(`${this.baseUrl}/GetDepartmentDetails`);
     }
 
-    addDepartmentDetails(payload: DepartmentDetails): Observable<any> {
+    addDepartmentDetails(payload: DepartmentDetails[]): Observable<any> {
         return this.http.post(`${this.baseUrl}/AddDepartmentDetails`, payload);
     }
 
-    updateDepartmentDetails(payload: DepartmentDetails): Observable<any> {
+    updateDepartmentDetails(payload: DepartmentDetails[]): Observable<any> {
         return this.http.post(`${this.baseUrl}/UpdateDepartmentDetails`, payload);
     }
 
-    deleteDepartmentDetails(payload: DepartmentDetails): Observable<any> {
+    deleteDepartmentDetails(payload: DepartmentDetails[]): Observable<any> {
         return this.http.post(`${this.baseUrl}/DeleteDepartmentDetails`, payload);
     }
 }
