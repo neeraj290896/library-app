@@ -616,5 +616,33 @@ export class BooksManageBooksComponent implements OnInit {
         });
     }
 
-    deleteBook(book: BookDetails): void { }
+    deleteBook(book: BookDetails): void {
+        const payload = [book];
+        this.bookService.deleteBookDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Delete Book - Failed',
+                        detail: res ? res.Message : 'Failed to delete book. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Delete Book - Success',
+                        detail: 'Book deleted successfully.'
+                    });
+                }
+
+                this.loadBooks();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Book - Failed',
+                    detail: 'Failed to delete book. Please try again.'
+                });
+            }
+        });
+    }
 }

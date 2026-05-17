@@ -170,5 +170,33 @@ export class BooksManageLanguageComponent implements OnInit {
         });
     }
 
-    deleteLanguage(language: LanguageDetails): void { }
+    deleteLanguage(language: LanguageDetails): void {
+        const payload = [language];
+        this.languageService.deleteLanguageDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Delete Language - Failed',
+                        detail: res ? res.Message : 'Failed to delete language. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Delete Language - Success',
+                        detail: 'Language deleted successfully.'
+                    });
+                }
+
+                this.loadLanguages();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Language - Failed',
+                    detail: 'Failed to delete language. Please try again.'
+                });
+            }
+        });
+    }
 }
