@@ -113,7 +113,9 @@
                 <input id="authorName" type="text" class="form-control" pInputText
                     [(ngModel)]="currentAuthor.AuthorName" [ngModelOptions]="{standalone: true}"
                     placeholder="Enter author" (ngModelChange)="validateInput('AuthorName')" />
-                <div *ngIf="errors.AuthorName" class="text-danger mt-1 small">{{ errors.AuthorName }}</div>
+                @if (errors.AuthorName) {
+                <div class="text-danger mt-1 small">{{ errors.AuthorName }}</div>
+                }
             </div>
             <div class="col-6">
                 <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
@@ -122,7 +124,9 @@
                 <p-select id="isActive" [(ngModel)]="currentAuthor.IsActive" [ngModelOptions]="{standalone: true}"
                     [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
                     styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
-                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                @if (errors.IsActive) {
+                <div class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                }
             </div>
         </div>
         <ng-template pTemplate="footer">

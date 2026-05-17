@@ -3,7 +3,7 @@
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="languages" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="languages" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -38,8 +38,9 @@
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
-                    <div class="d-flex align-items-center justify-content-center">
-                        <span class="pi pi-plus-circle" (click)="editLanguage()"></span>
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <span class="pi pi-plus-circle" (click)="editLanguage()" pTooltip="Add Language"></span>
+                        <span class="pi pi-upload" (click)="importLanguage()" pTooltip="Import Languages"></span>
                     </div>
                 </th>
             </tr>
@@ -88,9 +89,10 @@
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
                         <button pButton icon="pi pi-pencil" (click)="editLanguage(language)"
-                            class="p-button-rounded p-button-text p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Language"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteLanguage(language)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                            pTooltip="Delete Language"></button>
                     </div>
                 </td>
             </tr>
@@ -114,7 +116,9 @@
                 <input id="languageName" type="text" class="form-control" pInputText
                     [(ngModel)]="currentLanguage.LanguageName" [ngModelOptions]="{standalone: true}"
                     placeholder="Enter language" (ngModelChange)="validateInput('LanguageName')" />
-                <div *ngIf="errors.LanguageName" class="text-danger mt-1 small">{{ errors.LanguageName }}</div>
+                @if (errors.LanguageName) {
+                <div class="text-danger mt-1 small">{{ errors.LanguageName }}</div>
+                }
             </div>
             <div class="col-6">
                 <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
@@ -123,7 +127,9 @@
                 <p-select id="isActive" [(ngModel)]="currentLanguage.IsActive" [ngModelOptions]="{standalone: true}"
                     [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
                     styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
-                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                @if (errors.IsActive) {
+                <div class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                }
             </div>
         </div>
         <ng-template pTemplate="footer">
@@ -132,6 +138,156 @@
                     styleClass="btn-main-outlined" (click)="languageDialogVisible = false"></p-button>
                 <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
                     (click)="saveLanguage()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog header="Import Languages" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }">
+        <div class="row">
+            <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                        (click)="fileInput.click()"></p-button>
+                    <input type="file" #fileInput
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                        hidden (change)="onImportFileSelected($event)" />
+                    @if (importUploadError) {
+                    <div class="text-danger small">{{ importUploadError }}</div>
+                    }
+                </div>
+                <p-button type="button" label="Download Excel Template" icon="pi pi-download"
+                    styleClass="btn-main-outlined" (click)="downloadLanguageTemplate()"></p-button>
+            </div>
+        </div>
+
+        <div class="table-clear-filter">
+            <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+                (onClick)="clearImport()"></p-button>
+        </div>
+
+        <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                S.No
+                            </div>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 30%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="LanguageName">
+                                Language
+                                <p-sortIcon field="LanguageName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedLanguageNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 20%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                                Status
+                                <p-sortIcon field="IsActive"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
+                                Error
+                                <p-sortIcon field="Error"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedErrorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                </tr>
+                @if (importShowFt) {
+                <tr>
+                    <th></th>
+                    <th>
+                        <p-columnFilter field="LanguageName" matchMode="in" [showMenu]="false"
+                            [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importLanguageNameList"
+                                    [(ngModel)]="importSelectedLanguageNameList" (onChange)="filter($event.value)"
+                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                    optionLabel="label" optionValue="value" appendTo="body" placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importErrorList" [(ngModel)]="importSelectedErrorList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                </tr>
+                }
+            </ng-template>
+
+            <ng-template pTemplate="body" let-language let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td>{{ index + 1 }}</td>
+                    <td>
+                        <span [pTooltip]="language.LanguageName">
+                            {{ language.LanguageName }}
+                        </span>
+                    </td>
+                    <td>
+                        <p-tag [value]="language.IsActive ? 'Active' : 'In-active'"
+                            [severity]="getStatusSeverity(language.IsActive)"></p-tag>
+                    </td>
+                    <td>
+                        <span [pTooltip]="language.Error" class="text-danger">
+                            {{ language.Error }}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center">
+                        No languages found.
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="importDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveImport()"></p-button>
             </div>
         </ng-template>
     </p-dialog>

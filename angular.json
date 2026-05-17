@@ -33,7 +33,11 @@
                             "node_modules/bootstrap/dist/css/bootstrap.min.css",
                             "node_modules/primeicons/primeicons.css"
                         ],
-                        "scripts": []
+                        "scripts": [],
+                        "allowedCommonJsDependencies": [
+                            "exceljs",
+                            "file-saver"
+                        ]
                     },
                     "configurations": {
                         "production": {
@@ -46,12 +50,12 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "500kb",
+                                    "maximumWarning": "850kb",
                                     "maximumError": "1mb"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "2kb",
+                                    "maximumWarning": "3kb",
                                     "maximumError": "4kb"
                                 }
                             ],

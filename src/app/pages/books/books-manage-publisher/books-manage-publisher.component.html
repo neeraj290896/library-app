@@ -114,7 +114,9 @@
                 <input id="publisherName" type="text" class="form-control" pInputText
                     [(ngModel)]="currentPublisher.PublisherName" [ngModelOptions]="{standalone: true}"
                     placeholder="Enter publisher" (ngModelChange)="validateInput('PublisherName')" />
-                <div *ngIf="errors.PublisherName" class="text-danger mt-1 small">{{ errors.PublisherName }}</div>
+                @if (errors.PublisherName) {
+                <div class="text-danger mt-1 small">{{ errors.PublisherName }}</div>
+                }
             </div>
             <div class="col-6">
                 <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
@@ -123,7 +125,9 @@
                 <p-select id="isActive" [(ngModel)]="currentPublisher.IsActive" [ngModelOptions]="{standalone: true}"
                     [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
                     styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
-                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                @if (errors.IsActive) {
+                <div class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                }
             </div>
         </div>
         <ng-template pTemplate="footer">
