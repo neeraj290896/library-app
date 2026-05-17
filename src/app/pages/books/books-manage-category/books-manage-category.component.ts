@@ -168,5 +168,33 @@ export class BooksManageCategoryComponent implements OnInit {
         });
     }
 
-    deleteCategory(category: CategoryDetails): void { }
+    deleteCategory(category: CategoryDetails): void {
+        const payload = [category];
+        this.categoryService.deleteCategoryDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Delete Category - Failed',
+                        detail: res ? res.Message : 'Failed to delete category. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Delete Category - Success',
+                        detail: 'Category deleted successfully.'
+                    });
+                }
+
+                this.loadCategories();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Category - Failed',
+                    detail: 'Failed to delete category. Please try again.'
+                });
+            }
+        });
+    }
 }

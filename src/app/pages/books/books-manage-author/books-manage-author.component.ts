@@ -168,5 +168,33 @@ export class BooksManageAuthorComponent implements OnInit {
         });
     }
 
-    deleteAuthor(author: AuthorDetails): void { }
+    deleteAuthor(author: AuthorDetails): void {
+        const payload = [author];
+        this.authorService.deleteAuthorDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Delete Author - Failed',
+                        detail: res ? res.Message : 'Failed to delete author. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Delete Author - Success',
+                        detail: 'Author deleted successfully.'
+                    });
+                }
+
+                this.loadAuthors();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Author - Failed',
+                    detail: 'Failed to delete author. Please try again.'
+                });
+            }
+        });
+    }
 }

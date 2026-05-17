@@ -170,5 +170,33 @@ export class BooksManagePublisherComponent implements OnInit {
         });
     }
 
-    deletePublisher(publisher: PublisherDetails): void { }
+    deletePublisher(publisher: PublisherDetails): void {
+        const payload = [publisher];
+        this.publisherService.deletePublisherDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Delete Publisher - Failed',
+                        detail: res ? res.Message : 'Failed to delete publisher. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Delete Publisher - Success',
+                        detail: 'Publisher deleted successfully.'
+                    });
+                }
+
+                this.loadPublishers();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Delete Publisher - Failed',
+                    detail: 'Failed to delete publisher. Please try again.'
+                });
+            }
+        });
+    }
 }
