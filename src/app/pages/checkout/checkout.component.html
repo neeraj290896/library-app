@@ -1,38 +1,34 @@
-<div class="d-flex flex-column gap-4">
-    <div class="card border-0 shadow-sm rounded p-4">
-        <h2 class="fs-4 fw-semibold mb-1">Check-In/Out Books</h2>
-        <p class="small text-muted mb-4">Record book check-ins and check-outs for users</p>
-
-        <form (ngSubmit)="handleSubmit($event)" class="d-flex flex-column gap-4">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <label class="d-block small fw-medium text-secondary mb-1">
-                        Member ID *
-                    </label>
-                    <input pInputText type="text" [(ngModel)]="formData.memberId" name="memberId"
-                        placeholder="Enter member ID" class="form-control" required />
-                </div>
-                <div class="col-md-4">
-                    <label class="d-block small fw-medium text-secondary mb-1">
-                        Book ISBN *
-                    </label>
-                    <input pInputText type="text" [(ngModel)]="formData.isbn" name="isbn" placeholder="Enter ISBN"
-                        class="form-control" required />
-                </div>
-                <div class="col-md-4">
-                    <label class="d-block small fw-medium text-secondary mb-1">
-                        Return Date *
-                    </label>
-                    <p-calendar [(ngModel)]="formData.returnDate" name="returnDate" dateFormat="yy-mm-dd"
-                        placeholder="Select return date" styleClass="w-100" [style]="{'width': '100%'}"
-                        [showIcon]="true" required></p-calendar>
-                </div>
+<div class="books-container d-flex flex-column gap-4">
+    <div class="card border-0 shadow-sm rounded p-4 card-container">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fs-4 fw-semibold mb-1">Transaction</h2>
+                <p class="small text-muted mb-0">Books transaction</p>
             </div>
-
-            <div class="d-flex align-items-center gap-3 justify-content-end">
-                <button pButton label="Clear" class="p-button-outlined btn-sm"></button>
-                <button pButton label="Checkout Book" class="p-button-outlined btn-sm active-filter"></button>
+            <div class="position-relative">
+                <span class="pi pi-search search-icon position-absolute text-muted"></span>
+                <input pInputText type="text" placeholder="Search book" [(ngModel)]="searchTerm"
+                    (input)="onSearch(searchTerm)" class="form-control ps-5" />
             </div>
-        </form>
+        </div>
+
+        <!-- Filter Tabs -->
+        <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
+            <p-tabPanel header="Manage Book Circulation">
+                <app-manage-book-circulation *ngIf="activeTab === 0"></app-manage-book-circulation>
+            </p-tabPanel>
+
+            <p-tabPanel [header]="'Overdue - ' + totalBooks()">
+                <app-books-overdue *ngIf="activeTab === 1" [totalBooks]="totalBooks()" [books]="filteredBooks()">
+                </app-books-overdue>
+            </p-tabPanel>   
+             <p-tabPanel header="Manage Issued Books">
+                <app-manage-issued-books *ngIf="activeTab === 2"></app-manage-issued-books>
+            </p-tabPanel>
+             <p-tabPanel header="Manage Returned Books">
+                <app-manage-returned-books *ngIf="activeTab === 3"></app-manage-returned-books>
+            </p-tabPanel>         
+        </p-tabView>
     </div>
 </div>

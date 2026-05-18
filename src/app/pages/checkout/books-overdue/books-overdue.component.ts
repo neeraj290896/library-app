@@ -6,14 +6,7 @@ import { TagModule } from 'primeng/tag';
 import { PaginatorModule } from 'primeng/paginator';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
-
-export interface Book {
-    sno: number;
-    title: string;
-    author: string;
-    publisher: string;
-    status: 'Available' | 'Borrowed' | 'Reserved';
-}
+import { BookDetails } from '@app/shared/models/api.models';
 
 @Component({
     selector: 'app-books-overdue',
@@ -25,7 +18,7 @@ export interface Book {
 })
 export class BooksOverdueComponent {
     @Input() totalBooks = 0;
-    @Input() books: Book[] = [];
+    @Input() books: BookDetails[] = [];
 
     @ViewChild('dt') dataTable: Table | undefined;
 
@@ -44,10 +37,10 @@ export class BooksOverdueComponent {
     }
 
     initializeFilterLists(): void {
-        this.titleList = [...new Set(this.books.map(book => book.title))].map(e => ({ label: e, value: e }));
-        this.authorList = [...new Set(this.books.map(book => book.author))].map(e => ({ label: e, value: e }));
-        this.publisherList = [...new Set(this.books.map(book => book.publisher))].map(e => ({ label: e, value: e }));
-        this.statusList = [...new Set(this.books.map(book => book.status))].map(e => ({ label: e, value: e }));
+        // this.titleList = [...new Set(this.books.map(book => book.BookName))].map(e => ({ label: e, value: e }));
+        // this.authorList = [...new Set(this.books.map(book => book.AuthorName))].map(e => ({ label: e, value: e }));
+        // this.publisherList = [...new Set(this.books.map(book => book.PublisherName))].map(e => ({ label: e, value: e }));
+        // this.statusList = [...new Set(this.books.map(book => book.Status))].map(e => ({ label: e, value: e }));
     }
 
     showFilter(): void {
@@ -72,7 +65,7 @@ export class BooksOverdueComponent {
         }
     }
 
-    editBook(book: Book): void { }
+    editBook(book: BookDetails): void { }
 
-    deleteBook(book: Book): void { }
+    deleteBook(book: BookDetails): void { }
 }

@@ -245,8 +245,8 @@
                     DOB<sup>*</sup>
                 </label>
                 <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
-                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy"
-                    placeholder="Select DOB" styleClass="w-100" inputStyleClass="w-100" />
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [minDate]="minDate"
+                    [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100" inputStyleClass="w-100" />
                 <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
             </div>
             <div class="col-6 mb-3">

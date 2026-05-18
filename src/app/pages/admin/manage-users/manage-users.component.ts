@@ -30,6 +30,9 @@ export class ManageUsersComponent {
      private roleService = inject(RoleService);
     @ViewChild('dt') dataTable: Table | undefined;
 
+    minDate: Date | undefined;
+    maxDate: Date | undefined;
+
     public users: UserDetails[] = [];
     public showFt: boolean = false;
     public userNameList: { label: string, value: string }[] = [];
@@ -70,6 +73,19 @@ export class ManageUsersComponent {
      ];
 
   ngOnInit(): void {
+    let today = new Date();
+    let year = today.getFullYear();
+    let minYear = year - 100;
+    let maxYear = year - 15;
+
+    this.minDate = new Date();
+    this.minDate.setMonth(1);
+    this.minDate.setFullYear(minYear);
+
+    this.maxDate = new Date();
+    this.maxDate.setMonth(12);
+    this.maxDate.setFullYear(maxYear);
+
     this.loadRoleDetails();
     this.loadUserDetails();
   }

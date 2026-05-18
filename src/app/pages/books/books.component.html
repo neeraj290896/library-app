@@ -15,29 +15,29 @@
 
         <!-- Filter Tabs -->
         <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
-            <p-tabPanel [header]="'Overdue - ' + totalBooks()">
+            <!-- <p-tabPanel [header]="'Overdue - ' + totalBooks()">
                 <app-books-overdue *ngIf="activeTab === 0" [totalBooks]="totalBooks()" [books]="filteredBooks()">
                 </app-books-overdue>
-            </p-tabPanel>
+            </p-tabPanel> -->
 
             <p-tabPanel header="Manage Books">
-                <app-books-manage-books *ngIf="activeTab === 1"></app-books-manage-books>
+                <app-books-manage-books *ngIf="activeTab === 0"></app-books-manage-books>
             </p-tabPanel>
 
             <p-tabPanel header="Manage Author">
-                <app-books-manage-author *ngIf="activeTab === 2"></app-books-manage-author>
+                <app-books-manage-author *ngIf="activeTab === 1"></app-books-manage-author>
             </p-tabPanel>
 
             <p-tabPanel header="Manage Publisher">
-                <app-books-manage-publisher *ngIf="activeTab === 3"></app-books-manage-publisher>
+                <app-books-manage-publisher *ngIf="activeTab === 2"></app-books-manage-publisher>
             </p-tabPanel>
 
             <p-tabPanel header="Manage Category">
-                <app-books-manage-category *ngIf="activeTab === 4"></app-books-manage-category>
+                <app-books-manage-category *ngIf="activeTab === 3"></app-books-manage-category>
             </p-tabPanel>
 
             <p-tabPanel header="Manage Language">
-                <app-books-manage-language *ngIf="activeTab === 5"></app-books-manage-language>
+                <app-books-manage-language *ngIf="activeTab === 4"></app-books-manage-language>
             </p-tabPanel>
         </p-tabView>
     </div>
