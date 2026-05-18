@@ -4,9 +4,12 @@ export interface AccessRequestDetails {
     RoleName?: string | null;
     FullName?: string | null;
     MobileNo?: string | null;
-    MaildId?: string | null;
+    MailId?: string | null;
     Status?: string | null;
     CreatedDate: string;
+    ApprovedBy?: number | null;
+    ApprovedByUserName?: string | null;
+    ApprovedDate?: string | null;
 }
 
 export interface SettingDetails {
@@ -219,8 +222,10 @@ export interface ResetCredPassword {
 
 export interface RoleDetails {
     RoleId: number;
-    RoleName?: string | null;
+    RoleName?: string | null;    
     IsActive: boolean;
+    UserHasEditAccess: boolean;
+    UserCanLogin: boolean;
 }
 
 export interface StateDetails {
@@ -282,4 +287,25 @@ export interface UserDetails {
     CreatedByUserName?: string | null;
     LastLogInTime?: string | null;
     IsActive?: boolean | null;
+}
+
+
+export interface RoleDetails {
+   RoleId: number;
+   RoleName?: string | null;
+   IsActive: boolean;
+}
+
+export interface DepartmentDetails {
+   DepartmentId: number;
+   DepartmentName?: string | null;
+   IsActive: boolean;
+}
+
+
+
+export interface TransactionTypeDetails {
+   TypeId: number;
+   TypeName?: string | null;
+   IsActive: boolean;
 }

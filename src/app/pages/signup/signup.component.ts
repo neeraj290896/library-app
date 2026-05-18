@@ -42,7 +42,7 @@ export class SignupComponent implements OnInit {
         this.roleService.getRoleDetails().subscribe({
             next: (data: RoleDetails[] | { data?: RoleDetails[] }) => {
                 const roleList = Array.isArray(data) ? data : (data.data ?? []);
-                const active = roleList.filter(r => r.IsActive);
+                const active = roleList.filter(r => r.IsActive && r.UserCanLogin && r.RoleId >2);
                 this.roles.set(active);
                 if (active.length > 0) {
                     this.selectedRoleId.set(active[0].RoleId);
@@ -106,9 +106,8 @@ export class SignupComponent implements OnInit {
         this.loading.set(true);
         this.userService.addUserDetails(payload).subscribe({
             next: (res: any) => {
-                this.loading.set(false);
-
                 if (!res || !res.Status) {
+                    this.loading.set(false);
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Signup Failed',
