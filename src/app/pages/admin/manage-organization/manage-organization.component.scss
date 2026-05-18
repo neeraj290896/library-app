@@ -1,0 +1,32 @@
+$color-primary: #22c55e;
+
+::ng-deep {
+    .manage-organization-container {
+        .p-datatable {
+            .p-datatable-table {
+                table-layout: fixed;
+
+                .p-datatable-thead>tr>th {
+                    padding: 0.35rem 1rem;
+                }
+
+                .p-datatable-tbody>tr>td {
+                    padding: 0.25rem 1rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
+        }
+
+        .p-tag {
+            padding: 0rem 0.5rem;
+        }
+
+        .table-clear-filter {
+            position: absolute;
+            margin-top: 0.3rem;
+            z-index: 1;
+        }
+    }
+}
