@@ -11,7 +11,7 @@
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
-                            S.No
+                            
                         </div>
                     </div>
                 </th>
@@ -74,7 +74,9 @@
                 </th>          
                 <th class="text-start text-muted fw-medium" style="width: 10%;"> 
                     <div class="d-flex align-items-center justify-content-center">
-                        <span class="pi pi-plus-circle" (click)="approveAccess()"></span>
+                        <span class="pi pi-check-circle" (click)="approveAccess()"></span>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                        <span class="pi pi-times-circle" (click)="rejectAccess()"></span>
                     </div></th>
             </tr>
             @if (showFt) {

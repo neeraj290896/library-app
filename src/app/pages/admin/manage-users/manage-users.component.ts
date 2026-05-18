@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UserDetails } from '@app/shared/models/api.models';
+import { RoleDetails, UserDetails } from '@app/shared/models/api.models';
+import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -16,7 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-manage-users',
-  imports: [CommonModule, ButtonModule, TableModule, TagModule, 
+  imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule, 
           PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, 
           SelectModule, FormsModule, TooltipModule],
   templateUrl: './manage-users.component.html',
@@ -25,6 +27,7 @@ import { TooltipModule } from 'primeng/tooltip';
 export class ManageUsersComponent {
     private messageService = inject(MessageService);
     private userService = inject(UserService);
+     private roleService = inject(RoleService);
     @ViewChild('dt') dataTable: Table | undefined;
 
     public users: UserDetails[] = [];
@@ -48,14 +51,41 @@ export class ManageUsersComponent {
     public errors: { FullName: string, Gender: string, DOB: string, MailId: string, MobileNo: string, RoleId : string, Status : string, 
         IsActive: string } = {         
         FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status : '', IsActive: ''};
+
+
     public options: { label: string; value: boolean; }[] = [
         { label: 'Active', value: true },
         { label: 'In-Active', value: false }
     ];
+    public roleOptions: { label: string; value: number; }[] = [];
+    public genderOptions: { label: string; value: string; }[] = [
+        { label: 'Male', value: 'M' },
+        { label: 'Female', value: 'F' },
+        { label: 'Others', value: 'O' },
+    ];
+     public statusOptions: { label: string; value: string; }[] = [
+        { label: 'Approved', value: 'Approved' },
+        { label: 'Rejected', value: 'Rejected' },
+        { label: 'Pending', value: 'Pending' }
+     ];
 
   ngOnInit(): void {
-      this.loadUserDetails();
+    this.loadRoleDetails();
+    this.loadUserDetails();
   }
+
+  loadRoleDetails(): void {
+          this.roleService.getRoleDetails().subscribe({
+              next: (data: RoleDetails[]) => {
+                  this.roleOptions = data.map(role => {
+                      return { label: role.RoleName ?? '', value: role.RoleId };
+                  });
+              },
+              error: (err) => {
+                  console.error('Error loading role:', err);
+              }
+          });
+      }
 
   loadUserDetails(): void {
           this.userService.getAllUserDetails().subscribe({
@@ -117,6 +147,33 @@ export class ManageUsersComponent {
             this.userDialogVisible = true;
     }
 
+    onRoleChange(): void {
+        const role = this.roleOptions.find(l => l.value === this.currentUser.RoleId);
+        if (role) {
+            this.currentUser.RoleName = role.label;
+        }
+
+        this.validateInput('RoleId');
+    }
+
+    // onGenderChange(): void {
+    //     const gender = this.genderOptions.find(l => l.value === this.currentUser.Gender);
+    //     if (gender) {
+    //         this.currentUser.Gender = gender.label;
+    //     }
+
+    //     this.validateInput('Gender');
+    // }
+
+    //  onStatusChange(): void {
+    //     const acReq = this.statusOptions.find(l => l.value === this.currentUser.Status);
+    //     if (acReq) {
+    //         this.currentUser.Status = acReq.label;
+    //     }
+
+    //     this.validateInput('Status');
+    // }
+
     validateInput(key: string): boolean {
         let isValid = true;
 
@@ -129,51 +186,60 @@ export class ManageUsersComponent {
                     this.errors.FullName = '';
                 }
                 break;
+            
+            case 'RoleId':
+                if (!(this.currentUser.RoleId !=null  && this.currentUser.RoleId > 0)) {
+                    this.errors.RoleId = 'Please select Role.';
+                    isValid = false;
+                } else {
+                    this.errors.RoleId = '';
+                }
+                break;
         
-        case 'Gender':
-            if (!this.currentUser.Gender?.trim()) {
-                this.errors.Gender = 'Please select Gender.';
-                isValid = false;
-            } else {
-                this.errors.Gender = '';
-            }
-            break;
+            case 'Gender':
+                if (!this.currentUser.Gender?.trim()) {
+                    this.errors.Gender = 'Please select Gender.';
+                    isValid = false;
+                } else {
+                    this.errors.Gender = '';
+                }
+                break;
+       
+            case 'MailId':
+                if (!this.currentUser.MailId?.trim()) {
+                    this.errors.MailId = 'MailId is required.';
+                    isValid = false;
+                } else {
+                    this.errors.MailId = '';
+                }
+                break;
 
-        case 'DOB':
-            if (!this.currentUser.DOB?.trim()) {
-                this.errors.DOB = 'DOB is required.';
-                isValid = false;
-            } else {
-                this.errors.DOB = '';
-            }
-            break;
+            case 'MobileNo':
+                if (!this.currentUser.MobileNo?.trim()) {
+                    this.errors.MobileNo = 'MobileNo is required.';
+                    isValid = false;
+                } else {
+                    this.errors.MobileNo = '';
+                }
+                break;
+        
+            case 'DOB':
+                if (!this.currentUser.DOB?.trim()) {
+                    this.errors.DOB = 'DOB is required.';
+                    isValid = false;
+                } else {
+                    this.errors.DOB = '';
+                }
+                break;
 
-        case 'MailId':
-            if (!this.currentUser.MailId?.trim()) {
-                this.errors.MailId = 'MailId is required.';
-                isValid = false;
-            } else {
-                this.errors.MailId = '';
-            }
-            break;
-
-        case 'MobileNo':
-            if (!this.currentUser.MobileNo?.trim()) {
-                this.errors.MobileNo = 'MobileNo is required.';
-                isValid = false;
-            } else {
-                this.errors.MobileNo = '';
-            }
-            break;
-
-        case 'RoleId':
-            if (!(this.currentUser.RoleId !=null  && this.currentUser.RoleId > 0)) {
-                this.errors.RoleId = 'Please select RoleId.';
-                isValid = false;
-            } else {
-                this.errors.RoleId = '';
-            }
-            break;
+            case 'Status':
+                if (this.currentUser.Status === null) {
+                    this.errors.Status = 'Access Request Status is required.';
+                    isValid = false;
+                } else {
+                    this.errors.Status = '';
+                }
+                break;
 
             case 'IsActive':
                 if (this.currentUser.IsActive === null) {
@@ -193,8 +259,14 @@ export class ManageUsersComponent {
 
     validateUser(): boolean {
         const isNameValid = this.validateInput('FullName');
+        const isRoleIdValid = this.validateInput('RoleId');
+        const isGenderValid = this.validateInput('Gender');
+        const isMailIdValid = this.validateInput('MailId');
+        const isMobileNoValid = this.validateInput('MobileNo');
+        const isDOBValid = this.validateInput('DOB');
+        const isAccessRequestValid = this.validateInput('Status');
         const isStatusValid = this.validateInput('IsActive');
-        return isNameValid && isStatusValid;
+        return isNameValid &&isRoleIdValid && isGenderValid && isMailIdValid && isMobileNoValid && isDOBValid && isAccessRequestValid && isStatusValid;
     }
 
     saveUser(): void {

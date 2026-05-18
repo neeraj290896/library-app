@@ -204,6 +204,62 @@
                 <div *ngIf="errors.FullName" class="text-danger mt-1 small">{{ errors.FullName }}</div>
             </div>
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                    RoleName<sup>*</sup>
+                </label>
+                <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"
+                    [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Select Role"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onRoleChange()" />
+                <div *ngIf="errors.RoleId" class="text-danger mt-1 small">{{ errors.RoleId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="gender">
+                    Gender<sup>*</sup>
+                </label>
+                <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
+                    [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
+                    styleClass="w-100" appendTo="body"  />
+                    <!-- (ngModelChange)="onGenderChange()" -->
+                <div *ngIf="errors.Gender" class="text-danger mt-1 small">{{ errors.Gender }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="mailId">
+                    MailId<sup>*</sup>
+                </label>
+                <input id="mailId" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentUser.MailId" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter MailId" (ngModelChange)="validateInput('MailId')" />
+                <div *ngIf="errors.MailId" class="text-danger mt-1 small">{{ errors.MailId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="mobile">
+                    MobileNo<sup>*</sup>
+                </label>
+                <input id="mobile" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentUser.MobileNo" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter MobileNo" (ngModelChange)="validateInput('MobileNo')" />
+                <div *ngIf="errors.MobileNo" class="text-danger mt-1 small">{{ errors.MobileNo }}</div>
+            </div>   
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="dob">
+                    DOB<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy"
+                    placeholder="Select DOB" styleClass="w-100" inputStyleClass="w-100" />
+                <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="status">
+                    Access Request Status<sup>*</sup>
+                </label>
+                <p-select id="status" [(ngModel)]="currentUser.Status" [ngModelOptions]="{standalone: true}"
+                    [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Select Access Request Status"
+                    styleClass="w-100" appendTo="body"  />
+                    <!-- (ngModelChange)="onStatusChange()" -->
+                <div *ngIf="errors.Status" class="text-danger mt-1 small">{{ errors.Status }}</div>
+            </div>          
+            <div class="col-6 mb-3">                
                 <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
                     Status<sup>*</sup>
                 </label>
