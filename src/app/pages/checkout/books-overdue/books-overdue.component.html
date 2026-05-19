@@ -3,7 +3,7 @@
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table [value]="totalOverDues" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -134,7 +134,7 @@
         <ng-template pTemplate="emptymessage">
             <tr>
                 <td colspan="6" class="text-center">
-                    <p>No books found.</p>
+                    <p>No Over Due found.</p>
                 </td>
             </tr>
         </ng-template>

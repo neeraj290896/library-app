@@ -32,9 +32,9 @@
                 </th>
                 <th class="text-start text-muted fw-medium">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="title">
-                            Title
-                            <p-sortIcon field="title"></p-sortIcon>
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                            Book Name
+                            <p-sortIcon field="bookName"></p-sortIcon>
                         </div>
                         <span class="pi" [ngClass]="selectedTitleList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
@@ -42,9 +42,9 @@
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 20%;">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="author">
-                            Author
-                            <p-sortIcon field="author"></p-sortIcon>
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="borrowerName">
+                            Borrower Name
+                            <p-sortIcon field="borrowerName"></p-sortIcon>
                         </div>
                         <span class="pi" [ngClass]="selectedAuthorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
@@ -52,15 +52,23 @@
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 20%;">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="publisher">
-                            Publisher
-                            <p-sortIcon field="publisher"></p-sortIcon>
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="issuedBy">
+                            IssuedBy
+                            <p-sortIcon field="issuedBy"></p-sortIcon>
                         </div>
                         <span class="pi" [ngClass]="selectedPublisherList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 14%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="issuedDate">
+                            Issued On
+                            <p-sortIcon field="issuedDate"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="status">
                             Status
@@ -76,9 +84,9 @@
             <tr>
                 <th></th>
                 <th>
-                    <p-columnFilter field="title" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                    <p-columnFilter field="bookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="titleList" [(ngModel)]="selectedTitleList"
+                            <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
                                 (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
                                 [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
                                 placeholder="All">
@@ -87,9 +95,9 @@
                     </p-columnFilter>
                 </th>
                 <th>
-                    <p-columnFilter field="author" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                    <p-columnFilter field="borrowerName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="authorList" [(ngModel)]="selectedAuthorList"
+                            <p-multiSelect [options]="borrowerNameList" [(ngModel)]="selectedBorrowerNameList"
                                 (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
                                 [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
                                 placeholder="All">
@@ -98,9 +106,9 @@
                     </p-columnFilter>
                 </th>
                 <th>
-                    <p-columnFilter field="publisher" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                    <p-columnFilter field="issuedBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="publisherList" [(ngModel)]="selectedPublisherList"
+                            <p-multiSelect [options]="issuedByList" [(ngModel)]="selectedIssuedByList"
                                 (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
                                 [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
                                 placeholder="All">
@@ -108,6 +116,7 @@
                         </ng-template>
                     </p-columnFilter>
                 </th>
+                <th></th>
                 <th>
                     <p-columnFilter field="status" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -127,18 +136,17 @@
         <ng-template pTemplate="body" let-book>
             <tr class="border-bottom">
                 <td>{{ book.sno }}</td>
-                <td>{{ book.title }}</td>
-                <td>{{ book.author }}</td>
-                <td>{{ book.publisher }}</td>
+                <td>{{ book.bookName }}</td>
+                <td>{{ book.borrowerName }}</td>
+                <td>{{ book.issuedBy }}</td>
+                <td>{{ book.issuedDate }}</td>
                 <td>
                     <p-tag [value]="book.status" [severity]="getStatusSeverity(book.status)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <button pButton icon="pi pi-pencil" (click)="editBook(book)"
-                            class="p-button-rounded p-button-text p-button-sm"></button>
-                        <button pButton icon="pi pi-trash" (click)="deleteBook(book)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-sm"></button>                        
                     </div>
                 </td>
             </tr>
@@ -146,8 +154,8 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="6" class="text-center">
-                    <p>No books found.</p>
+                <td colspan="7" class="text-center">
+                    <p>No book circulation found.</p>
                 </td>
             </tr>
         </ng-template>

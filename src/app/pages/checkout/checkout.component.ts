@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -9,7 +9,9 @@ import { ManageBookCirculationComponent } from './manage-book-circulation/manage
 import { ManageIssuedBooksComponent } from './manage-issued-books/manage-issued-books.component';
 import { ManageReturnedBooksComponent } from './manage-returned-books/manage-returned-books.component';
 import { TabViewModule } from 'primeng/tabview';
-import { BookDetails } from '@app/shared/models/api.models';
+import { OverDueDetails } from '@app/shared/models/api.models';
+import { MessageService } from 'primeng/api';
+import { OverDueService } from '@services/overdue.service';
 
 @Component({
     selector: 'app-checkout',
@@ -22,34 +24,29 @@ import { BookDetails } from '@app/shared/models/api.models';
     styleUrl: './checkout.component.scss'
 })
 export class CheckoutComponent {
-     searchTerm = '';
+    private messageService = inject(MessageService);
+    private _overDueService = inject(OverDueService);
+    searchTerm = '';
     activeTab = 0;
+    overDueCount = 0;
+    overDues: OverDueDetails[] = [];
 
-    // Mock data
-    allBooks = signal<BookDetails[]>([
-    //     { sno: 1, title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', publisher: 'Scribner', status: 'Available' },
-    //     { sno: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee', publisher: 'J.B. Lippincott & Co.', status: 'Borrowed' },
-    //     { sno: 3, title: '1984', author: 'George Orwell', publisher: 'Secker & Warburg', status: 'Available' },
-    //     { sno: 4, title: 'Pride and Prejudice', author: 'Jane Austen', publisher: 'T. Egerton', status: 'Available' },
-    //     { sno: 5, title: 'The Catcher in the Rye', author: 'J.D. Salinger', publisher: 'Little, Brown', status: 'Reserved' },
-    //     { sno: 6, title: 'Animal Farm', author: 'George Orwell', publisher: 'Secker & Warburg', status: 'Available' },
-    //     { sno: 7, title: 'The Hobbit', author: 'J.R.R. Tolkien', publisher: 'Allen & Unwin', status: 'Borrowed' },
-    //     { sno: 8, title: 'Brave New World', author: 'Aldous Huxley', publisher: 'Chatto & Windus', status: 'Available' },
-    ]);
-
-    filteredBooks = computed(() => {
-        const books = this.allBooks();
-        const term = this.searchTerm.toLowerCase();
-
-        // return books.filter(book =>
-            // book.BookName.toLowerCase().includes(term) ||
-            // book.BookBarcode.toLowerCase().includes(term) ||
-            // book.publisher.toLowerCase().includes(term)
-        // );
-        return null;
-    });
-
-    totalBooks = computed(() => this.filteredBooks().length);
+    ngOnInit(): void {
+        this.loadOverDueDetails();
+    }
+    
+    loadOverDueDetails(): void {
+        this._overDueService.getOverDueDetails().subscribe({
+            next: (data: OverDueDetails[]) => {
+                this.overDues = data;
+                this.overDueCount = data.length;                
+            },
+            error: (err) => {
+                console.error('Error loading overDue:', err);
+            }
+        });
+    }  
+   
 
     setFilter(tabIndex: number) {
         this.activeTab = tabIndex;

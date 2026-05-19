@@ -309,3 +309,24 @@ export interface TransactionTypeDetails {
    TypeName?: string | null;
    IsActive: boolean;
 }
+
+export interface OverDueDetails {
+    OverDueId?: number | null;
+    BookCirculationId: number;
+    BookId: number;
+    BookName?: string | null;
+    IssuedDate: string;
+    IssuedByUserId: number;
+    IssuedByUserName?: string | null;
+    BorrowerId: number;
+    BorrowerName?: string | null;
+    FineAmount?: number | null;
+    OverDueFrom?: string | null;
+    OverDueDays?: number | null;
+    OverDueStatus?: string | null;
+    CreatedDate?: string | null;
+    UpdatedDate?: string | null;
+    UpdatedByUserId?: number | null;
+    UpdatedByUserName?: string | null;
+    SytemUpdatedDate?: string | null;
+}

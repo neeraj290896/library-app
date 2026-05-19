@@ -6,7 +6,7 @@ import { TagModule } from 'primeng/tag';
 import { PaginatorModule } from 'primeng/paginator';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
-import { BookDetails } from '@app/shared/models/api.models';
+import { BookDetails, OverDueDetails } from '@app/shared/models/api.models';
 
 @Component({
     selector: 'app-books-overdue',
@@ -17,8 +17,8 @@ import { BookDetails } from '@app/shared/models/api.models';
     styleUrl: './books-overdue.component.scss'
 })
 export class BooksOverdueComponent {
-    @Input() totalBooks = 0;
-    @Input() books: BookDetails[] = [];
+    @Input() totalOverDueCount = 0;
+    @Input() totalOverDues: OverDueDetails[] = [];
 
     @ViewChild('dt') dataTable: Table | undefined;
 
