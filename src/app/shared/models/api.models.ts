@@ -156,13 +156,6 @@ export interface LanguageDetails {
     IsActive: boolean | null;
 }
 
-export interface ImportLanguageDetails {
-    LanguageId: number;
-    LanguageName?: string | null;
-    IsActive: boolean | null;
-    Error: string;
-}
-
 export interface LoggedInUserDetails {
     UserId?: number | null;
     LoggedInTime?: string | null;
@@ -301,8 +294,6 @@ export interface DepartmentDetails {
    DepartmentName?: string | null;
    IsActive: boolean;
 }
-
-
 
 export interface TransactionTypeDetails {
    TypeId: number;

@@ -28,11 +28,5 @@ $color-primary: #22c55e;
             margin-top: 0.5rem;
             z-index: 1;
         }
-
-        .import-preview-table {
-            .p-datatable-tbody > tr.invalid-row > td {
-                background: #ffe6e6;
-            }
-        }
     }
 }

@@ -9,13 +9,17 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { LanguageService } from '@services/language.service';
-import { ImportLanguageDetails, LanguageDetails } from '@app/shared/models/api.models';
+import { LanguageDetails } from '@app/shared/models/api.models';
 import * as Xlsx from 'xlsx';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
+
+type ImportLanguageDetails = LanguageDetails & {
+    Error: string;
+};
 
 @Component({
     selector: 'app-books-manage-language',
@@ -113,6 +117,7 @@ export class BooksManageLanguageComponent implements OnInit {
         this.importDataTable?.reset();
         this.importSelectedLanguageNameList = [];
         this.importSelectedStatusList = [];
+        this.importSelectedErrorList = [];
         this.importShowFt = false;
     }
 

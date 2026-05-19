@@ -38,8 +38,9 @@
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
-                    <div class="d-flex align-items-center justify-content-center">
-                        <span class="pi pi-plus-circle" (click)="editPublisher()"></span>
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <span class="pi pi-plus-circle" (click)="editPublisher()" pTooltip="Add Publisher"></span>
+                        <span class="pi pi-upload" (click)="importPublisher()" pTooltip="Import Publishers"></span>
                     </div>
                 </th>
             </tr>
@@ -88,9 +89,10 @@
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
                         <button pButton icon="pi pi-pencil" (click)="editPublisher(publisher)"
-                            class="p-button-rounded p-button-text p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Publisher"></button>
                         <button pButton icon="pi pi-trash" (click)="deletePublisher(publisher)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                            pTooltip="Delete Publisher"></button>
                     </div>
                 </td>
             </tr>
@@ -136,6 +138,156 @@
                     styleClass="btn-main-outlined" (click)="publisherDialogVisible = false"></p-button>
                 <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
                     (click)="savePublisher()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog header="Import Publishers" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }">
+        <div class="row">
+            <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                        (click)="fileInput.click()"></p-button>
+                    <input type="file" #fileInput
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                        hidden (change)="onImportFileSelected($event)" />
+                    @if (importUploadError) {
+                    <div class="text-danger small">{{ importUploadError }}</div>
+                    }
+                </div>
+                <p-button type="button" label="Download Excel Template" icon="pi pi-download"
+                    styleClass="btn-main-outlined" (click)="downloadPublisherTemplate()"></p-button>
+            </div>
+        </div>
+
+        <div class="table-clear-filter">
+            <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+                (onClick)="clearImport()"></p-button>
+        </div>
+
+        <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                S.No
+                            </div>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 30%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="PublisherName">
+                                Publisher
+                                <p-sortIcon field="PublisherName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedPublisherNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 20%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                                Status
+                                <p-sortIcon field="IsActive"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
+                                Error (If Any)
+                                <p-sortIcon field="Error"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedErrorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                </tr>
+                @if (importShowFt) {
+                <tr>
+                    <th></th>
+                    <th>
+                        <p-columnFilter field="PublisherName" matchMode="in" [showMenu]="false"
+                            [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importPublisherNameList"
+                                    [(ngModel)]="importSelectedPublisherNameList" (onChange)="filter($event.value)"
+                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                    optionLabel="label" optionValue="value" appendTo="body" placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importErrorList" [(ngModel)]="importSelectedErrorList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                </tr>
+                }
+            </ng-template>
+
+            <ng-template pTemplate="body" let-publisher let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td>{{ index + 1 }}</td>
+                    <td>
+                        <span [pTooltip]="publisher.PublisherName">
+                            {{ publisher.PublisherName }}
+                        </span>
+                    </td>
+                    <td>
+                        <p-tag [value]="publisher.IsActive ? 'Active' : 'In-active'"
+                            [severity]="getStatusSeverity(publisher.IsActive)"></p-tag>
+                    </td>
+                    <td>
+                        <span [pTooltip]="publisher.Error" class="text-danger">
+                            {{ publisher.Error }}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center">
+                        No publishers found.
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="importDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveImport()"></p-button>
             </div>
         </ng-template>
     </p-dialog>
