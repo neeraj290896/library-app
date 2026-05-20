@@ -80,7 +80,7 @@ export interface BookCirculationDetails {
     FineAmount?: number | null;
     OverDueFrom?: string | null;
     OverDueDays?: number | null;
-    OverDueStaus?: string | null;
+    OverDueStatus?: string | null;
     SytemUpdatedDate?: string | null;
     ReturnByUserId?: number | null;
     ReturnByUserName?: string | null;

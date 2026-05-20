@@ -1,1 +1,187 @@
-<p>manage-issued-books works!</p>
+<div class="manage-issued-container">
+    <div class="table-clear-filter">
+        <p-button variant="outlined" label="Clear" icon="pi pi-filter-slash" (onClick)="clear()"></p-button>
+    </div>
+    <p-table [value]="issuedBooks" [autoLayout]="false" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <ng-template pTemplate="header">
+            <tr class="border-bottom">
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            S.No
+                        </div>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="RoleName">
+                            RoleName
+                            <p-sortIcon field="RoleName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedRoleNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                 <th class="text-start text-muted fw-medium" style="width: 21%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                           User Has Edit Access?
+                        </div>
+                    </div>
+                </th>
+                 <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            User Can Login?
+                        </div>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                            Status
+                            <p-sortIcon field="IsActive"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="pi pi-plus-circle" (click)="editRole()"></span>
+                    </div>
+                </th>
+            </tr>
+            @if (showFt) {
+            <tr>
+                <th></th>
+                <th>
+                    <p-columnFilter field="RoleName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="roleNameList" [(ngModel)]="selectedRoleNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+                <th></th>
+                <th>
+                    <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+            </tr>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="body" let-role let-index="rowIndex">
+            <tr class="border-bottom">
+                <td>{{ index + 1 }}</td>
+                <td>{{ role.RoleName }}</td>
+                <td><p-checkbox 
+                    [(ngModel)]="role.UserHasEditAccess" 
+                    [binary]="true"  [disabled]="true"
+                    inputId="binary">
+                </p-checkbox></td>
+                <td>
+                    <p-checkbox 
+                    [(ngModel)]="role.UserCanLogin" 
+                    [binary]="true"  [disabled]="true"
+                    inputId="binary">
+                </p-checkbox>
+                    </td>
+                <td>
+                    <p-tag [value]="role.IsActive ? 'Active' : 'Inactive'"
+                        [severity]="getStatusSeverity(role.IsActive)"></p-tag>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2 justify-content-center">
+                        <button pButton icon="pi pi-pencil" (click)="editRole(role)"
+                            class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
+                        <button pButton icon="pi pi-trash" (click)="deleteRole(role)"
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6" class="text-center">
+                    No roles found.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <p-dialog [header]="header" [(visible)]="roleDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
+        <div class="row">
+            <div class="col-6 mb-3" >
+                <label class="d-block small fw-medium text-secondary mb-1" for="roleName">
+                    Role<sup>*</sup>
+                </label>
+                <input id="roleName" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentRole.RoleName" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter role" (ngModelChange)="validateInput('RoleName')" />
+                <div *ngIf="errors.RoleName" class="text-danger mt-1 small">{{ errors.RoleName }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="isActive" [(ngModel)]="currentRole.IsActive" [ngModelOptions]="{standalone: true}"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="userHasEditAccess">
+                    User Has Edit Access?<sup>*</sup>
+                </label>
+               <p-radioButton name="grpUserHasEditAccess" value="true" inputId="yes_userHasEditAccess"
+                   [(ngModel)]="currentRole.UserHasEditAccess"></p-radioButton> &nbsp;
+                   <label for="yes_userHasEditAccess" class="ml-2">Yes</label>
+                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 <p-radioButton name="grpUserHasEditAccess" value="false" inputId="no_userHasEditAccess"
+                   [(ngModel)]="currentRole.UserHasEditAccess"></p-radioButton> &nbsp;
+                    <label for="no_userHasEditAccess" class="ml-2">No</label>
+                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div *ngIf="errors.UserHasEditAccess" class="text-danger mt-1 small">{{ errors.UserHasEditAccess }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="userCanLogin">
+                    User Can Login?<sup>*</sup>
+                </label>
+                 <p-radioButton name="grpUserCanLogin" value="true" inputId="yes_userCanLogin"
+                   [(ngModel)]="currentRole.UserCanLogin"></p-radioButton> &nbsp;
+                   <label for="yes_userCanLogin" class="ml-2">Yes</label>
+                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 <p-radioButton name="grpUserCanLogin" value="false" inputId="no_userCanLogin"
+                   [(ngModel)]="currentRole.UserCanLogin"></p-radioButton> &nbsp;
+                    <label for="no_userCanLogin" class="ml-2">No</label>
+                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div *ngIf="errors.UserCanLogin" class="text-danger mt-1 small">{{ errors.UserCanLogin }}</div>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="roleDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveRole()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>

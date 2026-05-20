@@ -44,7 +44,7 @@ export class ManageBookCirculationComponent {
     }
 
     getAllBookCirculartion(): void{
-        this._bcService.getAllBookCirculationDetails().subscribe({
+        this._bcService.getAllBookCirculationDetails('A').subscribe({
                 next: (data: BookCirculationDetails[]) => {
                     this.bcDetails = data;
                     this.filteredBcDetails = data;

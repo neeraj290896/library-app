@@ -12,8 +12,8 @@ export class BookCirculationService {
 
     constructor(private http: HttpClient) { }
 
-    getAllBookCirculationDetails(): Observable<any> {
-        return this.http.get(`${this.baseUrl}/GetAllBookCirculationDetails`);
+    getAllBookCirculationDetails(dsMode: string): Observable<any> {
+        return this.http.get(`${this.baseUrl}/GetAllBookCirculationDetails?dsMode=`+dsMode);
     }
 
     getBookCirculationDetailsById(bookId: number): Observable<any> {
