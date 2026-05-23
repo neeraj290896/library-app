@@ -46,9 +46,9 @@ export class ManageIssuedBooksComponent {
     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
       Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
     };
-    public options: { label: string; value: boolean; }[] = [
-        { label: 'Active', value: true },
-        { label: 'In-Active', value: false }
+    public statusOptions: { label: string; value: string; }[] = [
+        { label: 'Issued', value: 'Issued' },
+        { label: 'Returned', value: 'Returned' }
     ];
    
 
@@ -89,7 +89,7 @@ export class ManageIssuedBooksComponent {
         this.showFt = false;
     }
 
-   getOverDueStatusSeverity(_overDueDays: number): 'success' | 'warning' | 'info' {
+    getOverDueStatusSeverity(_overDueDays: number): 'success' | 'warning' | 'info' {
         switch (true) {
             case _overDueDays <= 0 : return 'success';
             case _overDueDays > 0 && _overDueDays < 10 : return 'warning';
@@ -156,7 +156,7 @@ export class ManageIssuedBooksComponent {
                 break;
 
             case 'ReturnByUserName':
-                if (this.currentIssuedBook.ReturnByUserName ?.trim() == "Returned" && this.currentIssuedBook.ReturnByUserName ?.trim()) {
+                if (this.currentIssuedBook.Status ?.trim() == "Returned" && this.currentIssuedBook.ReturnByUserName ?.trim()) {
                     this.errors.ReturnByUserName = 'ReturnBy Name is required.';
                     isValid = false;
                 } else {

@@ -10,11 +10,11 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { PaginatorModule } from 'primeng/paginator';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-manage-book-circulation',
-  imports: [ CommonModule, TagModule, TableModule, ButtonModule,
-        FormsModule, PaginatorModule, MultiSelectModule,
+  imports: [ CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, MultiSelectModule,
         InputTextModule,],
   templateUrl: './manage-book-circulation.component.html',
   styleUrl: './manage-book-circulation.component.scss'
@@ -36,7 +36,17 @@ export class ManageBookCirculationComponent {
   public selectedStatusList: string[] = [];
   public bcDetails: BookCirculationDetails[] = [];
   public filteredBcDetails: BookCirculationDetails[] = [];
+  public bcDialogVisible = false;
   bcDetailsCount = 0;
+  public header: string = '';
+  public selectedBook: BookCirculationDetails = 
+    { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'',
+      IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
+      ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
+      UpdatedByUserName :'', UpdatedDate: '' };
+    public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
+      Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
+    };
 
     ngOnInit(): void {
         this.getAllBookCirculartion();
@@ -58,28 +68,74 @@ export class ManageBookCirculationComponent {
             });
     }
 
+    onBookSearch(term: string) {
+        this.searchBookTerm = term;
+        this.commonBookCirculationSearch();      
+    }
 
-  onBookSearch(term: string) {
-      this.searchBookTerm = term;
+    onUserSearch(term: string) {
+        this.searchUserTerm = term.trim();
+        this.commonBookCirculationSearch();               
 
-      if(this.searchBookTerm !="")
-      {
-        if(this.filteredBcDetails !=null && this.filteredBcDetails.length >0)
+    }
+
+    commonBookCirculationSearch()
+    {
+        var _userBarcode : number = 0
+        var _bookBarcode : number = 0
+        
+
+        if(this.searchUserTerm !="" && this.searchUserTerm.includes(environment.usersBarcodeSyntax))
         {
-            
-        }
-      }
-      else
-      {
-        this.filteredBcDetails = this.bcDetails;
-      }
-      
-      
-  }
+            let strSplitBarcode = this.searchUserTerm.split("_").pop() ?? '0';                 
+            _userBarcode = parseInt(strSplitBarcode);
+        } 
 
-  onUserSearch(term: string) {
-      this.searchUserTerm = term;
-  }
+        if(this.searchBookTerm !="" && this.searchBookTerm.includes(environment.booksBarcodeSyntax))
+        {
+            let strSplitBarcode = this.searchBookTerm.split("_").pop() ?? '0';                 
+            _bookBarcode = parseInt(strSplitBarcode);
+        }
+
+        if(this.bcDetails !=null && this.bcDetails.length >0)
+        {           
+                        
+            if(_userBarcode > 0 && _bookBarcode > 0)
+            {
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerId == _userBarcode && x.BookId == _bookBarcode);                
+            }
+            else if(_userBarcode == 0 && _bookBarcode > 0)
+            {
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BookId == _bookBarcode);                
+            }
+            else if(_userBarcode > 0 && _bookBarcode == 0)
+            {
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerId == _userBarcode);                
+            }
+            else if(this.searchBookTerm !="" && this.searchUserTerm !="")
+            {
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.includes(this.searchBookTerm) && x.BorrowerName?.includes(this.searchUserTerm));                
+            }
+            else if(this.searchBookTerm !="" && this.searchUserTerm =="")
+            {
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.includes(this.searchBookTerm));                
+            }
+            else if(this.searchBookTerm =="" && this.searchUserTerm !="")
+            {
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerName?.includes(this.searchUserTerm));
+            }
+            else
+            {
+                this.filteredBcDetails = this.bcDetails;
+            }
+                
+        }
+        else
+        {
+            this.filteredBcDetails = [];
+        }
+    }
+
     initializeFilterLists(): void {
         this.bookNameList = [...new Set(this.bcDetails.map(book => book.BookName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.borrowerNameList = [...new Set(this.bcDetails.map(book => book.BorrowerName))].map(e => ({ label: e ?? "", value: e ?? "" }));
@@ -109,6 +165,174 @@ export class ManageBookCirculationComponent {
         }
     }
 
-    editBook(book: BookCirculationDetails): void { }
+    editBook(_bc: BookCirculationDetails | null = null): void {
+
+        if(_bc)
+        {
+            this.selectedBook  = { ..._bc };
+
+             if (_bc.Status == "Issued") {
+                
+                this.header = 'Update Issued Book Details';
+            } 
+            else {                
+                this.header = 'Update Returned Book Details';
+            }
+        }
+        else
+        {
+            this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
+                                IssuedByUserId: 0, IssuedByUserName :'', IssuedDate : '', OverDueId: 0, FineAmount: 0.0, 
+                                OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'', ReturnByUserId: 0,
+                                ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
+                                UpdatedByUserName :'', UpdatedDate: '' };
+
+            this.header = "Issue book"            
+        }
+        
+        this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''} 
+            
+        this.bcDialogVisible = true;
+    }
+
+     validateInput(key: string): boolean {
+        let isValid = true;
+
+        switch (key) {
+            case 'BookName':
+                if (!this.selectedBook.BookName?.trim()) {
+                    this.errors.BookName = 'Book name is required.';
+                    isValid = false;
+                }                 
+                else {
+                    this.errors.BookName = '';
+                }
+                break;
+
+            case 'BorrowerName':
+                if (this.selectedBook.BorrowerName ?.trim()) {
+                    this.errors.BorrowerName = 'Borrower Name is required.';
+                    isValid = false;
+                } else {
+                    this.errors.BorrowerName = '';
+                }
+                break;
+
+            case 'IssuedByUserName':
+                if (this.selectedBook.IssuedByUserName ?.trim()) {
+                    this.errors.IssuedByUserName = 'IssuedBy Name is required.';
+                    isValid = false;
+                } else {
+                    this.errors.IssuedByUserName = '';
+                }
+                break;
+              
+            case 'Status':
+                if (this.selectedBook.Status ?.trim()) {
+                    this.errors.Status = 'Status is required.';
+                    isValid = false;
+                } else {
+                    this.errors.Status = '';
+                }
+                break;
+
+            case 'ReturnByUserName':
+                if (this.selectedBook.Status ?.trim() == "Returned" && this.selectedBook.ReturnByUserName ?.trim()) {
+                    this.errors.ReturnByUserName = 'ReturnBy Name is required.';
+                    isValid = false;
+                } else {
+                    this.errors.ReturnByUserName = '';
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return isValid;
+    }
+
+    validateBcDetails(): boolean {
+        const isBookNameValid = this.validateInput('BookName');
+        const isBorrowerNameValid = this.validateInput('BorrowerName');
+        const isIssuedByUserNameValid = this.validateInput('IssuedByUserName');
+        const isStatusValid = this.validateInput('Status');
+        const isReturnByUserNameValid = this.validateInput('ReturnByUserName');
+        return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid;
+    }
+
+    saveBcDetails(): void {
+        if (!this.validateBcDetails()) {
+            return;
+        }
+
+        if(this.selectedBook.Status == "Returned" )
+        {
+            this.returnBook();
+        }
+        else
+        {
+            this.issueBook();
+        }       
+    } 
+
+    issueBook():void {
+        this._bcService.issueBook(this.selectedBook).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage Book circulation - Failed',
+                        detail: res ? res.Message : 'Failed to Issue book. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage Book circulation - Success',
+                        detail: 'Updated Book circulation successfully.'
+                    });
+                }
+
+                this.getAllBookCirculartion();
+                this.bcDialogVisible = false;
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage Book circulation - Failed',
+                    detail: 'Failed to Issue book. Please try again.'
+                });
+            }
+        });
+    }
     
+    returnBook():void{
+        this._bcService.returnBook(this.selectedBook).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage Book circulation - Failed',
+                        detail: res ? res.Message : 'Failed to Return book. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage Book circulation - Success',
+                        detail: 'Updated Book circulation successfully.'
+                    });
+                }
+
+                this.getAllBookCirculartion();
+                this.bcDialogVisible = false;
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage Book circulation - Failed',
+                    detail: 'Failed to Return book. Please try again.'
+                });
+            }
+        });
+    }
 }
