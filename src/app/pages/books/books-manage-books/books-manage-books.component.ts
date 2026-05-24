@@ -7,7 +7,6 @@ import { PaginatorModule } from 'primeng/paginator';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { BookService } from '@services/book.service';
 import { AuthorDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails } from '@app/shared/models/api.models';
@@ -19,8 +18,16 @@ import { LanguageService } from '@app/shared/services/language.service';
 import { BuildingService } from '@app/shared/services/building.service';
 import { FloorService } from '@app/shared/services/floor.service';
 import { RackService } from '@app/shared/services/rack.service';
+import * as Xlsx from 'xlsx';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
+
+type ImportBookDetails = BookDetails & {
+    Error: string;
+};
 
 @Component({
     selector: 'app-books-manage-books',
@@ -43,8 +50,14 @@ export class BooksManageBooksComponent implements OnInit {
     private rackService = inject(RackService);
 
     @ViewChild('dt') dataTable: Table | undefined;
+    @ViewChild('importDt') importDataTable: Table | undefined;
 
     public books: BookDetails[] = [];
+    public authors: AuthorDetails[] = [];
+    public publishers: PublisherDetails[] = [];
+    public categories: CategoryDetails[] = [];
+    public languages: LanguageDetails[] = [];
+    public buildings: BuildingDetails[] = [];
     public floors: FloorDetails[] = [];
     public racks: RackDetails[] = [];
     public showFt: boolean = false;
@@ -130,6 +143,27 @@ export class BooksManageBooksComponent implements OnInit {
         { label: 'In-Active', value: false }
     ];
 
+    public importDialogVisible: boolean = false;
+    public importPreview: ImportBookDetails[] = [];
+    public importUploadError: string = '';
+    public importShowFt: boolean = false;
+    public importBookNameList: { label: string, value: string }[] = [];
+    public importAuthorNameList: { label: string, value: string }[] = [];
+    public importPublisherNameList: { label: string, value: string }[] = [];
+    public importCategoryNameList: { label: string, value: string }[] = [];
+    public importLanguageNameList: { label: string, value: string }[] = [];
+    public importPublishedYearList: { label: number, value: number }[] = [];
+    public importStatusList: { label: string, value: boolean }[] = [];
+    public importErrorList: { label: string, value: string }[] = [];
+    public importSelectedBookNameList: string[] = [];
+    public importSelectedAuthorNameList: string[] = [];
+    public importSelectedPublisherNameList: string[] = [];
+    public importSelectedCategoryNameList: string[] = [];
+    public importSelectedLanguageNameList: string[] = [];
+    public importSelectedPublishedYearList: number[] = [];
+    public importSelectedStatusList: boolean[] = [];
+    public importSelectedErrorList: string[] = [];
+
     ngOnInit(): void {
         this.loadBooks();
         this.loadAuthors();
@@ -156,6 +190,7 @@ export class BooksManageBooksComponent implements OnInit {
     loadAuthors(): void {
         this.authorService.getAuthorDetails().subscribe({
             next: (data: AuthorDetails[]) => {
+                this.authors = data;
                 this.authorOptions = data.map(author => {
                     return { label: author.AuthorName ?? '', value: author.AuthorId };
                 });
@@ -169,6 +204,7 @@ export class BooksManageBooksComponent implements OnInit {
     loadPublishers(): void {
         this.publisherService.getPublisherDetails().subscribe({
             next: (data: PublisherDetails[]) => {
+                this.publishers = data;
                 this.publisherOptions = data.map(publisher => {
                     return { label: publisher.PublisherName ?? '', value: publisher.PublisherId };
                 });
@@ -182,6 +218,7 @@ export class BooksManageBooksComponent implements OnInit {
     loadCategories(): void {
         this.categoryService.getCategoryDetails().subscribe({
             next: (data: CategoryDetails[]) => {
+                this.categories = data;
                 this.categoryOptions = data.map(category => {
                     return { label: category.CategoryName ?? '', value: category.CategoryId };
                 });
@@ -195,6 +232,7 @@ export class BooksManageBooksComponent implements OnInit {
     loadLanguages(): void {
         this.languageService.getLanguageDetails().subscribe({
             next: (data: LanguageDetails[]) => {
+                this.languages = data;
                 this.languageOptions = data.map(language => {
                     return { label: language.LanguageName ?? '', value: language.LanguageId };
                 });
@@ -208,6 +246,7 @@ export class BooksManageBooksComponent implements OnInit {
     loadBuildings(): void {
         this.buildingService.getAllBuildingDetails().subscribe({
             next: (data: BuildingDetails[]) => {
+                this.buildings = data;
                 this.buildingOptions = data.map(building => {
                     return { label: building.BuildingName ?? '', value: building.BuildingId };
                 });
@@ -257,8 +296,31 @@ export class BooksManageBooksComponent implements OnInit {
             .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
     }
 
+    initializeImportFilterLists(): void {
+        this.importBookNameList = [...new Set(this.importPreview.map(book => book.BookName))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importAuthorNameList = [...new Set(this.importPreview.map(book => book.AuthorName))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importPublisherNameList = [...new Set(this.importPreview.map(book => book.PublisherName))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importCategoryNameList = [...new Set(this.importPreview.map(book => book.CategoryName))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importLanguageNameList = [...new Set(this.importPreview.map(book => book.LanguageName))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importPublishedYearList = [...new Set(this.importPreview.map(book => book.PublishedYear))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importStatusList = [...new Set(this.importPreview.map(book => book.IsActive ?? false))]
+            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+        this.importErrorList = [...new Set(this.importPreview.map(lang => lang.Error))]
+            .map(e => ({ label: e!, value: e! }));
+    }
+
     showFilter(): void {
         this.showFt = !this.showFt;
+    }
+
+    showImportFilter(): void {
+        this.importShowFt = !this.importShowFt;
     }
 
     clear(): void {
@@ -271,6 +333,19 @@ export class BooksManageBooksComponent implements OnInit {
         this.selectedPublishedYearList = [];
         this.selectedStatusList = [];
         this.showFt = false;
+    }
+
+    clearImport(): void {
+        this.importDataTable?.reset();
+        this.importSelectedBookNameList = [];
+        this.importSelectedAuthorNameList = [];
+        this.importSelectedPublisherNameList = [];
+        this.importSelectedCategoryNameList = [];
+        this.importSelectedLanguageNameList = [];
+        this.importSelectedPublishedYearList = [];
+        this.importSelectedStatusList = [];
+        this.importSelectedErrorList = [];
+        this.importShowFt = false;
     }
 
     getStatusSeverity(isActive: boolean): 'success' | 'danger' {
@@ -381,7 +456,7 @@ export class BooksManageBooksComponent implements OnInit {
     onPublishedYearChange(): void {
         if (this.publishedDate) {
             this.currentBook.PublishedYear = this.publishedDate.getFullYear();
-        } 
+        }
         else {
             this.currentBook.PublishedYear = null;
         }
@@ -641,6 +716,594 @@ export class BooksManageBooksComponent implements OnInit {
                     severity: 'error',
                     summary: 'Delete Book - Failed',
                     detail: 'Failed to delete book. Please try again.'
+                });
+            }
+        });
+    }
+
+    importBook(): void {
+        this.importDialogVisible = true;
+        this.importPreview = [];
+        this.importUploadError = '';
+    }
+
+    async downloadBookTemplate(): Promise<void> {
+        const workbook = new ExcelJS.Workbook();
+
+        const bodyStyle: Partial<ExcelJS.Style> = {
+            border: {
+                top: { style: 'thin', color: { argb: '00000000' } },
+                left: { style: 'thin', color: { argb: '00000000' } },
+                bottom: { style: 'thin', color: { argb: '00000000' } },
+                right: { style: 'thin', color: { argb: '00000000' } },
+            },
+            alignment: { horizontal: 'center', vertical: 'middle' }
+        };
+
+        const headerStyle: Partial<ExcelJS.Style> = {
+            font: { bold: true, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF22C55E' } },
+            ...bodyStyle
+        };
+
+        const worksheet = workbook.addWorksheet('Books');
+        worksheet.addRow(['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)',
+            'BUILDING', 'FLOOR', 'RACK', 'BARCODE', 'STATUS']);
+
+        worksheet.getRow(1).eachCell(cell => {
+            cell.style = headerStyle;
+        });
+
+        worksheet.autoFilter = {
+            from: 'A1',
+            to: 'L1'
+        };
+
+        const authorsSheet = workbook.addWorksheet('AuthorList');
+        this.authors.forEach((author, idx) => {
+            authorsSheet.getCell(idx + 1, 1).value = author.AuthorName;
+        });
+        authorsSheet.state = 'hidden';
+
+        const publishersSheet = workbook.addWorksheet('PublisherList');
+        this.publishers.forEach((pub, idx) => {
+            publishersSheet.getCell(idx + 1, 1).value = pub.PublisherName;
+        });
+        publishersSheet.state = 'hidden';
+
+        const categoriesSheet = workbook.addWorksheet('CategoryList');
+        this.categories.forEach((cat, idx) => {
+            categoriesSheet.getCell(idx + 1, 1).value = cat.CategoryName;
+        });
+        categoriesSheet.state = 'hidden';
+
+        const languagesSheet = workbook.addWorksheet('LanguageList');
+        this.languages.forEach((lang, idx) => {
+            languagesSheet.getCell(idx + 1, 1).value = lang.LanguageName;
+        });
+        languagesSheet.state = 'hidden';
+
+        const buildingsSheet = workbook.addWorksheet('BuildingList');
+        this.buildings.forEach((building, idx) => {
+            buildingsSheet.getCell(idx + 1, 1).value = building.BuildingName;
+        });
+        buildingsSheet.state = 'hidden';
+
+        const floorsSheet = workbook.addWorksheet('FloorList');
+        this.floors.forEach((floor, idx) => {
+            floorsSheet.getCell(idx + 1, 1).value = floor.FloorName;
+        });
+        floorsSheet.state = 'hidden';
+
+        const racksSheet = workbook.addWorksheet('RackList');
+        this.racks.forEach((rack, idx) => {
+            racksSheet.getCell(idx + 1, 1).value = rack.RackLabel;
+        });
+        racksSheet.state = 'hidden';
+
+        for (let rowIndex = 2; rowIndex <= 1000; rowIndex++) {
+            const authorCell = worksheet.getCell(rowIndex, 2);
+            authorCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`AuthorList!$A$1:$A$${this.authors.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Author',
+                error: 'Please select a valid author from the list.'
+            };
+
+            const publisherCell = worksheet.getCell(rowIndex, 3);
+            publisherCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`PublisherList!$A$1:$A$${this.publishers.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Publisher',
+                error: 'Please select a valid publisher from the list.'
+            };
+
+            const categoryCell = worksheet.getCell(rowIndex, 4);
+            categoryCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`CategoryList!$A$1:$A$${this.categories.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Category',
+                error: 'Please select a valid category from the list.'
+            };
+
+            const languageCell = worksheet.getCell(rowIndex, 5);
+            languageCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`LanguageList!$A$1:$A$${this.languages.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Language',
+                error: 'Please select a valid language from the list.'
+            };
+
+            const yearCell = worksheet.getCell(rowIndex, 6);
+            yearCell.dataValidation = {
+                type: 'whole',
+                operator: 'between',
+                formulae: ['1000', '9999'],
+                allowBlank: true,
+                showErrorMessage: true,
+                errorTitle: 'Invalid Year',
+                error: 'Please enter a 4-digit year (e.g., 2024).'
+            };
+
+            const priceCell = worksheet.getCell(rowIndex, 7);
+            priceCell.dataValidation = {
+                type: 'decimal',
+                operator: 'greaterThan',
+                formulae: ['0'],
+                allowBlank: true,
+                showErrorMessage: true,
+                errorTitle: 'Invalid Price',
+                error: 'Please enter a valid price (greater than 0).'
+            };
+
+            const buildingCell = worksheet.getCell(rowIndex, 8);
+            buildingCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`BuildingList!$A$1:$A$${this.buildings.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Building',
+                error: 'Please select a valid building from the list.'
+            };
+
+            const floorCell = worksheet.getCell(rowIndex, 9);
+            floorCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`FloorList!$A$1:$A$${this.floors.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Floor',
+                error: 'Please select a valid floor for a selected building.'
+            };
+
+            const rackCell = worksheet.getCell(rowIndex, 10);
+            rackCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`RackList!$A$1:$A$${this.racks.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Rack',
+                error: 'Please select a valid rack for the selected floor.'
+            };
+
+            const statusCell = worksheet.getCell(rowIndex, 12);
+            statusCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: ['"Active,In-active"'],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Status',
+                error: 'Please select Active or In-active.'
+            };
+        }
+
+        worksheet.columns.forEach(col => {
+            const lengths = col.values === undefined ? [] : col.values.map(v => {
+                if (v === null || v === undefined) return 0;
+                else return v.toString().length;
+            });
+            col.width = Math.max(...lengths.filter(v => typeof v === 'number')) + 10;
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, 'import-book-template.xlsx');
+    }
+
+    onImportFileSelected(event: Event): void {
+        this.importPreview = [];
+        this.importUploadError = '';
+
+        const input = event.target as HTMLInputElement;
+        if (!input.files || !input.files.length) {
+            this.importUploadError = 'File not selected.';
+            input.value = '';
+            return;
+        }
+
+        if (!['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'].includes(input.files[0].type)) {
+            this.importUploadError = 'Invalid file type. Please upload an Excel file (.xlsx or .xls).';
+            input.value = '';
+            return;
+        }
+
+        const file = input.files[0];
+        input.value = '';
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(file);
+        reader.onload = async (e: ProgressEvent<FileReader>) => {
+            const data = e.target?.result;
+            if (!data) {
+                this.importUploadError = 'Unable to read file.';
+                return;
+            }
+
+            try {
+                const workbook = Xlsx.read(data as ArrayBuffer, { type: 'array' });
+                if (!workbook.SheetNames.length) {
+                    this.importUploadError = 'Excel file does not contain any worksheets.';
+                    return;
+                }
+
+                const rows = Xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {
+                    defval: null,
+                    blankrows: false,
+                    raw: false
+                });
+
+                if (!rows.length) {
+                    this.importUploadError = 'No data rows were found in the file.';
+                    return;
+                }
+
+                const headerRow = Object.keys(rows[0] || {});
+                const expectedHeaders = ['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR',
+                    'PRICE(₹)', 'BUILDING', 'FLOOR', 'RACK', 'BARCODE', 'STATUS'];
+                if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
+                    this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
+                    return;
+                }
+
+                rows.forEach((row: any) => {
+                    const bookName = row['BOOK']?.toString().trim();
+                    const authorName = row['AUTHOR']?.toString().trim();
+                    const publisherName = row['PUBLISHER']?.toString().trim();
+                    const categoryName = row['CATEGORY']?.toString().trim();
+                    const languageName = row['LANGUAGE']?.toString().trim();
+                    const publishedYear = Number(row['YEAR']?.toString().trim());
+                    const price = Number(row['PRICE(₹)']?.toString().trim());
+                    const buildingName = row['BUILDING']?.toString().trim();
+                    const floorName = row['FLOOR']?.toString().trim();
+                    const rackLabel = row['RACK']?.toString().trim();
+                    const bookBarcode = row['BARCODE']?.toString().trim();
+                    const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
+
+                    const importItem: ImportBookDetails = {
+                        BookId: 0,
+                        BookName: bookName,
+                        AuthorId: null,
+                        AuthorName: authorName,
+                        PublisherId: null,
+                        PublisherName: publisherName,
+                        CategoryId: null,
+                        CategoryName: categoryName,
+                        LanguageId: null,
+                        LanguageName: languageName,
+                        PublishedYear: publishedYear,
+                        Price: price,
+                        Status: 'Available',
+                        BuildingId: null,
+                        BuildingName: buildingName,
+                        FloorId: null,
+                        FloorNumber: 0,
+                        FloorName: floorName,
+                        RackId: null,
+                        RackNumber: 0,
+                        RackLabel: rackLabel,
+                        BookBarcode: bookBarcode,
+                        IsActive: isActive,
+                        Error: ''
+                    };
+                    this.importPreview.push(importItem);
+                });
+
+                this.validateImportBook();
+                this.initializeImportFilterLists();
+            }
+            catch (error) {
+                this.importUploadError = 'Invalid file data.';
+            }
+        };
+    }
+
+    validateImportInput(key: string, index: number): boolean {
+        let isValid = true;
+
+        switch (key) {
+            case 'BookName':
+                if (!this.importPreview[index].BookName?.trim()) {
+                    this.importPreview[index].Error = 'Book is required.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'AuthorName':
+                if (!this.importPreview[index].AuthorName?.trim()) {
+                    this.importPreview[index].Error = 'Author is required.';
+                    isValid = false;
+                }
+                else if (!this.authors.some(author => author.AuthorName?.toLowerCase() === this.importPreview[index].AuthorName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Author not enlisted.';
+                    isValid = false;
+                }
+                else {
+                    const author = this.authors.find(a => a.AuthorName?.toLowerCase() === this.importPreview[index].AuthorName?.trim().toLowerCase());
+                    if (author) {
+                        this.importPreview[index].AuthorId = author.AuthorId;
+                        this.importPreview[index].AuthorName = author.AuthorName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'PublisherName':
+                if (!this.importPreview[index].PublisherName?.trim()) {
+                    this.importPreview[index].Error = 'Publisher is required.';
+                    isValid = false;
+                }
+                else if (!this.publishers.some(publisher => publisher.PublisherName?.toLowerCase() === this.importPreview[index].PublisherName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Publisher not enlisted.';
+                    isValid = false;
+                }
+                else {
+                    const publisher = this.publishers.find(p => p.PublisherName?.toLowerCase() === this.importPreview[index].PublisherName?.trim().toLowerCase());
+                    if (publisher) {
+                        this.importPreview[index].PublisherId = publisher.PublisherId;
+                        this.importPreview[index].PublisherName = publisher.PublisherName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'CategoryName':
+                if (!this.importPreview[index].CategoryName?.trim()) {
+                    this.importPreview[index].Error = 'Category is required.';
+                    isValid = false;
+                }
+                else if (!this.categories.some(category => category.CategoryName?.toLowerCase() === this.importPreview[index].CategoryName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Category not enlisted.';
+                    isValid = false;
+                }
+                else {
+                    const category = this.categories.find(c => c.CategoryName?.toLowerCase() === this.importPreview[index].CategoryName?.trim().toLowerCase());
+                    if (category) {
+                        this.importPreview[index].CategoryId = category.CategoryId;
+                        this.importPreview[index].CategoryName = category.CategoryName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'LanguageName':
+                if (!this.importPreview[index].LanguageName?.trim()) {
+                    this.importPreview[index].Error = 'Language is required.';
+                    isValid = false;
+                }
+                else if (!this.languages.some(lang => lang.LanguageName?.toLowerCase() === this.importPreview[index].LanguageName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Language not enlisted.';
+                    isValid = false;
+                }
+                else {
+                    const language = this.languages.find(l => l.LanguageName?.toLowerCase() === this.importPreview[index].LanguageName?.trim().toLowerCase());
+                    if (language) {
+                        this.importPreview[index].LanguageId = language.LanguageId;
+                        this.importPreview[index].LanguageName = language.LanguageName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'PublishedYear':
+                if (!this.importPreview[index].PublishedYear || this.importPreview[index].PublishedYear < 1000 || this.importPreview[index].PublishedYear > 9999) {
+                    this.importPreview[index].Error = 'Invalid published year.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'Price':
+                if (!this.importPreview[index].Price || this.importPreview[index].Price <= 0) {
+                    this.importPreview[index].Error = 'Invalid price.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'BuildingName':
+                if (!this.importPreview[index].BuildingName?.trim()) {
+                    this.importPreview[index].Error = 'Building is required.';
+                    isValid = false;
+                }
+                else if (!this.buildings.some(building => building.BuildingName?.toLowerCase() === this.importPreview[index].BuildingName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Building not enlisted.';
+                    isValid = false;
+                }
+                else {
+                    const building = this.buildings.find(b => b.BuildingName?.toLowerCase() === this.importPreview[index].BuildingName?.trim().toLowerCase());
+                    if (building) {
+                        this.importPreview[index].BuildingId = building.BuildingId;
+                        this.importPreview[index].BuildingName = building.BuildingName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'FloorName':
+                if (!this.importPreview[index].FloorName?.trim()) {
+                    this.importPreview[index].Error = 'Floor is required.';
+                    isValid = false;
+                }
+                else if (!this.floors.some(floor => floor.BuildingId === this.importPreview[index].BuildingId &&
+                    floor.FloorName?.toLowerCase() === this.importPreview[index].FloorName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Floor not enlisted for the selected building.';
+                    isValid = false;
+                }
+                else {
+                    const floor = this.floors.find(f => f.BuildingId === this.importPreview[index].BuildingId &&
+                        f.FloorName?.toLowerCase() === this.importPreview[index].FloorName?.trim().toLowerCase());
+                    if (floor) {
+                        this.importPreview[index].FloorId = floor.FloorId;
+                        this.importPreview[index].FloorNumber = floor.FloorNumber;
+                        this.importPreview[index].FloorName = floor.FloorName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'RackLabel':
+                if (!this.importPreview[index].RackLabel?.trim()) {
+                    this.importPreview[index].Error = 'Rack label is required.';
+                    isValid = false;
+                }
+                else if (!this.racks.some(rack => rack.BuildingId === this.importPreview[index].BuildingId &&
+                    rack.FloorId === this.importPreview[index].FloorId &&
+                    rack.RackLabel?.trim().toLowerCase() === this.importPreview[index].RackLabel?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Rack label not enlisted for the selected building and floor.';
+                    isValid = false;
+                }
+                else {
+                    const rack = this.racks.find(r => r.BuildingId === this.importPreview[index].BuildingId &&
+                        r.FloorId === this.importPreview[index].FloorId &&
+                        r.RackLabel?.trim().toLowerCase() === this.importPreview[index].RackLabel?.trim().toLowerCase());
+                    if (rack) {
+                        this.importPreview[index].RackId = rack.RackId;
+                        this.importPreview[index].RackNumber = rack.RackNumber;
+                        this.importPreview[index].RackLabel = rack.RackLabel;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'BookBarcode':
+                if (!this.importPreview[index].BookBarcode?.trim()) {
+                    this.importPreview[index].Error = 'Barcode is required.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            case 'IsActive':
+                if (this.importPreview[index].IsActive === null) {
+                    this.importPreview[index].Error = 'Status is required.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return isValid;
+    }
+
+    validateImportBook(): boolean {
+        return this.importPreview.every((item, index) => {
+            return this.validateImportInput('BookName', index) &&
+                this.validateImportInput('AuthorName', index) &&
+                this.validateImportInput('PublisherName', index) &&
+                this.validateImportInput('CategoryName', index) &&
+                this.validateImportInput('LanguageName', index) &&
+                this.validateImportInput('PublishedYear', index) &&
+                this.validateImportInput('Price', index) &&
+                this.validateImportInput('BuildingName', index) &&
+                this.validateImportInput('FloorName', index) &&
+                this.validateImportInput('RackLabel', index) &&
+                this.validateImportInput('BookBarcode', index) &&
+                this.validateImportInput('IsActive', index);
+        });
+    }
+
+    saveImport(): void {
+        if (!this.importPreview.length) {
+            this.importUploadError = 'No data to import.';
+            return;
+        }
+
+        if (!this.validateImportBook()) {
+            return;
+        }
+
+        const payload = this.importPreview.map(item => {
+            return {
+                BookId: item.BookId,
+                BookName: item.BookName,
+                AuthorId: item.AuthorId,
+                AuthorName: item.AuthorName,
+                PublisherId: item.PublisherId,
+                PublisherName: item.PublisherName,
+                CategoryId: item.CategoryId,
+                CategoryName: item.CategoryName,
+                LanguageId: item.LanguageId,
+                LanguageName: item.LanguageName,
+                PublishedYear: item.PublishedYear,
+                Price: item.Price,
+                Status: item.Status,
+                BuildingId: item.BuildingId,
+                BuildingName: item.BuildingName,
+                FloorId: item.FloorId,
+                FloorNumber: item.FloorNumber,
+                FloorName: item.FloorName,
+                RackId: item.RackId,
+                RackNumber: item.RackNumber,
+                RackLabel: item.RackLabel,
+                BookBarcode: item.BookBarcode,
+                IsActive: item.IsActive
+            };
+        });
+        this.bookService.updateBookDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage Books - Failed',
+                        detail: res ? res.Message : 'Failed to import books. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage Books - Success',
+                        detail: 'Books imported successfully.'
+                    });
+                }
+
+                this.loadBooks();
+                this.importDialogVisible = false;
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage Books - Failed',
+                    detail: 'Failed to import books. Please try again.'
                 });
             }
         });
