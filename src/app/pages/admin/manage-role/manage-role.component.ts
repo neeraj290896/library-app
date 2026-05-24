@@ -71,7 +71,7 @@ export class ManageRoleComponent {
         this.roleNameList = [...new Set(this.roles.map(role => role.RoleName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.roles.map(role => role.IsActive))]
-            .map(e => ({ label: e ? 'Active' : 'Inactive', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     showFilter(): void {

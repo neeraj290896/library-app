@@ -8,10 +8,11 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { PaginatorModule } from 'primeng/paginator';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { Tooltip } from "primeng/tooltip";
 
 @Component({
   selector: 'app-manage-organization',
- imports: [CommonModule, ButtonModule, TableModule, TagModule, PaginatorModule, MultiSelectModule, FormsModule],
+ imports: [CommonModule, ButtonModule, TableModule, TagModule, PaginatorModule, MultiSelectModule, FormsModule, Tooltip],
   templateUrl: './manage-organization.component.html',
   styleUrl: './manage-organization.component.scss'
 })
@@ -47,7 +48,7 @@ export class ManageOrganizationComponent {
         this.organizationNameList = [...new Set(this.organizations.map(organization => organization.OrganizationName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.organizations.map(organization => organization.IsActive))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     showFilter(): void {
@@ -65,7 +66,7 @@ export class ManageOrganizationComponent {
         return isActive ? 'success' : 'danger';
     }
 
-    editOrganization(organization: OrganizationDetails): void { }
+    editOrganization(organization: OrganizationDetails | null = null): void { }
 
     deleteOrganization(organization: OrganizationDetails): void { }
 }

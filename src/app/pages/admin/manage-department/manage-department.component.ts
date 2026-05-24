@@ -67,7 +67,7 @@ private messageService = inject(MessageService);
         this.departmentNameList = [...new Set(this.departments.map(department => department.DepartmentName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.departments.map(department => department.IsActive))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     showFilter(): void {

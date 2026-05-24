@@ -86,14 +86,14 @@ export class BooksManageLanguageComponent implements OnInit {
         this.languageNameList = [...new Set(this.languages.map(lang => lang.LanguageName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.languages.map(lang => lang.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     initializeImportFilterLists(): void {
         this.importLanguageNameList = [...new Set(this.importPreview.map(lang => lang.LanguageName))]
             .map(e => ({ label: e!, value: e! }));
         this.importStatusList = [...new Set(this.importPreview.map(lang => lang.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
         this.importErrorList = [...new Set(this.importPreview.map(lang => lang.Error))]
             .map(e => ({ label: e!, value: e! }));
     }

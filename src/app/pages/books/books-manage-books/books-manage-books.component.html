@@ -201,7 +201,7 @@
                 </td>
                 <td>{{ book.PublishedYear }}</td>
                 <td>
-                    <p-tag [value]="book.IsActive ? 'Active' : 'In-active'"
+                    <p-tag [value]="book.IsActive ? 'Active' : 'In-Active'"
                         [severity]="getStatusSeverity(book.IsActive)"></p-tag>
                 </td>
                 <td>
@@ -225,7 +225,7 @@
         </ng-template>
     </p-table>
 
-    <p-dialog header="Edit Book" [(visible)]="bookDialogVisible" [modal]="true" [style]="{ width: '70vw' }">
+    <p-dialog [header]="header" [(visible)]="bookDialogVisible" [modal]="true" [style]="{ width: '70vw' }">
         <div class="row">
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
@@ -511,9 +511,10 @@
                     <th>
                         <p-columnFilter field="AuthorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importAuthorNameList" [(ngModel)]="importSelectedAuthorNameList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                <p-multiSelect [options]="importAuthorNameList"
+                                    [(ngModel)]="importSelectedAuthorNameList" (onChange)="filter($event.value)"
+                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                    optionLabel="label" optionValue="value" appendTo="body"
                                     placeholder="All"></p-multiSelect>
                             </ng-template>
                         </p-columnFilter>
@@ -522,9 +523,10 @@
                         <p-columnFilter field="PublisherName" matchMode="in" [showMenu]="false"
                             [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importPublisherNameList" [(ngModel)]="importSelectedPublisherNameList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                <p-multiSelect [options]="importPublisherNameList"
+                                    [(ngModel)]="importSelectedPublisherNameList" (onChange)="filter($event.value)"
+                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                    optionLabel="label" optionValue="value" appendTo="body"
                                     placeholder="All"></p-multiSelect>
                             </ng-template>
                         </p-columnFilter>
@@ -533,9 +535,10 @@
                         <p-columnFilter field="CategoryName" matchMode="in" [showMenu]="false"
                             [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importCategoryNameList" [(ngModel)]="importSelectedCategoryNameList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                <p-multiSelect [options]="importCategoryNameList"
+                                    [(ngModel)]="importSelectedCategoryNameList" (onChange)="filter($event.value)"
+                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                    optionLabel="label" optionValue="value" appendTo="body"
                                     placeholder="All"></p-multiSelect>
                             </ng-template>
                         </p-columnFilter>
@@ -544,9 +547,10 @@
                         <p-columnFilter field="LanguageName" matchMode="in" [showMenu]="false"
                             [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importLanguageNameList" [(ngModel)]="importSelectedLanguageNameList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                <p-multiSelect [options]="importLanguageNameList"
+                                    [(ngModel)]="importSelectedLanguageNameList" (onChange)="filter($event.value)"
+                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                    optionLabel="label" optionValue="value" appendTo="body"
                                     placeholder="All"></p-multiSelect>
                             </ng-template>
                         </p-columnFilter>
@@ -555,9 +559,10 @@
                         <p-columnFilter field="PublishedYear" matchMode="in" [showMenu]="false"
                             [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importPublishedYearList" [(ngModel)]="importSelectedPublishedYearList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                <p-multiSelect [options]="importPublishedYearList"
+                                    [(ngModel)]="importSelectedPublishedYearList" (onChange)="filter($event.value)"
+                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                    optionLabel="label" optionValue="value" appendTo="body"
                                     placeholder="All"></p-multiSelect>
                             </ng-template>
                         </p-columnFilter>
@@ -613,7 +618,7 @@
                     </td>
                     <td>{{ book.PublishedYear }}</td>
                     <td>
-                        <p-tag [value]="book.IsActive ? 'Active' : 'In-active'"
+                        <p-tag [value]="book.IsActive ? 'Active' : 'In-Active'"
                             [severity]="getStatusSeverity(book.IsActive)"></p-tag>
                     </td>
                     <td>

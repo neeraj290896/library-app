@@ -25,20 +25,8 @@ $color-primary: #22c55e;
 
         .table-clear-filter {
             position: absolute;
-            margin-top: 0.3rem;
+            margin-top: 0.5rem;
             z-index: 1;
-
-            .p-button {
-                background: transparent !important;
-                border-color: $color-primary !important;
-                color: $color-primary !important;
-                transition: background-color 0.2s ease;
-
-                &:hover {
-                    background-color: $color-primary !important;
-                    color: white !important;
-                }
-            }
         }
     }
 }

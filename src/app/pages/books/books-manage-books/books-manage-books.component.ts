@@ -68,7 +68,6 @@ export class BooksManageBooksComponent implements OnInit {
     public languageNameList: { label: string, value: string }[] = [];
     public publishedYearList: { label: number, value: number }[] = [];
     public statusList: { label: string, value: boolean }[] = [];
-
     public selectedBookNameList: string[] = [];
     public selectedAuthorNameList: string[] = [];
     public selectedPublisherNameList: string[] = [];
@@ -293,7 +292,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.publishedYearList = [...new Set(this.books.map(book => book.PublishedYear))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.books.map(book => book.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     initializeImportFilterLists(): void {
@@ -310,7 +309,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.importPublishedYearList = [...new Set(this.importPreview.map(book => book.PublishedYear))]
             .map(e => ({ label: e!, value: e! }));
         this.importStatusList = [...new Set(this.importPreview.map(book => book.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
         this.importErrorList = [...new Set(this.importPreview.map(lang => lang.Error))]
             .map(e => ({ label: e!, value: e! }));
     }
@@ -898,10 +897,10 @@ export class BooksManageBooksComponent implements OnInit {
             statusCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
-                formulae: ['"Active,In-active"'],
+                formulae: ['"Active,In-Active"'],
                 showErrorMessage: true,
                 errorTitle: 'Invalid Status',
-                error: 'Please select Active or In-active.'
+                error: 'Please select Active or In-Active.'
             };
         }
 

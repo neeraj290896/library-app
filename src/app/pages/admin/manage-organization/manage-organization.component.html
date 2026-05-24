@@ -3,7 +3,7 @@
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="organizations" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="organizations" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -38,7 +38,11 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 10%;">Action</th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="pi pi-plus-circle" (click)="editOrganization()" pTooltip="Add Organization"></span>
+                    </div>
+                </th>
             </tr>
             @if (showFt) {
             <tr>
@@ -79,15 +83,15 @@
                 <td> <img [src]="organization.LogoPath || 'assets/images/logo.png'" [alt]="organization.LogoPath" width="100" class="shadow-4" /></td>
                 <td><img [src]="organization.ImagePath || 'assets/images/logo.png'" [alt]="organization.ImagePath" width="100" class="shadow-4" /></td>
                 <td>
-                    <p-tag [value]="organization.IsActive ? 'Active' : 'In-active'"
+                    <p-tag [value]="organization.IsActive ? 'Active' : 'In-Active'"
                         [severity]="getStatusSeverity(organization.IsActive)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <button pButton icon="pi pi-pencil" (click)="editOrganization(organization)"
-                            class="p-button-rounded p-button-text p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Organization"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteOrganization(organization)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm" pTooltip="Delete Organization"></button>
                     </div>
                 </td>
             </tr>

@@ -3,7 +3,7 @@
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="departments" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="departments" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -38,7 +38,7 @@
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 25%;">
                     <div class="d-flex align-items-center justify-content-center">
-                        <span class="pi pi-plus-circle" (click)="editDepartment()"></span>
+                        <span class="pi pi-plus-circle" (click)="editDepartment()" pTooltip="Add Department"></span>
                     </div></th>
             </tr>
             @if (showFt) {
@@ -76,15 +76,15 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ department.DepartmentName }}</td>
                 <td>
-                    <p-tag [value]="department.IsActive ? 'Active' : 'In-active'"
+                    <p-tag [value]="department.IsActive ? 'Active' : 'In-Active'"
                         [severity]="getStatusSeverity(department.IsActive)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2 justify-content-center">
                         <button pButton icon="pi pi-pencil" (click)="editDepartment(department)"
-                            class="p-button-rounded p-button-text p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Department"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteDepartment(department)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm" pTooltip="Delete Department"></button>
                     </div>
                 </td>
             </tr>
