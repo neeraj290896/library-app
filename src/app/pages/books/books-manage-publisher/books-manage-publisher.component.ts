@@ -86,14 +86,14 @@ export class BooksManagePublisherComponent implements OnInit {
         this.publisherNameList = [...new Set(this.publishers.map(pub => pub.PublisherName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.publishers.map(pub => pub.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     initializeImportFilterLists(): void {
         this.importPublisherNameList = [...new Set(this.importPreview.map(pub => pub.PublisherName))]
             .map(e => ({ label: e!, value: e! }));
         this.importStatusList = [...new Set(this.importPreview.map(pub => pub.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
         this.importErrorList = [...new Set(this.importPreview.map(pub => pub.Error))]
             .map(e => ({ label: e!, value: e! }));
     }

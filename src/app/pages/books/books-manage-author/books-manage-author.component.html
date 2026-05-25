@@ -39,7 +39,7 @@
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
                     <div class="d-flex align-items-center justify-content-center gap-3">
                         <span class="pi pi-plus-circle" (click)="editAuthor()" pTooltip="Add Author"></span>
-                        <span class="pi pi-upload" (click)="importAuthor()" pTooltip="Import Authors"></span>
+                        <!-- <span class="pi pi-upload" (click)="importAuthor()" pTooltip="Import Authors"></span> -->
                     </div>
                 </th>
             </tr>
@@ -82,7 +82,7 @@
                     </span>
                 </td>
                 <td>
-                    <p-tag [value]="author.IsActive ? 'Active' : 'In-active'"
+                    <p-tag [value]="author.IsActive ? 'Active' : 'In-Active'"
                         [severity]="getStatusSeverity(author.IsActive)"></p-tag>
                 </td>
                 <td>
@@ -261,7 +261,7 @@
                         </span>
                     </td>
                     <td>
-                        <p-tag [value]="author.IsActive ? 'Active' : 'In-active'"
+                        <p-tag [value]="author.IsActive ? 'Active' : 'In-Active'"
                             [severity]="getStatusSeverity(author.IsActive)"></p-tag>
                     </td>
                     <td>

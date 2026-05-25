@@ -1,8 +1,9 @@
 <div class="manage-user-container">
     <div class="table-clear-filter">
-        <p-button variant="outlined" label="Clear" icon="pi pi-filter-slash" (onClick)="clear()"></p-button>
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="users" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="users" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -25,13 +26,13 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                 <th class="text-start text-muted fw-medium" style="width: 10%;">
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="RoleName">
                             RoleName
                             <p-sortIcon field="RoleName"></p-sortIcon>
                         </div>
-                        <span class="pi" [ngClass]="selectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                        <span class="pi" [ngClass]="selectedRoleList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
                 </th>
@@ -41,7 +42,7 @@
                             Gender
                             <p-sortIcon field="Gender"></p-sortIcon>
                         </div>
-                        <span class="pi" [ngClass]="selectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                        <span class="pi" [ngClass]="selectedGenderList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
                 </th>
@@ -51,7 +52,7 @@
                             MobileNo
                             <p-sortIcon field="MobileNo"></p-sortIcon>
                         </div>
-                        <span class="pi" [ngClass]="selectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                        <span class="pi" [ngClass]="selectedMobileNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
                 </th>
@@ -61,10 +62,10 @@
                             MailId
                             <p-sortIcon field="MailId"></p-sortIcon>
                         </div>
-                        <span class="pi" [ngClass]="selectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                        <span class="pi" [ngClass]="selectedMailIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
-                </th>               
+                </th>
                 <th class="text-start text-muted fw-medium" style="width: 9%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
@@ -75,16 +76,19 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                 <th class="text-start text-muted fw-medium" style="width: 13%;">
+                <th class="text-start text-muted fw-medium" style="width: 13%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="LastLogInTime">
-                            LastLogInTime                            
-                        </div>                        
+                            LastLogInTime
+                        </div>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 7%;"> <div class="d-flex align-items-center justify-content-center">
-                        <span class="pi pi-plus-circle" (click)="editUser()"></span>
-                    </div></th>
+                <th class="text-start text-muted fw-medium" style="width: 7%;">
+                    <div class="d-flex align-items-center justify-content-center gap-3">
+                        <span class="pi pi-plus-circle" (click)="editUser()" pTooltip="Add User"></span>
+                        <span class="pi pi-upload" (click)="importUser()" pTooltip="Import Users"></span>
+                    </div>
+                </th>
             </tr>
             @if (showFt) {
             <tr>
@@ -141,7 +145,7 @@
                             </p-multiSelect>
                         </ng-template>
                     </p-columnFilter>
-                </th>                
+                </th>
                 <th>
                     <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -166,18 +170,19 @@
                 <td>{{ user.RoleName }}</td>
                 <td>{{ user.Gender }}</td>
                 <td>{{ user.MobileNo }}</td>
-                <td>{{ user.MailId }}</td>                
+                <td>{{ user.MailId }}</td>
                 <td>
-                    <p-tag [value]="user.IsActive ? 'Active' : 'Inactive'"
+                    <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
                         [severity]="getStatusSeverity(user.IsActive)"></p-tag>
                 </td>
-                <td>{{ user.LastLogInTime }}</td>
+                <td>{{ user.LastLogInTime | date:'MM/dd/yyyy HH:mm:ss' }}</td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <button pButton icon="pi pi-pencil" (click)="editUser(user)"
-                            class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Edit User"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteUser(user)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"
+                            pTooltip="Delete User"></button>
                     </div>
                 </td>
             </tr>
@@ -192,15 +197,15 @@
         </ng-template>
     </p-table>
 
-     <p-dialog [header]="header" [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
+    <p-dialog [header]="header" [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
         <div class="row">
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="fullName">
                     FullName<sup>*</sup>
                 </label>
-                <input id="fullName" type="text" class="form-control" pInputText
-                    [(ngModel)]="currentUser.FullName" [ngModelOptions]="{standalone: true}"
-                    placeholder="Enter FullName" (ngModelChange)="validateInput('FullName')" />
+                <input id="fullName" type="text" class="form-control" pInputText [(ngModel)]="currentUser.FullName"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter FullName"
+                    (ngModelChange)="validateInput('FullName')" />
                 <div *ngIf="errors.FullName" class="text-danger mt-1 small">{{ errors.FullName }}</div>
             </div>
             <div class="col-6 mb-3">
@@ -218,35 +223,36 @@
                 </label>
                 <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
                     [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
-                    styleClass="w-100" appendTo="body"  />
-                    <!-- (ngModelChange)="onGenderChange()" -->
+                    styleClass="w-100" appendTo="body" />
+                <!-- (ngModelChange)="onGenderChange()" -->
                 <div *ngIf="errors.Gender" class="text-danger mt-1 small">{{ errors.Gender }}</div>
             </div>
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="mailId">
                     MailId<sup>*</sup>
                 </label>
-                <input id="mailId" type="text" class="form-control" pInputText
-                    [(ngModel)]="currentUser.MailId" [ngModelOptions]="{standalone: true}"
-                    placeholder="Enter MailId" (ngModelChange)="validateInput('MailId')" />
+                <input id="mailId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MailId"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter MailId"
+                    (ngModelChange)="validateInput('MailId')" />
                 <div *ngIf="errors.MailId" class="text-danger mt-1 small">{{ errors.MailId }}</div>
             </div>
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="mobile">
                     MobileNo<sup>*</sup>
                 </label>
-                <input id="mobile" type="text" class="form-control" pInputText
-                    [(ngModel)]="currentUser.MobileNo" [ngModelOptions]="{standalone: true}"
-                    placeholder="Enter MobileNo" (ngModelChange)="validateInput('MobileNo')" />
+                <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo"
+                    (ngModelChange)="validateInput('MobileNo')" />
                 <div *ngIf="errors.MobileNo" class="text-danger mt-1 small">{{ errors.MobileNo }}</div>
-            </div>   
+            </div>
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="dob">
                     DOB<sup>*</sup>
                 </label>
                 <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
-                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [minDate]="minDate"
-                    [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100" inputStyleClass="w-100" />
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                    [minDate]="minDate" [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100"
+                    inputStyleClass="w-100" />
                 <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
             </div>
             <div class="col-6 mb-3">
@@ -254,12 +260,12 @@
                     Access Request Status<sup>*</sup>
                 </label>
                 <p-select id="status" [(ngModel)]="currentUser.Status" [ngModelOptions]="{standalone: true}"
-                    [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Select Access Request Status"
-                    styleClass="w-100" appendTo="body"  />
-                    <!-- (ngModelChange)="onStatusChange()" -->
+                    [options]="statusOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select Access Request Status" styleClass="w-100" appendTo="body" />
+                <!-- (ngModelChange)="onStatusChange()" -->
                 <div *ngIf="errors.Status" class="text-danger mt-1 small">{{ errors.Status }}</div>
-            </div>          
-            <div class="col-6 mb-3">                
+            </div>
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
                     Status<sup>*</sup>
                 </label>
@@ -275,6 +281,241 @@
                     styleClass="btn-main-outlined" (click)="userDialogVisible = false"></p-button>
                 <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
                     (click)="saveUser()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog header="Import Users" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }">
+        <div class="row">
+            <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                        (click)="fileInput.click()"></p-button>
+                    <input type="file" #fileInput
+                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                        hidden (change)="onImportFileSelected($event)" />
+                    @if (importUploadError) {
+                    <div class="text-danger small">{{ importUploadError }}</div>
+                    }
+                </div>
+                <p-button type="button" label="Download Excel Template" icon="pi pi-download"
+                    styleClass="btn-main-outlined" (click)="downloadUserTemplate()"></p-button>
+            </div>
+        </div>
+
+        <div class="table-clear-filter">
+            <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+                (onClick)="clearImport()"></p-button>
+        </div>
+
+        <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th class="text-start text-muted fw-medium" style="width: 4%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                S.No
+                            </div>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 16%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="FullName">
+                                FullName
+                                <p-sortIcon field="FullName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="RoleName">
+                                RoleName
+                                <p-sortIcon field="RoleName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedRoleList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="Gender">
+                                Gender
+                                <p-sortIcon field="Gender"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedGenderList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 13%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="MobileNo">
+                                MobileNo
+                                <p-sortIcon field="MobileNo"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedMobileNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 18%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="MailId">
+                                MailId
+                                <p-sortIcon field="MailId"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedMailIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                                Status
+                                <p-sortIcon field="IsActive"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
+                                Error (If Any)
+                                <p-sortIcon field="Error"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedErrorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                </tr>
+                @if (importShowFt) {
+                <tr>
+                    <th></th>
+                    <th>
+                        <p-columnFilter field="FullName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importUserNameList" [(ngModel)]="importSelectedUserNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th><p-columnFilter field="RoleName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importRoleList" [(ngModel)]="importSelectedRoleList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter></th>
+                    <th>
+                        <p-columnFilter field="Gender" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importGenderList" [(ngModel)]="importSelectedGenderList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="MobileNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importMobileNoList" [(ngModel)]="importSelectedMobileNoList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="MailId" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importMailIdList" [(ngModel)]="importSelectedMailIdList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importErrorList" [(ngModel)]="importSelectedErrorList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                </tr>
+                }
+            </ng-template>
+
+            <ng-template pTemplate="body" let-user let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ user.FullName }}</td>
+                    <td>{{ user.RoleName }}</td>
+                    <td>{{ user.Gender }}</td>
+                    <td>{{ user.MobileNo }}</td>
+                    <td>{{ user.MailId }}</td>
+                    <td>
+                        <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
+                            [severity]="getStatusSeverity(user.IsActive)"></p-tag>
+                    </td>
+                    <td>
+                        <span [pTooltip]="user.Error" class="text-danger">
+                            {{ user.Error }}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="8" class="text-center">
+                        No Users found.
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="importDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveImport()"></p-button>
             </div>
         </ng-template>
     </p-dialog>

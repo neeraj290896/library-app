@@ -40,7 +40,7 @@
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
                     <div class="d-flex align-items-center justify-content-center gap-3">
                         <span class="pi pi-plus-circle" (click)="editLanguage()" pTooltip="Add Language"></span>
-                        <span class="pi pi-upload" (click)="importLanguage()" pTooltip="Import Languages"></span>
+                        <!-- <span class="pi pi-upload" (click)="importLanguage()" pTooltip="Import Languages"></span> -->
                     </div>
                 </th>
             </tr>
@@ -83,7 +83,7 @@
                     </span>
                 </td>
                 <td>
-                    <p-tag [value]="language.IsActive ? 'Active' : 'In-active'"
+                    <p-tag [value]="language.IsActive ? 'Active' : 'In-Active'"
                         [severity]="getStatusSeverity(language.IsActive)"></p-tag>
                 </td>
                 <td>
@@ -262,7 +262,7 @@
                         </span>
                     </td>
                     <td>
-                        <p-tag [value]="language.IsActive ? 'Active' : 'In-active'"
+                        <p-tag [value]="language.IsActive ? 'Active' : 'In-Active'"
                             [severity]="getStatusSeverity(language.IsActive)"></p-tag>
                     </td>
                     <td>

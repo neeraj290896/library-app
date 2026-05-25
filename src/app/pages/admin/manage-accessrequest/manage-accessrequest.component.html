@@ -1,8 +1,9 @@
 <div class="manage-user-container">
     <div class="table-clear-filter">
-        <p-button variant="outlined" label="Clear" icon="pi pi-filter-slash" (onClick)="clear()"></p-button>
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="accessRequests" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="accessRequests" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -74,9 +75,9 @@
                 </th>          
                 <th class="text-start text-muted fw-medium" style="width: 10%;"> 
                     <div class="d-flex align-items-center justify-content-center">
-                        <span class="pi pi-check-circle" (click)="approveAccess()"></span>
+                        <span class="pi pi-check-circle" (click)="approveAccess()" pTooltip="Approve Access"></span>
                         &nbsp; &nbsp; &nbsp; &nbsp;
-                        <span class="pi pi-times-circle" (click)="rejectAccess()"></span>
+                        <span class="pi pi-times-circle" (click)="rejectAccess()" pTooltip="Reject Access"></span>
                     </div></th>
             </tr>
             @if (showFt) {
@@ -156,9 +157,9 @@
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <button pButton icon="pi pi-check" style="color: green" (click)="approveAccess(user)"
-                            class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Approve Access"></button>
                         <button pButton icon="pi pi-times" (click)="rejectAccess(user)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon" pTooltip="Reject Access"></button>
                     </div>
                 </td>
             </tr>

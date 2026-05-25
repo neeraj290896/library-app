@@ -86,14 +86,14 @@ export class BooksManageCategoryComponent implements OnInit {
         this.categoryNameList = [...new Set(this.categories.map(cat => cat.CategoryName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.categories.map(cat => cat.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     initializeImportFilterLists(): void {
         this.importCategoryNameList = [...new Set(this.importPreview.map(cat => cat.CategoryName))]
             .map(e => ({ label: e!, value: e! }));
         this.importStatusList = [...new Set(this.importPreview.map(cat => cat.IsActive ?? false))]
-            .map(e => ({ label: e ? 'Active' : 'In-active', value: e }));
+            .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
         this.importErrorList = [...new Set(this.importPreview.map(cat => cat.Error))]
             .map(e => ({ label: e!, value: e! }));
     }

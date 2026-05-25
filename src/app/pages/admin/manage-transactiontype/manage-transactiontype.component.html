@@ -1,8 +1,9 @@
 <div class="manage-transactionType-container">
     <div class="table-clear-filter">
-        <p-button variant="outlined" label="Clear" icon="pi pi-filter-slash" (onClick)="clear()"></p-button>
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="transactionTypes" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="transactionTypes" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -37,7 +38,7 @@
                 </th>
                  <th class="text-start text-muted fw-medium" style="width: 20%;">
                     <div class="d-flex align-items-center justify-content-center">
-                        <span class="pi pi-plus-circle" (click)="editTransactionType()"></span>
+                        <span class="pi pi-plus-circle" (click)="editTransactionType()" pTooltip="Add Transaction Type"></span>
                     </div>
                 </th>
             </tr>
@@ -76,15 +77,15 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ transactionType.TypeName }}</td>
                 <td>
-                    <p-tag [value]="transactionType.IsActive ? 'Active' : 'Inactive'"
+                    <p-tag [value]="transactionType.IsActive ? 'Active' : 'In-Active'"
                         [severity]="getStatusSeverity(transactionType.IsActive)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2 justify-content-center">
                         <button pButton icon="pi pi-pencil" (click)="editTransactionType(transactionType)"
-                            class="p-button-rounded p-button-text p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Edit Transaction Type"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteTransactionType(transactionType)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"></button>
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon" pTooltip="Delete Transaction Type"></button>
                     </div>
                 </td>
             </tr>
