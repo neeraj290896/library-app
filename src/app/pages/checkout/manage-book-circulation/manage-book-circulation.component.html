@@ -166,11 +166,115 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="book">
                     Book Name<sup>*</sup>
                 </label>
-                <p-select id="book" [(ngModel)]="currentUser.BookId" [ngModelOptions]="{standalone: true}"
+                <p-select id="book" [(ngModel)]="selectedBook.BookId" [ngModelOptions]="{standalone: true}"
                     [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onBookChange()" />
                 <div *ngIf="errors.BookId" class="text-danger mt-1 small">{{ errors.BookId }}</div>
             </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="borrowerName">
+                    Borrower Name<sup>*</sup>
+                </label>
+                <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
+                    [options]="borrowerOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
+                <div *ngIf="errors.BorrowerId" class="text-danger mt-1 small">{{ errors.BorrowerId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="issuedBy">
+                    Issued By<sup>*</sup>
+                </label>
+                <p-select id="issuedBy" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
+                <div *ngIf="errors.IssuedByUserId" class="text-danger mt-1 small">{{ errors.IssuedByUserId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="issuedDate">
+                    Issued Date<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="selectedBook.IssuedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                    placeholder="Select Issued Date" styleClass="w-100" inputStyleClass="w-100" />
+                <div *ngIf="errors.IssuedDate" class="text-danger mt-1 small">{{ errors.IssuedDate }}</div>
+            </div>
+            <hr>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="returnedBy">
+                    Returned By<sup>*</sup>
+                </label>
+                <p-select id="returnedBy" [(ngModel)]="selectedBook.ReturnByUserId" [ngModelOptions]="{standalone: true}"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select ReturnedBy"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onReturnedChange()" />
+                <div *ngIf="errors.ReturnByUserId" class="text-danger mt-1 small">{{ errors.ReturnByUserId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="returnedDate">
+                    Returned Date<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="selectedBook.ReturnDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                    placeholder="Select Return Date" styleClass="w-100" inputStyleClass="w-100" />
+                <div *ngIf="errors.ReturnDate" class="text-danger mt-1 small">{{ errors.ReturnDate }}</div>
+            </div>
+            <hr>
+             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="overDueFrom">
+                    OverDue From<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="selectedBook.OverDueFrom" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                    placeholder="Select Over Due Date" styleClass="w-100" inputStyleClass="w-100" />                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="overDueDays">
+                    OverDue Days<sup>*</sup>
+                </label>
+                <input id="overDueDays" type="text" class="form-control" pInputText
+                    [(ngModel)]="selectedBook.OverDueDays" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Over Due days" />               
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="fineAmount">
+                    Fine Amount<sup>*</sup>
+                </label>
+                <input id="fineAmount" type="text" class="form-control" pInputText
+                    [(ngModel)]="selectedBook.FineAmount" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Fine amount" />               
+            </div>
+             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="overDueStatus">
+                    OverDue Status<sup>*</sup>
+                </label>
+                <p-select id="overDueStatus" [(ngModel)]="selectedBook.OverDueStatus" [ngModelOptions]="{standalone: true}"
+                    [options]="overDueStatusOptions" optionLabel="label" optionValue="value" placeholder="Select OverDue Status"
+                    styleClass="w-100" appendTo="body" />                
+            </div>
+            <hr>
+             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="comments">
+                    Comments<sup>*</sup>
+                </label>
+                <input id="comments" type="text" class="form-control" pInputText
+                    [(ngModel)]="selectedBook.Comments" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Comments" />               
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="status">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="status" [(ngModel)]="selectedBook.Status" [ngModelOptions]="{standalone: true}"
+                    [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Select Status"
+                    styleClass="w-100" appendTo="body" />                
+            </div>
         </div>
+         <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="bcDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveBcDetails()"></p-button>
+            </div>
+        </ng-template>
     </p-dialog>
 </div>

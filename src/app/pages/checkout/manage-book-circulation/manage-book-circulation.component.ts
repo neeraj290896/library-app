@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BookCirculationDetails, BookDetails } from '@app/shared/models/api.models';
+import { BookCirculationDetails, BookDetails, UserDetails } from '@app/shared/models/api.models';
 import { BookCirculationService } from '@app/shared/services/book-circulation.service';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -11,6 +11,8 @@ import { PaginatorModule } from 'primeng/paginator';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { environment } from '../../../../environments/environment';
+import { BookService } from '@app/shared/services/book.service';
+import { UserService } from '@app/shared/services/user.service';
 
 @Component({
   selector: 'app-manage-book-circulation',
@@ -24,6 +26,8 @@ export class ManageBookCirculationComponent {
   searchUserTerm = '';
   private messageService = inject(MessageService);
   private _bcService = inject(BookCirculationService);
+  private _bookService = inject(BookService);
+  private _userService = inject(UserService);
   @ViewChild('dt') dataTable: Table | undefined;
   public showFt: boolean = false;
   public bookNameList: { label: string, value: string }[] = [];
@@ -47,10 +51,22 @@ export class ManageBookCirculationComponent {
     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
       Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
     };
+  public bookOptions: { label: string; value: number; }[] = [];
+  public availableBooks: { label: string; value: number; }[] = [];
+  public userOptions: { label: string; value: number; }[] = [];
+  public overDueStatusOptions: { label: string; value: string; }[] = [
+        { label: 'Pending', value: 'Pending' },
+        { label: 'Paid', value: 'Paid' }
+    ];
+  public statusOptions: { label: string; value: string; }[] = [
+        { label: 'Issued', value: 'Issued' },
+        { label: 'Returned', value: 'Returned' }
+    ];
 
     ngOnInit(): void {
+        this.loadBooks();
+        this.loadUserDetails();
         this.getAllBookCirculartion();
-        
     }
 
     getAllBookCirculartion(): void{
@@ -67,6 +83,32 @@ export class ManageBookCirculationComponent {
                 }
             });
     }
+
+    loadBooks(): void {
+        this._bookService.getAllBookDetails().subscribe({
+            next: (data: BookDetails[]) => {
+                this.bookOptions = data.map(book => {
+                    return { label: book.BookName ?? '', value: book.BookId };
+                });                
+            },
+            error: (err) => {
+                console.error('Error loading books:', err);
+            }
+        });
+    }
+
+    loadUserDetails(): void {
+            this._userService.getAllUserDetails().subscribe({
+                next: (data: UserDetails[]) => {
+                    this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
+                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+                    });
+                },
+                error: (err) => {
+                    console.error('Error loading users:', err);
+                }
+            });
+        }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
@@ -153,14 +195,26 @@ export class ManageBookCirculationComponent {
         this.selectedBorrowerNameList = [];
         this.selectedIssuedByList = [];
         this.selectedStatusList = [];
+        this.searchBookTerm = '';
+        this.searchUserTerm = '';
+        this.onBookSearch('');
         this.showFt = false;
     }
 
     getStatusSeverity(status: string): 'success' | 'warning' | 'info' {
         switch (status) {
-            case 'Available': return 'success';
-            case 'Borrowed': return 'warning';
-            case 'Reserved': return 'info';
+            case 'Returned': return 'success';
+            case 'Issued': return 'warning';
+            // case 'Issued': return 'info';
+            default: return 'info';
+        }
+    }
+
+    getOverDueStatusSeverity(_overDueDays: number): 'success' | 'warning'| 'error' | 'info' {
+        switch (true) {
+            case _overDueDays <= 0 : return 'success';
+            case _overDueDays > 0 && _overDueDays < 10 : return 'warning';
+            case _overDueDays > 10 : return 'error';
             default: return 'info';
         }
     }
@@ -195,7 +249,7 @@ export class ManageBookCirculationComponent {
         this.bcDialogVisible = true;
     }
 
-     validateInput(key: string): boolean {
+    validateInput(key: string): boolean {
         let isValid = true;
 
         switch (key) {
@@ -335,4 +389,5 @@ export class ManageBookCirculationComponent {
             }
         });
     }
+    
 }

@@ -1,7 +1,7 @@
 $color-primary: #22c55e;
 
 ::ng-deep {
-    .manage-issued-container {
+    .manage-bc-container {
         .p-datatable {
             .p-datatable-table {
                 table-layout: fixed;
@@ -25,20 +25,20 @@ $color-primary: #22c55e;
 
         .table-clear-filter {
             position: absolute;
-            margin-top: 0.3rem;
+            margin-top: 0.5rem;
             z-index: 1;
+        }
 
-            .p-button {
-                background: transparent !important;
-                border-color: $color-primary !important;
-                color: $color-primary !important;
-                transition: background-color 0.2s ease;
-
-                &:hover {
-                    background-color: $color-primary !important;
-                    color: white !important;
-                }
-            }
+        .searchIcon{
+            margin-left: 12px;
+            margin-top: 12px;
         }
     }
+}
+
+hr {
+  border: none;
+  height: 2px;
+  background-color: #333;
+  width: 50%;
 }
