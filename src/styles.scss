@@ -526,6 +526,14 @@ table {
     }
 }
 
+.p-card {
+    border-radius: var(--bs-border-radius) !important;
+    
+    .p-card-body {
+        padding: $spacing-4 !important;
+    }
+}
+
 // Badge styles
 .badge {
     display: inline-block;

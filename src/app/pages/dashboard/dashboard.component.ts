@@ -1,42 +1,71 @@
-import { Component, signal, inject, effect } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookService } from '../../shared/services/book.service';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
+import { DashboardService } from '@app/shared/services/dashboard.service';
+import { DashboardSummaryDetails, OverDueDetails } from '@app/shared/models/api.models';
+import { OverDueService } from '@app/shared/services/overdue.service';
+import { BooksOverdueComponent } from '../checkout/books-overdue/books-overdue.component';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
-    imports: [CommonModule, CardModule, TableModule, ButtonModule, FormsModule, InputTextModule, PaginatorModule],
+    imports: [CommonModule, CardModule, TableModule, ButtonModule, FormsModule, InputTextModule,
+        PaginatorModule, BooksOverdueComponent],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
-    private bookService = inject(BookService);
+    private dashboardService = inject(DashboardService);
+    private overDueService = inject(OverDueService);
 
-    currentDate = new Date();
-    searchTerm = '';
-    activeFilter = 'overdue';
+    public currentDate: Date = new Date();
+    public searchTerm: string = '';
+    public activeFilter: string = 'overdue';
 
-    statsData = signal([
-        { label: 'Total Books', value: '32345', change: '+11%', trend: 'up' },
-        { label: 'Borrowed Books', value: '2405', change: '+23%', trend: 'up' },
-        { label: 'Overdue Books', value: '45', change: '+11%', trend: 'up' },
-        { label: 'Total Users', value: '34', change: '-10%', trend: 'down' }
-    ]);
+    public dashboardSummary: { label: string; total: number; active: number }[] = [
+        { label: 'Total Books', total: 0, active: 0 },
+        { label: 'Borrowed Books', total: 0, active: 0 },
+        { label: 'Overdue Books', total: 0, active: 0 },
+        { label: 'Total Users', total: 0, active: 0 }
+    ];
+    public overDues: OverDueDetails[] = [];
 
-    chartData = signal<any[]>([]);
-    overdueHistory = signal<any[]>([]);
-    recentCheckouts = signal<any[]>([]);
-    topBooks = signal<any[]>([]);
+    ngOnInit(): void {
+        this.loadDashboardSummary();
+        this.loadOverDueDetails();
+    }
 
-    constructor() {
-        effect(() => {
-            this.overdueHistory.set(this.bookService.getOverdueBooks());
+    loadDashboardSummary(): void {
+        this.dashboardService.getDashboardSummary().subscribe({
+            next: (data: DashboardSummaryDetails[]) => {
+                if (data && data.length > 0) {
+                    this.dashboardSummary = [
+                        { label: 'Total Books', total: data[0].TotalBooks || 0, active: data[0].TotalActiveBooks || 0 },
+                        { label: 'Borrowed Books', total: data[0].TotalBorrowedBooks || 0, active: data[0].ActiveBorrowedBooks || 0 },
+                        { label: 'Overdue Books', total: data[0].TotalOverDue || 0, active: data[0].ActiveOverDue || 0 },
+                        { label: 'Total Users', total: data[0].TotalUsers || 0, active: data[0].ActiveUsers || 0 }
+                    ];
+                }
+            },
+            error: (err) => {
+                console.error('Error loading dashboard summary:', err);
+            }
+        });
+    }
+
+    loadOverDueDetails(): void {
+        this.overDueService.getOverDueDetails().subscribe({
+            next: (data: OverDueDetails[]) => {
+                this.overDues = data;
+            },
+            error: (err) => {
+                console.error('Error loading overDue :', err);
+            }
         });
     }
 

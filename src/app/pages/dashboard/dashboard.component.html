@@ -16,15 +16,14 @@
 
     <!-- Stats Grid -->
     <div class="row g-3">
-        @for (stat of statsData(); track stat.label) {
+        @for (stat of dashboardSummary; track stat.label) {
         <div class="col-md-6 col-lg-3">
             <p-card>
                 <div class="small text-muted mb-2">{{ stat.label }}</div>
                 <div class="d-flex align-items-start gap-2">
-                    <div class="fs-2 fw-semibold">{{ stat.value }}</div>
-                    <span class="badge stat-badge" [class.stat-badge-up]="stat.trend === 'up'"
-                        [class.stat-badge-down]="stat.trend === 'down'">
-                        {{ stat.change }}
+                    <div class="fs-4 fw-semibold">{{ stat.total }}</div>
+                    <span class="badge stat-badge stat-badge-up">
+                        {{ stat.active }}
                     </span>
                 </div>
             </p-card>
@@ -36,59 +35,28 @@
     <div class="card border-0 shadow-sm rounded p-3">
         <h3 class="fs-5 fw-semibold mb-3">Quick Actions</h3>
         <div class="d-flex gap-2 flex-wrap">
-            <button pButton label="Overdue" class="p-button-outlined btn-sm" (click)="setFilter('overdue')"
-                [ngClass]="{'active-filter': activeFilter === 'overdue'}"></button>
-            <button pButton label="Add New Book" class="p-button-outlined btn-sm" (click)="setFilter('addNewBook')"
-                [ngClass]="{'active-filter': activeFilter === 'addNewBook'}"></button>
-            <button pButton label="Register User" class="p-button-outlined btn-sm" (click)="setFilter('registerUser')"
-                [ngClass]="{'active-filter': activeFilter === 'registerUser'}"></button>
-            <button pButton label="Issue Books" class="p-button-outlined btn-sm" (click)="setFilter('issueBooks')"
-                [ngClass]="{'active-filter': activeFilter === 'issueBooks'}"></button>
-            <button pButton label="Return Books" class="p-button-outlined btn-sm" (click)="setFilter('returnBooks')"
-                [ngClass]="{'active-filter': activeFilter === 'returnBooks'}"></button>
+            <p-button type="button" label="Overdue Books" styleClass="btn-main" (click)="setFilter('overdue')"></p-button>
+            <p-button type="button" label="Add New Book"
+                [ngClass]="{'p-button-outlined': activeFilter !== 'addNewBook'}"
+                [styleClass]="activeFilter !== 'addNewBook' ? 'btn-main-outlined' : ''"
+                (click)="setFilter('addNewBook')"></p-button>
+            <p-button type="button" label="Register User"
+                [ngClass]="{'p-button-outlined': activeFilter !== 'registerUser'}"
+                [styleClass]="activeFilter !== 'registerUser' ? 'btn-main-outlined' : ''"
+                (click)="setFilter('registerUser')"></p-button>
+            <p-button type="button" label="Issue Books" [ngClass]="{'p-button-outlined': activeFilter !== 'issueBooks'}"
+                [styleClass]="activeFilter !== 'issueBooks' ? 'btn-main-outlined' : ''"
+                (click)="setFilter('issueBooks')"></p-button>
+            <p-button type="button" label="Return Books"
+                [ngClass]="{'p-button-outlined': activeFilter !== 'returnBooks'}"
+                [styleClass]="activeFilter !== 'returnBooks' ? 'btn-main-outlined' : ''"
+                (click)="setFilter('returnBooks')"></p-button>
         </div>
     </div>
 
     <!-- Overdue Books -->
     <div class="card border-0 shadow-sm rounded p-3">
-        <h3 class="fs-5 fw-semibold mb-3">Overdue Books - {{ overdueHistory().length }}</h3>
-        <div class="table-responsive">
-            <p-table [value]="overdueHistory()" [tableStyle]="{'width':'100%','font-size':'0.875rem'}"
-                styleClass="compact-table">
-                <ng-template pTemplate="header">
-                    <tr class="table-header">
-                        <th class="text-start text-muted fw-medium">ID</th>
-                        <th class="text-start text-muted fw-medium">Title</th>
-                        <th class="text-start text-muted fw-medium">ISBN</th>
-                        <th class="text-start text-muted fw-medium">Due Date</th>
-                        <th class="text-start text-muted fw-medium">Fine</th>
-                        <th class="text-start text-muted fw-medium">Action</th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-overdue>
-                    <tr class="table-row">
-                        <td>{{ overdue.memberId }}</td>
-                        <td>{{ overdue.title }}</td>
-                        <td>{{ overdue.isbn }}</td>
-                        <td>{{ overdue.dueDate }}</td>
-                        <td>{{ overdue.fine }}</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <button pButton icon="pi pi-pencil"
-                                    class="p-button-rounded p-button-text p-button-sm"></button>
-                                <button pButton icon="pi pi-trash"
-                                    class="p-button-rounded p-button-text p-button-danger p-button-sm"></button>
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
-
-        <!-- Pagination -->
-        <div class="d-flex align-items-center justify-content-center mt-4 gap-3">
-            <button pButton label="< PREVIOUS" class="p-button-outlined btn-sm"></button>
-            <button pButton label="NEXT >>" class="p-button-outlined btn-sm"></button>
-        </div>
+        <h3 class="fs-5 fw-semibold mb-2">Overdue Books - {{ overDues.length }}</h3>
+        <app-books-overdue [totalOverDues]="overDues"></app-books-overdue>
     </div>
 </div>

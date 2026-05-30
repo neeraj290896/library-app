@@ -215,7 +215,7 @@ export interface ResetCredPassword {
 
 export interface RoleDetails {
     RoleId: number;
-    RoleName?: string | null;    
+    RoleName?: string | null;
     IsActive: boolean;
     UserHasEditAccess: boolean;
     UserCanLogin: boolean;
@@ -284,21 +284,21 @@ export interface UserDetails {
 
 
 export interface RoleDetails {
-   RoleId: number;
-   RoleName?: string | null;
-   IsActive: boolean;
+    RoleId: number;
+    RoleName?: string | null;
+    IsActive: boolean;
 }
 
 export interface DepartmentDetails {
-   DepartmentId: number;
-   DepartmentName?: string | null;
-   IsActive: boolean;
+    DepartmentId: number;
+    DepartmentName?: string | null;
+    IsActive: boolean;
 }
 
 export interface TransactionTypeDetails {
-   TypeId: number;
-   TypeName?: string | null;
-   IsActive: boolean;
+    TypeId: number;
+    TypeName?: string | null;
+    IsActive: boolean;
 }
 
 export interface OverDueDetails {
@@ -320,4 +320,15 @@ export interface OverDueDetails {
     UpdatedByUserId?: number | null;
     UpdatedByUserName?: string | null;
     SytemUpdatedDate?: string | null;
+}
+
+export interface DashboardSummaryDetails {
+    TotalBooks?: number;
+    TotalActiveBooks?: number;
+    TotalBorrowedBooks?: number;
+    ActiveBorrowedBooks?: number;
+    TotalOverDue?: number;
+    ActiveOverDue?: number;
+    TotalUsers?: number;
+    ActiveUsers?: number;
 }

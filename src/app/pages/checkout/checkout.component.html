@@ -18,17 +18,17 @@
             <p-tabPanel header="Manage Book Circulation">
                 <app-manage-book-circulation *ngIf="activeTab === 0"></app-manage-book-circulation>
             </p-tabPanel>
-
-            <p-tabPanel [header]="'Overdue - ' + {overDueCount}">
-                <app-books-overdue *ngIf="activeTab === 1" [totalOverDueCount]="overDueCount" [totalOverDues]="overDues">
+            <p-tabPanel [header]="'Manage Overdue Books - ' + overDueCount">
+                <app-books-overdue *ngIf="activeTab === 1" [totalOverDueCount]="overDueCount"
+                    [totalOverDues]="overDues">
                 </app-books-overdue>
-            </p-tabPanel>   
-             <p-tabPanel header="Manage Issued Books">
+            </p-tabPanel>
+            <p-tabPanel header="Manage Issued Books">
                 <app-manage-issued-books *ngIf="activeTab === 2"></app-manage-issued-books>
             </p-tabPanel>
-             <p-tabPanel header="Manage Returned Books">
+            <p-tabPanel header="Manage Returned Books">
                 <app-manage-returned-books *ngIf="activeTab === 3"></app-manage-returned-books>
-            </p-tabPanel>         
+            </p-tabPanel>
         </p-tabView>
     </div>
 </div>
