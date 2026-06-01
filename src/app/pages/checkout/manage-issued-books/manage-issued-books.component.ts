@@ -16,12 +16,14 @@ import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../../environments/environment';
+import { DatePickerModule } from 'primeng/datepicker';
+import { AuthService } from '@app/shared/services/auth.service';
 
 @Component({
   selector: 'app-manage-issued-books',
-  imports: [CommonModule, ButtonModule, TableModule, TagModule, 
-          PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, 
-          SelectModule, FormsModule, TooltipModule],
+  imports: [CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, 
+          MultiSelectModule, DialogModule, InputTextModule,
+                  SelectModule, FormsModule, DatePickerModule, TooltipModule],
   templateUrl: './manage-issued-books.component.html',
   styleUrl: './manage-issued-books.component.scss'
 })
@@ -32,6 +34,7 @@ export class ManageIssuedBooksComponent {
    private _bcService = inject(BookCirculationService);
    private _bookService = inject(BookService);
    private _userService = inject(UserService);
+   private _authService = inject(AuthService);
    @ViewChild('dt') dataTable: Table | undefined;
    public showFt: boolean = false;
    public bookNameList: { label: string, value: string }[] = [];
@@ -47,11 +50,16 @@ export class ManageIssuedBooksComponent {
    public bcDialogVisible = false;
    bcDetailsCount = 0;
    public header: string = '';
+   public loggedInUserDetails: UserDetails = {};
+   public issueNewBook: boolean = true;
+   public lstUserDetails: UserDetails[] = [];
+   public todayDate :string | undefined ;
    public selectedBook: BookCirculationDetails = 
      { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'',
        IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
        ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
-       UpdatedByUserName :'', UpdatedDate: '' };
+       UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
+    UpdatedByUserMailId:'' };
      public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
        Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
      };
@@ -66,8 +74,28 @@ export class ManageIssuedBooksComponent {
          { label: 'Issued', value: 'Issued' },
          { label: 'Returned', value: 'Returned' }
      ];
+      minDate: Date | undefined;
+    maxDate: Date | undefined;
+
  
      ngOnInit(): void {
+        const today = new Date();
+
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        this.minDate = yesterday;
+        this.maxDate = new Date();
+    
+        // 2. Pad single digits with leading zeros
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = today.getFullYear();
+
+        // 3. Assemble into the exact "yyyy-mm-dd" layout match
+        this.todayDate = `${year}-${month}-${day}`;
+
+        this.loggedInUserDetails = this._authService.userData() ?? {};
          this.loadBooks();
          this.loadUserDetails();
          this.getIssuedBookCirculartion();
@@ -227,6 +255,7 @@ export class ManageIssuedBooksComponent {
  
          if(_bc)
          {
+             this.issueNewBook = false;
              this.selectedBook  = { ..._bc };
  
               if (_bc.Status == "Issued") {
@@ -239,12 +268,14 @@ export class ManageIssuedBooksComponent {
          }
          else
          {
+            this.issueNewBook = true;      
              this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
-                                 IssuedByUserId: 0, IssuedByUserName :'', IssuedDate : '', OverDueId: 0, FineAmount: 0.0, 
-                                 OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'', ReturnByUserId: 0,
-                                 ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
-                                 UpdatedByUserName :'', UpdatedDate: '' };
- 
+                                IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
+                                IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+                                OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
+                                ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
+                                UpdatedByUserName :'', UpdatedDate: null };
+
              this.header = "Issue book"            
          }
          
@@ -268,7 +299,7 @@ export class ManageIssuedBooksComponent {
                  break;
  
              case 'BorrowerName':
-                 if (this.selectedBook.BorrowerName ?.trim()) {
+                 if (!this.selectedBook.BorrowerName?.trim()) {
                      this.errors.BorrowerName = 'Borrower Name is required.';
                      isValid = false;
                  } else {
@@ -277,7 +308,7 @@ export class ManageIssuedBooksComponent {
                  break;
  
              case 'IssuedByUserName':
-                 if (this.selectedBook.IssuedByUserName ?.trim()) {
+                 if (!this.selectedBook.IssuedByUserName?.trim()) {
                      this.errors.IssuedByUserName = 'IssuedBy Name is required.';
                      isValid = false;
                  } else {
@@ -286,7 +317,7 @@ export class ManageIssuedBooksComponent {
                  break;
                
              case 'Status':
-                 if (this.selectedBook.Status ?.trim()) {
+                 if (!this.selectedBook.Status?.trim()) {
                      this.errors.Status = 'Status is required.';
                      isValid = false;
                  } else {
@@ -295,7 +326,7 @@ export class ManageIssuedBooksComponent {
                  break;
  
              case 'ReturnByUserName':
-                 if (this.selectedBook.Status ?.trim() == "Returned" && this.selectedBook.ReturnByUserName ?.trim()) {
+                 if (this.selectedBook.Status?.trim() == "Returned" && !this.selectedBook.ReturnByUserName?.trim()) {
                      this.errors.ReturnByUserName = 'ReturnBy Name is required.';
                      isValid = false;
                  } else {
@@ -335,7 +366,10 @@ export class ManageIssuedBooksComponent {
      } 
  
      issueBook():void {
-         this._bcService.issueBook(this.selectedBook).subscribe({
+         let _issuedBook = { ...this.selectedBook }; 
+        _issuedBook.IssuedDate = this.parseCustomDateString(this.selectedBook.IssuedDate ?? "");
+
+        this._bcService.issueBook(_issuedBook).subscribe({
              next: (res: any) => {
                  if (!res || !res.Status) {
                      this.messageService.add({
@@ -365,7 +399,12 @@ export class ManageIssuedBooksComponent {
      }
      
      returnBook():void{
-         this._bcService.returnBook(this.selectedBook).subscribe({
+          let _returnedBook = { ...this.selectedBook }; 
+        _returnedBook.IssuedDate = this.parseCustomDateString(this.selectedBook.IssuedDate ?? "");
+        _returnedBook.ReturnDate = this.parseCustomDateString(this.selectedBook.ReturnDate ?? "");
+
+
+        this._bcService.returnBook(this.selectedBook).subscribe({
              next: (res: any) => {
                  if (!res || !res.Status) {
                      this.messageService.add({
@@ -392,5 +431,58 @@ export class ManageIssuedBooksComponent {
                  });
              }
          });
-     }  
+     }
+     
+    onBookChange():void{
+        const book = this.bookOptions.find(l => l.value === this.selectedBook.BookId);
+        if (book) {
+            this.selectedBook.BookName = book.label;
+        }
+
+        this.validateInput('BookName');
+    }
+
+    onBorrowerChange():void{
+        const _borrower = this.lstUserDetails.find(l => l.UserId === this.selectedBook.BorrowerId);
+        if (_borrower) {
+            this.selectedBook.BorrowerName = _borrower.FullName;
+            this.selectedBook.BorrowerMailId = _borrower.MailId;
+        }
+
+        this.validateInput('BorrowerName');
+    }
+
+    onIssuedChange():void{
+         const _issuedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.IssuedByUserId);
+        if (_issuedBy) {
+            this.selectedBook.IssuedByUserName = _issuedBy.FullName;
+            this.selectedBook.IssuedByUserMailId = _issuedBy.MailId;
+        }
+
+        this.validateInput('IssuedByUserName');
+    }
+
+    onReturnedChange():void{
+            const _returnedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.ReturnByUserId);
+        if (_returnedBy) {
+            this.selectedBook.ReturnByUserName = _returnedBy.FullName;
+            this.selectedBook.ReturnByUserMailId = _returnedBy.MailId;
+        }
+
+        this.validateInput('ReturnByUserName');
+    }
+
+    parseCustomDateString(dateStr: string): string | null {
+        if (!dateStr) return null;
+        
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return null;
+
+        const day = parseInt(parts[2], 10);
+        const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
+        const year = parseInt(parts[0], 10);
+
+        const nativeDate = new Date(year, month, day);
+        return nativeDate.toISOString(); // Generates "2026-06-01T00:00:00.000Z"
+    }
 }

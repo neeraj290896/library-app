@@ -13,11 +13,17 @@ import { TagModule } from 'primeng/tag';
 import { environment } from '../../../../environments/environment';
 import { BookService } from '@app/shared/services/book.service';
 import { UserService } from '@app/shared/services/user.service';
+import { DialogModule } from 'primeng/dialog';
+import { SelectModule } from 'primeng/select';
+import { DatePickerModule } from 'primeng/datepicker';
+import { TooltipModule } from 'primeng/tooltip';
+import { AuthService } from '@app/shared/services/auth.service';
 
 @Component({
   selector: 'app-manage-book-circulation',
-  imports: [ CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, MultiSelectModule,
-        InputTextModule,],
+  imports: [ CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, 
+        MultiSelectModule, DialogModule, InputTextModule,
+                SelectModule, FormsModule, DatePickerModule, TooltipModule],
   templateUrl: './manage-book-circulation.component.html',
   styleUrl: './manage-book-circulation.component.scss'
 })
@@ -28,6 +34,7 @@ export class ManageBookCirculationComponent {
   private _bcService = inject(BookCirculationService);
   private _bookService = inject(BookService);
   private _userService = inject(UserService);
+  private _authService = inject(AuthService);
   @ViewChild('dt') dataTable: Table | undefined;
   public showFt: boolean = false;
   public bookNameList: { label: string, value: string }[] = [];
@@ -41,13 +48,18 @@ export class ManageBookCirculationComponent {
   public bcDetails: BookCirculationDetails[] = [];
   public filteredBcDetails: BookCirculationDetails[] = [];
   public bcDialogVisible = false;
+  public todayDate :string | undefined ;
   bcDetailsCount = 0;
   public header: string = '';
+  public loggedInUserDetails: UserDetails = {};
+  public issueNewBook: boolean = true;
+  public lstUserDetails: UserDetails[] = [];
   public selectedBook: BookCirculationDetails = 
     { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'',
       IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
       ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
-      UpdatedByUserName :'', UpdatedDate: '' };
+      UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
+    UpdatedByUserMailId:'' };
     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
       Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
     };
@@ -62,8 +74,29 @@ export class ManageBookCirculationComponent {
         { label: 'Issued', value: 'Issued' },
         { label: 'Returned', value: 'Returned' }
     ];
+    minDate: Date | undefined;
+    maxDate: Date | undefined;
 
     ngOnInit(): void {
+
+        const today = new Date();
+
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        this.minDate = yesterday;
+        this.maxDate = new Date();
+    
+        // 2. Pad single digits with leading zeros
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = today.getFullYear();
+
+        // 3. Assemble into the exact "yyyy-mm-dd" layout match
+        this.todayDate = `${year}-${month}-${day}`;
+
+        this.loggedInUserDetails = this._authService.userData() ?? {};
+
         this.loadBooks();
         this.loadUserDetails();
         this.getAllBookCirculartion();
@@ -100,6 +133,7 @@ export class ManageBookCirculationComponent {
     loadUserDetails(): void {
             this._userService.getAllUserDetails().subscribe({
                 next: (data: UserDetails[]) => {
+                    this.lstUserDetails = data;
                     this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
                         return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
                     });
@@ -223,6 +257,7 @@ export class ManageBookCirculationComponent {
 
         if(_bc)
         {
+            this.issueNewBook = false;
             this.selectedBook  = { ..._bc };
 
              if (_bc.Status == "Issued") {
@@ -234,14 +269,17 @@ export class ManageBookCirculationComponent {
             }
         }
         else
-        {
-            this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
-                                IssuedByUserId: 0, IssuedByUserName :'', IssuedDate : '', OverDueId: 0, FineAmount: 0.0, 
-                                OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'', ReturnByUserId: 0,
-                                ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
-                                UpdatedByUserName :'', UpdatedDate: '' };
+        { 
+            this.issueNewBook = true;           
 
-            this.header = "Issue book"            
+            this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
+                                IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
+                                IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+                                OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
+                                ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
+                                UpdatedByUserName :'', UpdatedDate: null };
+
+            this.header = "Issue book";  
         }
         
         this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''} 
@@ -264,7 +302,7 @@ export class ManageBookCirculationComponent {
                 break;
 
             case 'BorrowerName':
-                if (this.selectedBook.BorrowerName ?.trim()) {
+                if (!this.selectedBook.BorrowerName?.trim()) {
                     this.errors.BorrowerName = 'Borrower Name is required.';
                     isValid = false;
                 } else {
@@ -273,7 +311,7 @@ export class ManageBookCirculationComponent {
                 break;
 
             case 'IssuedByUserName':
-                if (this.selectedBook.IssuedByUserName ?.trim()) {
+                if (!this.selectedBook.IssuedByUserName?.trim()) {
                     this.errors.IssuedByUserName = 'IssuedBy Name is required.';
                     isValid = false;
                 } else {
@@ -282,7 +320,7 @@ export class ManageBookCirculationComponent {
                 break;
               
             case 'Status':
-                if (this.selectedBook.Status ?.trim()) {
+                if (!this.selectedBook.Status?.trim()) {
                     this.errors.Status = 'Status is required.';
                     isValid = false;
                 } else {
@@ -291,7 +329,7 @@ export class ManageBookCirculationComponent {
                 break;
 
             case 'ReturnByUserName':
-                if (this.selectedBook.Status ?.trim() == "Returned" && this.selectedBook.ReturnByUserName ?.trim()) {
+                if (this.selectedBook.Status?.trim() == "Returned" && !this.selectedBook.ReturnByUserName?.trim()) {
                     this.errors.ReturnByUserName = 'ReturnBy Name is required.';
                     isValid = false;
                 } else {
@@ -331,7 +369,11 @@ export class ManageBookCirculationComponent {
     } 
 
     issueBook():void {
-        this._bcService.issueBook(this.selectedBook).subscribe({
+
+        let _issuedBook = { ...this.selectedBook }; 
+        _issuedBook.IssuedDate = this.parseCustomDateString(this.selectedBook.IssuedDate ?? "");
+
+        this._bcService.issueBook(_issuedBook).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
@@ -361,6 +403,12 @@ export class ManageBookCirculationComponent {
     }
     
     returnBook():void{
+
+        let _returnedBook = { ...this.selectedBook }; 
+        _returnedBook.IssuedDate = this.parseCustomDateString(this.selectedBook.IssuedDate ?? "");
+        _returnedBook.ReturnDate = this.parseCustomDateString(this.selectedBook.ReturnDate ?? "");
+
+
         this._bcService.returnBook(this.selectedBook).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
@@ -388,6 +436,59 @@ export class ManageBookCirculationComponent {
                 });
             }
         });
+    }
+
+    onBookChange():void{
+        const book = this.bookOptions.find(l => l.value === this.selectedBook.BookId);
+        if (book) {
+            this.selectedBook.BookName = book.label;
+        }
+
+        this.validateInput('BookName');
+    }
+
+    onBorrowerChange():void{
+        const _borrower = this.lstUserDetails.find(l => l.UserId === this.selectedBook.BorrowerId);
+        if (_borrower) {
+            this.selectedBook.BorrowerName = _borrower.FullName;
+            this.selectedBook.BorrowerMailId = _borrower.MailId;
+        }
+
+        this.validateInput('BorrowerName');
+    }
+
+    onIssuedChange():void{
+         const _issuedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.IssuedByUserId);
+        if (_issuedBy) {
+            this.selectedBook.IssuedByUserName = _issuedBy.FullName;
+            this.selectedBook.IssuedByUserMailId = _issuedBy.MailId;
+        }
+
+        this.validateInput('IssuedByUserName');
+    }
+
+    onReturnedChange():void{
+            const _returnedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.ReturnByUserId);
+        if (_returnedBy) {
+            this.selectedBook.ReturnByUserName = _returnedBy.FullName;
+            this.selectedBook.ReturnByUserMailId = _returnedBy.MailId;
+        }
+
+        this.validateInput('ReturnByUserName');
+    }
+
+    parseCustomDateString(dateStr: string): string | null {
+        if (!dateStr) return null;
+        
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return null;
+
+        const day = parseInt(parts[2], 10);
+        const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
+        const year = parseInt(parts[0], 10);
+
+        const nativeDate = new Date(year, month, day);
+        return nativeDate.toISOString(); // Generates "2026-06-01T00:00:00.000Z"
     }
     
 }

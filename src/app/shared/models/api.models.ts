@@ -73,8 +73,10 @@ export interface BookCirculationDetails {
     BookName?: string | null;
     BorrowerId?: number | null;
     BorrowerName?: string | null;
+    BorrowerMailId?: string | null;
     IssuedByUserId?: number | null;
     IssuedByUserName?: string | null;
+    IssuedByUserMailId?: string | null;
     IssuedDate?: string | null;
     OverDueId?: number | null;
     FineAmount?: number | null;
@@ -85,11 +87,13 @@ export interface BookCirculationDetails {
     ReturnByUserId?: number | null;
     ReturnByUserName?: string | null;
     ReturnDate?: string | null;
+    ReturnByUserMailId?: string | null;
     Comments?: string | null;
     Status?: string | null;
     UpdatedByUserId?: number | null;
     UpdatedByUserName?: string | null;
     UpdatedDate?: string | null;
+    UpdatedByUserMailId?: string | null;
 }
 
 export interface BuildingDetails {
