@@ -252,49 +252,6 @@ searchBookTerm = '';
         }
     }
 
-    editBook(_bc: BookCirculationDetails | null = null): void {
-
-        if(_bc)
-        {
-            console.log("_bc :", _bc);
-            
-            this.selectedBook  = { ..._bc };
-
-            if(_bc.IssuedDate !=null && _bc.IssuedDate !="")
-            {
-                this.selectedBook.IssuedDate = this.parseCustomDateStringForUI(new Date(_bc.IssuedDate));
-            }
-           
-            if(_bc.ReturnDate !=null && _bc.ReturnDate !="")
-            {
-                this.selectedBook.ReturnDate = this.parseCustomDateStringForUI(new Date(_bc.ReturnDate));
-            }
-            else{
-                this.selectedBook.ReturnDate = this.todayDate;
-            }
-
-            if(_bc.OverDueFrom !=null && _bc.OverDueFrom !="")
-            {
-                this.selectedBook.OverDueFrom = this.parseCustomDateStringForUI(new Date(_bc.OverDueFrom));
-            } 
-            
-            if(this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId>0)
-            {
-                this.isOverDue = true;
-            }
-           
-                             
-            this.header = 'Returned Book Details';
-            
-        }       
-
-       
-        
-        this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''} 
-            
-        this.bcDialogVisible = true;
-    }   
-
     parseCustomDateStringForUI(dateStr: Date): string {
         // 2. Pad single digits with leading zeros
         const day = String(dateStr.getDate()).padStart(2, '0');

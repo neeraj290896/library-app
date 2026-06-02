@@ -172,7 +172,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="book">
                     Book Name<sup>*</sup>
                 </label>
-                <p-select id="book" [(ngModel)]="selectedBook.BookId" [ngModelOptions]="{standalone: true}"
+                <p-select id="book" [disabled]="!isIssueNewBook" [(ngModel)]="selectedBook.BookId" [ngModelOptions]="{standalone: true}"
                     [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onBookChange()" />
                 <div *ngIf="errors.BookName" class="text-danger mt-1 small">{{ errors.BookName }}</div>
@@ -190,7 +190,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="issuedBy">
                     Issued By<sup>*</sup>
                 </label>
-                <p-select id="issuedBy" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
+                <p-select id="issuedBy" [disabled] ="true" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
                     [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onIssuedChange()" />
                 <div *ngIf="errors.IssuedByUserName" class="text-danger mt-1 small">{{ errors.IssuedByUserName }}</div>
@@ -275,13 +275,15 @@
         </div>
          <ng-template pTemplate="footer">
             <div class="d-flex justify-content-end align-items-center gap-3">
-                <label class="form-check-label small fw-medium text-secondary me-2" for="diffUserCheck">
+                <div *ngIf="this.isReturnBook">
+                    <label class="form-check-label small fw-medium text-secondary me-2" for="diffUserCheck">
                         Return by different user
                     </label>
-
                     <input class="form-check-input m-0" type="checkbox" id="diffUserCheck" 
                         [(ngModel)]="isReturnByDifferentUser" [ngModelOptions]="{standalone: true}"
                         (ngModelChange)="returnByDifferentUser()">
+                </div>
+                
 
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     styleClass="btn-main-outlined" (click)="bcDialogVisible = false"></p-button>

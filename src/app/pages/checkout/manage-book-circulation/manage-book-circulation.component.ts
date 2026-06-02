@@ -79,6 +79,8 @@ export class ManageBookCirculationComponent {
     maxDate: Date | undefined;
 
     isReturnByDifferentUser: boolean = false;
+    public lstBookDetails: BookDetails[] = [];
+    public isIssueNewBook: boolean = false;
 
     ngOnInit(): void {
 
@@ -119,6 +121,7 @@ export class ManageBookCirculationComponent {
     loadBooks(): void {
         this._bookService.getAllBookDetails().subscribe({
             next: (data: BookDetails[]) => {
+                this.lstBookDetails = data;
                 this.bookOptions = data.map(book => {
                     return { label: book.BookName ?? '', value: book.BookId };
                 });                
@@ -256,7 +259,8 @@ export class ManageBookCirculationComponent {
 
         if(_bc)
         {
-            console.log("_bc :", _bc);
+            this.isIssueNewBook = false;
+            this.bindOnlyActiveDetails();
             
             this.selectedBook  = { ..._bc };
 
@@ -296,7 +300,9 @@ export class ManageBookCirculationComponent {
             }
         }
         else
-        {                       
+        {   
+            this.isIssueNewBook = true;
+            this.bindOnlyActiveDetails();                    
 
             this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
                                 IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
@@ -313,6 +319,29 @@ export class ManageBookCirculationComponent {
         this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''} 
             
         this.bcDialogVisible = true;
+    }
+
+    bindOnlyActiveDetails() : void{
+        if(this.isIssueNewBook)
+        {
+            this.userOptions = this.lstUserDetails.filter(x => x.IsActive == true && x.FullName?.trim() !='').map(usr => {
+                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+                    });
+            
+            this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
+                    return { label: book.BookName ?? '', value: book.BookId };
+                }); 
+        }
+        else
+        {
+            this.userOptions = this.lstUserDetails.filter(x => x.FullName?.trim() !='').map(usr => {
+                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+                    });
+
+            this.bookOptions = this.lstBookDetails.map(book => {
+                    return { label: book.BookName ?? '', value: book.BookId };
+                }); 
+        }
     }
 
     validateInput(key: string): boolean {
@@ -609,7 +638,6 @@ export class ManageBookCirculationComponent {
     }
 
     viewBookCirculationDetails(_bc: BookCirculationDetails): void{
-
     }
     
 }
