@@ -147,7 +147,7 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                        <button pButton icon="pi pi-pencil" (click)="editBook(book)"
+                        <button pButton icon="pi pi-pencil" (click)="editBook(book)" [disabled] = "book.Status == 'Returned'"
                             class="p-button-rounded p-button-text p-button-sm"></button> 
 
                             <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"

@@ -98,7 +98,7 @@ export class ManageRoleComponent {
                 this.currentRole = { RoleId: 0, RoleName: '', IsActive: true, UserCanLogin : false, UserHasEditAccess : false };
                 this.header = 'Add Role';
             }
-            this.errors = { RoleName: '', IsActive: '', UserHasEditAccess : false, UserCanLogin: false };
+            this.errors = { RoleName: '', IsActive: '', UserHasEditAccess : false, UserCanLogin: false };            
             this.roleDialogVisible = true;
     }
 

@@ -151,11 +151,11 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="userHasEditAccess">
                     User Has Edit Access?<sup>*</sup>
                 </label>
-               <p-radioButton name="grpUserHasEditAccess" value="true" inputId="yes_userHasEditAccess"
+               <p-radioButton name="grpUserHasEditAccess" [value]="true" inputId="yes_userHasEditAccess"
                    [(ngModel)]="currentRole.UserHasEditAccess"></p-radioButton> &nbsp;
                    <label for="yes_userHasEditAccess" class="ml-2">Yes</label>
                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                 <p-radioButton name="grpUserHasEditAccess" value="false" inputId="no_userHasEditAccess"
+                 <p-radioButton name="grpUserHasEditAccess" [value]="false" inputId="no_userHasEditAccess"
                    [(ngModel)]="currentRole.UserHasEditAccess"></p-radioButton> &nbsp;
                     <label for="no_userHasEditAccess" class="ml-2">No</label>
                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -165,11 +165,11 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="userCanLogin">
                     User Can Login?<sup>*</sup>
                 </label>
-                 <p-radioButton name="grpUserCanLogin" value="true" inputId="yes_userCanLogin"
+                 <p-radioButton name="grpUserCanLogin" [value]="true" inputId="yes_userCanLogin"
                    [(ngModel)]="currentRole.UserCanLogin"></p-radioButton> &nbsp;
                    <label for="yes_userCanLogin" class="ml-2">Yes</label>
                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                 <p-radioButton name="grpUserCanLogin" value="false" inputId="no_userCanLogin"
+                 <p-radioButton name="grpUserCanLogin" [value]="false" inputId="no_userCanLogin"
                    [(ngModel)]="currentRole.UserCanLogin"></p-radioButton> &nbsp;
                     <label for="no_userCanLogin" class="ml-2">No</label>
                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

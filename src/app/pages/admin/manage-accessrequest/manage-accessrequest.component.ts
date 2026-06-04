@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AccessRequestDetails } from '@app/shared/models/api.models';
+import { AccessRequestDetails, UserDetails } from '@app/shared/models/api.models';
 import { AdminService } from '@app/shared/services/admin.service';
+import { AuthService } from '@app/shared/services/auth.service';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -26,6 +27,7 @@ export class ManageAccessrequestComponent {
 private messageService = inject(MessageService);
     private accessRequestService = inject(AdminService);
     @ViewChild('dt') dataTable: Table | undefined;
+    private _authService = inject(AuthService);
 
      public all_AccessRequests: AccessRequestDetails[] = [];
     public accessRequests: AccessRequestDetails[] = [];
@@ -48,8 +50,12 @@ private messageService = inject(MessageService);
         { label: 'Active', value: true },
         { label: 'In-Active', value: false }
     ];
+    public loggedInUserDetails: UserDetails = {};
+    selectedAccessRequestDetails: AccessRequestDetails[] = [];
+    selectedIds: number[] = [];
 
   ngOnInit(): void {
+    this.loggedInUserDetails = this._authService.userData() ?? {};
       this.loadAccessRequestDetails();
   }
 
@@ -103,13 +109,118 @@ private messageService = inject(MessageService);
   }
 
   approveAccess(_accessRequest: AccessRequestDetails | null = null): void{
+    let _lstAccessRequest: AccessRequestDetails[] = [];
+    if(_accessRequest !=null)
+    {
+        _accessRequest.Status = "Approved";
+        _accessRequest.ApprovedBy = this.loggedInUserDetails.UserId;
+        _accessRequest.ApprovedByUserName = this.loggedInUserDetails.FullName;
+        _lstAccessRequest.push(_accessRequest);
 
+        
+    }
+    else{
+        if(this.selectedIds !=null && this.selectedIds.length >0)
+        {
+            this.selectedIds.forEach(_accReq => {
+                let _selectedAccessRequest :AccessRequestDetails | undefined  = this.accessRequests.find(x => x.UserId == _accReq);
+
+                if(_selectedAccessRequest)
+                {
+                    _selectedAccessRequest.ApprovedBy = this.loggedInUserDetails.UserId;
+                    _selectedAccessRequest.ApprovedByUserName = this.loggedInUserDetails.FullName;
+                    _selectedAccessRequest.Status = "Approved";
+
+                    _lstAccessRequest.push(_selectedAccessRequest);
+                }
+            });
+        }
+    }
+
+    if(_lstAccessRequest !=null && _lstAccessRequest.length >0)
+    {
+        this.updateAccessRequestDetails(_lstAccessRequest,'Approve');
+    }   
+    
   }
   
 
   rejectAccess(_accessRequest: AccessRequestDetails | null = null): void{
 
+    let _lstAccessRequest: AccessRequestDetails[] = [];
+
+    if(_accessRequest !=null)
+    {
+        _accessRequest.Status = "Rejected";
+         _accessRequest.ApprovedBy = this.loggedInUserDetails.UserId;
+        _accessRequest.ApprovedByUserName = this.loggedInUserDetails.FullName;
+        _lstAccessRequest.push(_accessRequest);
+
+        
+    }
+    else{
+         if(this.selectedIds !=null && this.selectedIds.length >0)
+        {
+            this.selectedIds.forEach(_accReq => {
+                let _selectedAccessRequest :AccessRequestDetails | undefined  = this.accessRequests.find(x => x.UserId == _accReq);
+
+                if(_selectedAccessRequest)
+                {
+                    _selectedAccessRequest.ApprovedBy = this.loggedInUserDetails.UserId;
+                    _selectedAccessRequest.ApprovedByUserName = this.loggedInUserDetails.FullName;
+                    _selectedAccessRequest.Status = "Rejected";
+
+                    _lstAccessRequest.push(_selectedAccessRequest);
+                }
+            });
+        }
+    }
+
+    if(_lstAccessRequest !=null && _lstAccessRequest.length >0)
+    {
+        this.updateAccessRequestDetails(_lstAccessRequest,'Reject');
+    }
+    
   }
+
+  updateAccessRequestDetails(_lstAccessRequest: AccessRequestDetails[], _status : string): void{
+
+    this.accessRequestService.updateAccessRequestDetails(_lstAccessRequest).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: `${_status} Users Access - Failed`,
+                        detail: res ? res.Message : `Failed to ${_status} users access. Please try again.`
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: `${_status} Users Access - Success`,
+                        detail: `Users access ${_status} successfully.`
+                    });
+                }
+
+                this.loadAccessRequestDetails();
+                
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: `${_status} Users Access - Failed`,
+                    detail: `Failed to ${_status} users access. Please try again.`
+                });
+            }
+        });
+
+    }
+
+  onSelectionChange() {
+        // Extract only the IDs from the selected objects
+        this.selectedIds = this.selectedAccessRequestDetails.map(x => x.UserId);
+        
+        console.log('Selected IDs:', this.selectedIds);
+    }
 
   
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { OverDueDetails } from '../models/api.models';
 
 @Injectable({
     providedIn: 'root'
@@ -18,4 +19,8 @@ export class OverDueService {
     syncOverDueDetails(): Observable<any> {
         return this.http.get(`${this.baseUrl}/SyncOverDueDetails`);
     }
+
+    updateOverDueDetails(payload: OverDueDetails): Observable<any> {
+           return this.http.post(`${this.baseUrl}/ManipulateOverDueDetails`, payload);
+       }
 }

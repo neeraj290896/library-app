@@ -93,7 +93,7 @@ export interface BookCirculationDetails {
     UpdatedByUserId?: number | null;
     UpdatedByUserName?: string | null;
     UpdatedDate?: string | null;
-    UpdatedByUserMailId?: string | null;
+    UpdatedByUserMailId?: string | null;  
 }
 
 export interface BuildingDetails {
@@ -310,7 +310,7 @@ export interface OverDueDetails {
     BookCirculationId: number;
     BookId: number;
     BookName?: string | null;
-    IssuedDate: string;
+    IssuedDate?: string | null;
     IssuedByUserId: number;
     IssuedByUserName?: string | null;
     BorrowerId: number;
@@ -324,6 +324,15 @@ export interface OverDueDetails {
     UpdatedByUserId?: number | null;
     UpdatedByUserName?: string | null;
     SytemUpdatedDate?: string | null;
+    ReturnByUserId?: number | null;
+    ReturnByUserName?: string | null;
+    ReturnDate?: string | null;
+    ReturnByUserMailId?: string | null;
+    BorrowerMailId?: string | null;
+    IssuedByUserMailId?: string | null;
+    UpdatedByUserMailId?: string | null;
+    Status?: string | null;
+    Comments?: string | null;
 }
 
 export interface DashboardSummaryDetails {
