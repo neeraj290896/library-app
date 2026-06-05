@@ -28,5 +28,17 @@ $color-primary: #22c55e;
             margin-top: 0.5rem;
             z-index: 1;
         }
+
+        .searchIcon{
+            margin-left: 12px;
+            margin-top: 12px;
+        }
     }
+}
+
+hr {
+  border: none;
+  height: 2px;
+  background-color: #333;
+  width: 100%;
 }

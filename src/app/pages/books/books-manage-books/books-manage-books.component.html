@@ -201,8 +201,8 @@
                 </td>
                 <td>{{ book.PublishedYear }}</td>
                 <td>
-                    <p-tag [value]="book.IsActive ? 'Active' : 'In-Active'"
-                        [severity]="getStatusSeverity(book.IsActive)"></p-tag>
+                    <p-tag [value]="book.Status"
+                        [severity]="getStatusSeverity(book.Status)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">

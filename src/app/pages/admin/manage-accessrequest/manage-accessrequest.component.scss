@@ -30,3 +30,9 @@ $color-primary: #22c55e;
         }
     }
 }
+
+.disabled-container {
+    pointer-events: none; /* Blocks all mouse events, clicks, and selections */
+    opacity: 0.5;         /* Visually dims the container */
+    user-select: none;    /* Prevents selecting text */
+}

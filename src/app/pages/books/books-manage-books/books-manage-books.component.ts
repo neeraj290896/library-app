@@ -347,8 +347,11 @@ export class BooksManageBooksComponent implements OnInit {
         this.importShowFt = false;
     }
 
-    getStatusSeverity(isActive: boolean): 'success' | 'danger' {
-        return isActive ? 'success' : 'danger';
+    // getStatusSeverity(isActive: boolean): 'success' | 'danger' {
+    //     return isActive ? 'success' : 'danger';
+    // }
+    getStatusSeverity(status: string): 'success' | 'danger' {
+        return status == 'Available' ? 'success' : 'danger';
     }
 
     editBook(book: BookDetails | null = null): void {
