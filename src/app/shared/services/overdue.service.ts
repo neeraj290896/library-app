@@ -22,5 +22,9 @@ export class OverDueService {
 
     updateOverDueDetails(payload: OverDueDetails): Observable<any> {
            return this.http.post(`${this.baseUrl}/ManipulateOverDueDetails`, payload);
-       }
+    }
+
+    getOverDueDataRefreshDetails(): Observable<any> {
+        return this.http.get(`${this.baseUrl}/GetOverDueDataRefreshDetails`);
+    }
 }

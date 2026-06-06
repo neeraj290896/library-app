@@ -191,15 +191,15 @@ searchBookTerm = '';
             }
             else if(this.searchBookTerm !="" && this.searchUserTerm !="")
             {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.includes(this.searchBookTerm) && x.BorrowerName?.includes(this.searchUserTerm));                
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()) && x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));                
             }
             else if(this.searchBookTerm !="" && this.searchUserTerm =="")
             {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.includes(this.searchBookTerm));                
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()));                
             }
             else if(this.searchBookTerm =="" && this.searchUserTerm !="")
             {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerName?.includes(this.searchUserTerm));
+                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
             }
             else
             {
