@@ -201,8 +201,7 @@
                 </td>
                 <td>{{ book.PublishedYear }}</td>
                 <td>
-                    <p-tag [value]="book.Status"
-                        [severity]="getStatusSeverity(book.Status)"></p-tag>
+                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
@@ -225,7 +224,8 @@
         </ng-template>
     </p-table>
 
-    <p-dialog [header]="header" [(visible)]="bookDialogVisible" [modal]="true" [style]="{ width: '70vw' }">
+    <p-dialog [header]="header" [(visible)]="bookDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+        @if (header === 'Add Book') {
         <div class="row">
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
@@ -360,17 +360,175 @@
                 }
             </div>
         </div>
+        }
+        @else {
+        <!-- Filter Tabs -->
+        <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
+            <p-tabPanel [header]="header">
+                @if (activeTab === 0) {
+                <div class="row mt-2">
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
+                            Book<sup>*</sup>
+                        </label>
+                        <input id="bookName" type="text" class="form-control" pInputText
+                            [(ngModel)]="currentBook.BookName" [ngModelOptions]="{standalone: true}"
+                            placeholder="Enter book" (ngModelChange)="validateInput('BookName')" />
+                        @if (errors.BookName) {
+                        <div class="text-danger mt-1 small">{{ errors.BookName }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="authorId">
+                            Author<sup>*</sup>
+                        </label>
+                        <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}"
+                            [options]="authorOptions" optionLabel="label" optionValue="value"
+                            placeholder="Select author" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onAuthorChange()"></p-select>
+                        @if (errors.AuthorId) {
+                        <div class="text-danger mt-1 small">{{ errors.AuthorId }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="publisherId">
+                            Publisher<sup>*</sup>
+                        </label>
+                        <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId"
+                            [ngModelOptions]="{standalone: true}" [options]="publisherOptions" optionLabel="label"
+                            optionValue="value" placeholder="Select publisher" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onPublisherChange()"></p-select>
+                        @if (errors.PublisherId) {
+                        <div class="text-danger mt-1 small">{{ errors.PublisherId }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="categoryId">
+                            Category<sup>*</sup>
+                        </label>
+                        <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId"
+                            [ngModelOptions]="{standalone: true}" [options]="categoryOptions" optionLabel="label"
+                            optionValue="value" placeholder="Select category" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onCategoryChange()"></p-select>
+                        @if (errors.CategoryId) {
+                        <div class="text-danger mt-1 small">{{ errors.CategoryId }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="languageId">
+                            Language<sup>*</sup>
+                        </label>
+                        <p-select id="languageId" [(ngModel)]="currentBook.LanguageId"
+                            [ngModelOptions]="{standalone: true}" [options]="languageOptions" optionLabel="label"
+                            optionValue="value" placeholder="Select language" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onLanguageChange()"></p-select>
+                        @if (errors.LanguageId) {
+                        <div class="text-danger mt-1 small">{{ errors.LanguageId }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="publishedYear">
+                            Published Year<sup>*</sup>
+                        </label>
+                        <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                            [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy"
+                            placeholder="Select published year" styleClass="w-100" inputStyleClass="w-100" />
+                        @if (errors.PublishedYear) {
+                        <div class="text-danger mt-1 small">{{ errors.PublishedYear }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="price">
+                            Price(₹)<sup>*</sup>
+                        </label>
+                        <input id="price" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Price"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter price"
+                            (ngModelChange)="validateInput('Price')" />
+                        @if (errors.Price) {
+                        <div class="text-danger mt-1 small">{{ errors.Price }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="buildingId">
+                            Building<sup>*</sup>
+                        </label>
+                        <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId"
+                            [ngModelOptions]="{standalone: true}" [options]="buildingOptions" optionLabel="label"
+                            optionValue="value" placeholder="Select building" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onBuildingChange()"></p-select>
+                        @if (errors.BuildingId) {
+                        <div class="text-danger mt-1 small">{{ errors.BuildingId }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="floorId">
+                            Floor<sup>*</sup>
+                        </label>
+                        <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}"
+                            [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor"
+                            styleClass="w-100" appendTo="body" (ngModelChange)="onFloorChange()"></p-select>
+                        @if (errors.FloorId) {
+                        <div class="text-danger mt-1 small">{{ errors.FloorId }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="rackId">
+                            Rack<sup>*</sup>
+                        </label>
+                        <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}"
+                            [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack"
+                            styleClass="w-100" appendTo="body" (ngModelChange)="onRackChange()"></p-select>
+                        @if (errors.RackId) {
+                        <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="bookBarcode">
+                            Barcode<sup>*</sup>
+                        </label>
+                        <input id="bookBarcode" type="text" class="form-control" pInputText
+                            [(ngModel)]="currentBook.BookBarcode" [ngModelOptions]="{standalone: true}"
+                            placeholder="Enter barcode" (ngModelChange)="validateInput('BookBarcode')" />
+                        @if (errors.BookBarcode) {
+                        <div class="text-danger mt-1 small">{{ errors.BookBarcode }}</div>
+                        }
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                            Status<sup>*</sup>
+                        </label>
+                        <p-select id="isActive" [(ngModel)]="currentBook.IsActive" [ngModelOptions]="{standalone: true}"
+                            [options]="options" optionLabel="label" optionValue="value" placeholder="Select status"
+                            styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')"></p-select>
+                        @if (errors.IsActive) {
+                        <div class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                        }
+                    </div>
+                </div>
+                }
+            </p-tabPanel>
+
+            <p-tabPanel header="View Book Circulation">
+                @if (activeTab === 1) {
+                <app-books-view-circulation></app-books-view-circulation>
+                }
+            </p-tabPanel>
+        </p-tabView>
+        }
+
         <ng-template pTemplate="footer">
+            @if (header === 'Add Book' || (header === 'Edit Book' && activeTab === 0)) {
             <div class="d-flex justify-content-end align-items-center gap-3">
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     styleClass="btn-main-outlined" (click)="bookDialogVisible = false"></p-button>
                 <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
                     (click)="saveBook()"></p-button>
             </div>
+            }
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Import Books" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }">
+    <p-dialog header="Import Books" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }" appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">

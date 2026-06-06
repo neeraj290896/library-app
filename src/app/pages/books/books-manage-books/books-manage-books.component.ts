@@ -24,6 +24,8 @@ import { saveAs } from 'file-saver';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
+import { TabViewModule } from 'primeng/tabview';
+import { BooksViewCirculationComponent } from '../books-view-circulation/books-view-circulation.component';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -32,9 +34,12 @@ type ImportBookDetails = BookDetails & {
 @Component({
     selector: 'app-books-manage-books',
     standalone: true,
-    imports: [CommonModule, ButtonModule, TableModule, TagModule,
+    imports: [
+        CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
-        SelectModule, FormsModule, DatePickerModule, TooltipModule],
+        SelectModule, FormsModule, DatePickerModule, TooltipModule,
+        TabViewModule, BooksViewCirculationComponent
+    ],
     templateUrl: './books-manage-books.component.html',
     styleUrl: './books-manage-books.component.scss'
 })
@@ -162,6 +167,8 @@ export class BooksManageBooksComponent implements OnInit {
     public importSelectedPublishedYearList: number[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
+
+    public activeTab: number = 0;
 
     ngOnInit(): void {
         this.loadBooks();
@@ -416,6 +423,7 @@ export class BooksManageBooksComponent implements OnInit {
             BookBarcode: '',
             IsActive: ''
         };
+        this.activeTab = 0;
         this.bookDialogVisible = true;
     }
 

@@ -17,7 +17,7 @@
     <!-- Stats Grid -->
     <div class="row g-3">
         @for (stat of dashboardSummary; track stat.label) {
-        <div class="col-md-6 col-lg-3">
+        <div class="col-md-6 col-lg-3 cursor-pointer" (click)="openSummaryDetails(stat.label)">
             <p-card>
                 <div class="small text-muted mb-2">{{ stat.label }}</div>
                 <div class="d-flex align-items-start gap-2">
@@ -35,28 +35,45 @@
     <div class="card border-0 shadow-sm rounded p-3">
         <h3 class="fs-5 fw-semibold mb-3">Quick Actions</h3>
         <div class="d-flex gap-2 flex-wrap">
-            <p-button type="button" label="Overdue Books" styleClass="btn-main" (click)="setFilter('overdue')"></p-button>
-            <p-button type="button" label="Add New Book"
-                [ngClass]="{'p-button-outlined': activeFilter !== 'addNewBook'}"
-                [styleClass]="activeFilter !== 'addNewBook' ? 'btn-main-outlined' : ''"
+            <p-button type="button" label="Add New Book" class="p-button-outlined" styleClass="btn-main-outlined"
                 (click)="setFilter('addNewBook')"></p-button>
-            <p-button type="button" label="Register User"
-                [ngClass]="{'p-button-outlined': activeFilter !== 'registerUser'}"
-                [styleClass]="activeFilter !== 'registerUser' ? 'btn-main-outlined' : ''"
+            <p-button type="button" label="Register User" class="p-button-outlined" styleClass="btn-main-outlined"
                 (click)="setFilter('registerUser')"></p-button>
-            <p-button type="button" label="Issue Books" [ngClass]="{'p-button-outlined': activeFilter !== 'issueBooks'}"
-                [styleClass]="activeFilter !== 'issueBooks' ? 'btn-main-outlined' : ''"
+            <p-button type="button" label="Issue Books" class="p-button-outlined" styleClass="btn-main-outlined"
                 (click)="setFilter('issueBooks')"></p-button>
-            <p-button type="button" label="Return Books"
-                [ngClass]="{'p-button-outlined': activeFilter !== 'returnBooks'}"
-                [styleClass]="activeFilter !== 'returnBooks' ? 'btn-main-outlined' : ''"
+            <p-button type="button" label="Return Books" class="p-button-outlined" styleClass="btn-main-outlined"
                 (click)="setFilter('returnBooks')"></p-button>
         </div>
     </div>
 
     <!-- Overdue Books -->
     <div class="card border-0 shadow-sm rounded p-3">
-        <h3 class="fs-5 fw-semibold mb-2">Overdue Books - {{ overDues.length }}</h3>
+        <h3 class="fs-5 fw-semibold mb-3">Overdue Books - {{ overDues.length }}</h3>
         <app-books-overdue [totalOverDues]="overDues"></app-books-overdue>
     </div>
 </div>
+
+<!-- Dialogs -->
+<p-dialog header="Manage Books" [(visible)]="booksManageDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+    @if(booksManageDialogVisible) {
+    <app-books-manage-books></app-books-manage-books>
+    }
+</p-dialog>
+
+<p-dialog header="Issued Books" [(visible)]="issuedBooksDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+    @if (issuedBooksDialogVisible) {
+    <app-manage-issued-books></app-manage-issued-books>
+    }
+</p-dialog>
+
+<p-dialog header="Overdue Books" [(visible)]="overdueDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+    @if (overdueDialogVisible) {
+    <app-books-overdue [totalOverDues]="overDues"></app-books-overdue>
+    }
+</p-dialog>
+
+<p-dialog header="Manage Users" [(visible)]="usersDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+    @if (usersDialogVisible) {
+    <app-manage-users></app-manage-users>
+    }
+</p-dialog>

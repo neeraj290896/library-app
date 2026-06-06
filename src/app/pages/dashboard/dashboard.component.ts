@@ -6,16 +6,21 @@ import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
+import { DialogModule } from 'primeng/dialog';
 import { DashboardService } from '@app/shared/services/dashboard.service';
 import { DashboardSummaryDetails, OverDueDetails } from '@app/shared/models/api.models';
 import { OverDueService } from '@app/shared/services/overdue.service';
 import { BooksOverdueComponent } from '../checkout/books-overdue/books-overdue.component';
+import { BooksManageBooksComponent } from '../books/books-manage-books/books-manage-books.component';
+import { ManageIssuedBooksComponent } from '../checkout/manage-issued-books/manage-issued-books.component';
+import { ManageUsersComponent } from '../admin/manage-users/manage-users.component';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
     imports: [CommonModule, CardModule, TableModule, ButtonModule, FormsModule, InputTextModule,
-        PaginatorModule, BooksOverdueComponent],
+        PaginatorModule, DialogModule, BooksOverdueComponent, BooksManageBooksComponent, 
+        ManageIssuedBooksComponent, ManageUsersComponent],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
 })
@@ -26,6 +31,11 @@ export class DashboardComponent {
     public currentDate: Date = new Date();
     public searchTerm: string = '';
     public activeFilter: string = 'overdue';
+
+    public booksManageDialogVisible: boolean = false;
+    public issuedBooksDialogVisible: boolean = false;
+    public overdueDialogVisible: boolean = false;
+    public usersDialogVisible: boolean = false;
 
     public dashboardSummary: { label: string; total: number; active: number }[] = [
         { label: 'Total Books', total: 0, active: 0 },
@@ -75,5 +85,22 @@ export class DashboardComponent {
 
     onSearch(term: string) {
         this.searchTerm = term;
+    }
+
+    openSummaryDetails(label: string) {
+        switch (label) {
+            case 'Total Books':
+                this.booksManageDialogVisible = true;
+                break;
+            case 'Borrowed Books':
+                this.issuedBooksDialogVisible = true;
+                break;
+            case 'Overdue Books':
+                this.overdueDialogVisible = true;
+                break;
+            case 'Total Users':
+                this.usersDialogVisible = true;
+                break;
+        }
     }
 }

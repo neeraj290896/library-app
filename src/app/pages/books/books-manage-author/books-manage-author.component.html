@@ -106,7 +106,7 @@
         </ng-template>
     </p-table>
 
-    <p-dialog [header]="header" [(visible)]="authorDialogVisible" [modal]="true" [style]="{ width: '60vw' }">
+    <p-dialog [header]="header" [(visible)]="authorDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
         <div class="row">
             <div class="col-6">
                 <label class="d-block small fw-medium text-secondary mb-1" for="authorName">
@@ -141,7 +141,7 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Import Authors" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }">
+    <p-dialog header="Import Authors" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }" appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">
