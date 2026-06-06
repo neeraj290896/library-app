@@ -237,22 +237,72 @@ export class ManageIssuedBooksComponent {
         this.showFt = false;
     }
 
-    getStatusSeverity(status: string): 'success' | 'warning' | 'info' {
-        switch (status) {
-            case 'Returned': return 'success';
-            case 'Issued': return 'warning';
-            // case 'Issued': return 'info';
-            default: return 'info';
+    getStatusSeverity(status: string,_overDueDays: number): 'success' | 'warn'| 'danger' | 'info' | 'secondary'{
+        
+        if (status === 'Returned' && _overDueDays <= 0) {
+            return 'success';
         }
+
+        if (status === 'Returned' && _overDueDays <= 7) {
+            return 'info';
+        }
+
+        if (status === 'Issued' && _overDueDays <= 7) {
+            return 'info';
+        }
+
+        if (status === 'Issued' && _overDueDays > 7 && _overDueDays <= 14) {
+            return 'warn';
+        }
+
+        if (status === 'Issued' && _overDueDays > 14) {
+            return 'danger';
+        }
+        
+        return 'secondary'
     }
 
-    getOverDueStatusSeverity(_overDueDays: number): 'success' | 'warning'| 'error' | 'info' {
-        switch (true) {
-            case _overDueDays <= 0 : return 'success';
-            case _overDueDays > 0 && _overDueDays < 10 : return 'warning';
-            case _overDueDays > 10 : return 'error';
-            default: return 'info';
+
+    getOverDueSeverity(_overDueDays: number): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
+       
+        if (_overDueDays <= 7) {
+            return 'info';
         }
+        
+        if (_overDueDays > 7 && _overDueDays <= 14) {
+            return 'warn';
+        }
+
+        if (_overDueDays > 14) {
+            return 'danger';
+        }
+  
+        return 'success';
+       
+    }
+
+    getOverDueStatusSeverity(status: string,_overDueDays: number): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
+
+        console.log('status : ', status);
+        
+        if (status == null || status == undefined || status == '-') {
+            return 'secondary';
+        }
+
+        if (status === 'Paid' && _overDueDays <= 0) {
+            return 'success';
+        }
+
+        if (status !=null && _overDueDays <= 7) {
+            return 'info';
+        }
+        
+        if (status !=null && (_overDueDays > 7 && _overDueDays <= 14)) {
+            return 'warn';
+        }
+  
+        return 'danger';
+       
     }
 
     editBook(_bc: BookCirculationDetails | null = null): void {
