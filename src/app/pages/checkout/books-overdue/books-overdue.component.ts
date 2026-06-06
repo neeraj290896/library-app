@@ -6,7 +6,7 @@ import { TagModule } from 'primeng/tag';
 import { PaginatorModule } from 'primeng/paginator';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
-import { BookDetails, OverDueDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookDetails, OverDueDetails, OverDueRefreshDetails, UserDetails } from '@app/shared/models/api.models';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -76,7 +76,7 @@ export class BooksOverdueComponent {
     ];
     minDate: Date | undefined;
     maxDate: Date | undefined;
-
+    public lastRefreshedDate: string = '';
     public lstBookDetails: BookDetails[] = [];
 
     ngOnInit(): void {
@@ -94,7 +94,7 @@ export class BooksOverdueComponent {
         this.todayDate = this.parseCustomDateStringForUI(today);
 
         this.loggedInUserDetails = this._authService.userData() ?? {};
-
+        
         this.loadBooks();
         this.loadUserDetails();
         this.getOverDueDetails();
@@ -106,11 +106,28 @@ export class BooksOverdueComponent {
                     this._odDetails = data;
                     this.filteredOdDetails = data.filter(x => x.OverDueStatus == 'Pending');
                     this.totalOverDueCount = this.filteredOdDetails.length;    
-                    
+                    this.getOverDueRefreshedDetails();
                     this.initializeFilterLists();
                 },
                 error: (err) => {
                     console.error('Error loading over due book details:', err);
+                }
+            });
+    }
+
+    getOverDueRefreshedDetails(): void{
+        this._odService.getOverDueDataRefreshDetails().subscribe({
+                next: (data: OverDueRefreshDetails[]) => {                    
+                    var _refreshData = data.find(x => x.Status == 'Completed');
+
+                    if(_refreshData)
+                    {
+                        this.lastRefreshedDate = _refreshData.CreatedDate?.toString() ?? "";
+                    }
+                    
+                },
+                error: (err) => {
+                    console.error('Error loading over due refresh details:', err);
                 }
             });
     }
@@ -491,6 +508,36 @@ export class BooksOverdueComponent {
     }
 
     viewOverDueDetails(_odD: OverDueDetails): void{
+    }
+
+    refreshData(): void{
+        this._odService.syncOverDueDetails().subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Refresh Over Due - Failed',
+                        detail: res ? res.Message : 'Failed to refresh Over Due details. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Refresh Over Due - Success',
+                        detail: 'Refresh Over Due details successfully.'
+                    });
+                }
+
+                this.getOverDueRefreshedDetails();
+                
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Refresh Over Due - Failed',
+                    detail: 'Failed to refresh Over Due details. Please try again.'
+                });
+            }
+        });
     }
     
 }

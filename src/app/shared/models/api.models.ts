@@ -345,3 +345,10 @@ export interface DashboardSummaryDetails {
     TotalUsers?: number;
     ActiveUsers?: number;
 }
+
+export interface OverDueRefreshDetails {
+    Id: number;    
+    Status?: string | null;    
+    CreatedDate?: string | null;
+    UpdatedDate?: string | null;
+}
