@@ -22,7 +22,7 @@
 
         <ng-template pTemplate="header">
             <tr class="border-bottom">
-                <th class="text-start text-muted fw-medium" style="width: 5%;">
+                <th class="text-start text-muted fw-medium" style="width: 4%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
                             S.No
@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                <th class="text-start text-muted fw-medium" style="width: 12%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
                             Book Name
@@ -40,7 +40,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                <th class="text-start text-muted fw-medium" style="width: 12%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="borrowerName">
                             Borrower Name
@@ -50,7 +50,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                <!-- <th class="text-start text-muted fw-medium" style="width: 12%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="issuedBy">
                             Issued By
@@ -59,7 +59,7 @@
                         <span class="pi" [ngClass]="selectedIssuedByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
-                </th>
+                </th> -->
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="issuedDate">
@@ -68,7 +68,7 @@
                         </div>                       
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                <th class="text-start text-muted fw-medium" style="width: 8%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="status">
                             Status
@@ -76,6 +76,48 @@
                         </div>
                         <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 12%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnBy">
+                            Returned By
+                            <p-sortIcon field="returnBy"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedReturnByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnDate">
+                            Returned On
+                            <p-sortIcon field="returnDate"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueFrom">
+                            Over Due From
+                            <p-sortIcon field="overDueFrom"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
+                            Over Due in Days
+                            <p-sortIcon field="overDueDays"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
+                            Over Due Status
+                            <p-sortIcon field="overDueStatus"></p-sortIcon>
+                        </div>                       
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
@@ -107,7 +149,7 @@
                         </ng-template>
                     </p-columnFilter>
                 </th>
-                <th>
+                <!-- <th>
                     <p-columnFilter field="issuedBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                             <p-multiSelect [options]="issuedByList" [(ngModel)]="selectedIssuedByList"
@@ -117,7 +159,7 @@
                             </p-multiSelect>
                         </ng-template>
                     </p-columnFilter>
-                </th>
+                </th> -->
                 <th></th>
                 <th>
                     <p-columnFilter field="status" matchMode="in" [showMenu]="false" [showClearButton]="false">
@@ -130,6 +172,19 @@
                         </ng-template>
                     </p-columnFilter>
                 </th>
+                <th><p-columnFilter field="returnBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="returnByList" [(ngModel)]="selectedReturnByList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
                 <th></th>
             </tr>
             }
@@ -140,10 +195,23 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ book.BookName }}</td>
                 <td>{{ book.BorrowerName }}</td>
-                <td>{{ book.IssuedByUserName }}</td>
+                <!-- <td>{{ book.IssuedByUserName }}</td> -->
                 <td>{{ book.IssuedDate | date:'yyyy-MM-dd'}}</td>
                 <td>
-                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status)"></p-tag>
+                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
+                </td>
+                <td>{{ book.ReturnByUserName }}</td>
+                <td>{{ book.ReturnDate | date:'yyyy-MM-dd'}}</td>
+                
+                <td>
+                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+
+                </td>
+                <td>
+                    <p-tag [value]="book.OverDueDays  ?? '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+                </td>
+                <td>
+                    <p-tag [value]="book.OverDueStatus  ?? '-'" [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
@@ -157,7 +225,7 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="7" class="text-center">
+                <td colspan="12" class="text-center">
                     <p>No books returned.</p>
                 </td>
             </tr>

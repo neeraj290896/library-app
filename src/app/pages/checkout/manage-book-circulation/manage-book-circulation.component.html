@@ -78,6 +78,48 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
+                <th class="text-start text-muted fw-medium" style="width: 12%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnBy">
+                            Returned By
+                            <p-sortIcon field="returnBy"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedReturnByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnDate">
+                            Returned On
+                            <p-sortIcon field="returnDate"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueFrom">
+                            Over Due From
+                            <p-sortIcon field="overDueFrom"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
+                            Over Due in Days
+                            <p-sortIcon field="overDueDays"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
+                            Over Due Status
+                            <p-sortIcon field="overDueStatus"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
                     <span class="pi pi-plus-circle" (click)="editBook()" pTooltip="Issue Book"></span>
                 </th>
@@ -130,6 +172,19 @@
                         </ng-template>
                     </p-columnFilter>
                 </th>
+                <th><p-columnFilter field="returnBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="returnByList" [(ngModel)]="selectedReturnByList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
                 <th></th>
             </tr>
             }
@@ -143,7 +198,20 @@
                 <td>{{ book.IssuedByUserName }}</td>
                 <td>{{ book.IssuedDate | date:'yyyy-MM-dd'}}</td>
                 <td>
-                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status)"></p-tag>
+                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
+                </td>
+                <td>{{ book.ReturnByUserName }}</td>
+                <td>{{ book.ReturnDate | date:'yyyy-MM-dd'}}</td>
+                
+                <td>
+                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+
+                </td>
+                <td>
+                    <p-tag [value]="book.OverDueDays  ?? '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+                </td>
+                <td>
+                    <p-tag [value]="book.OverDueStatus  ?? '-'" [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
@@ -160,7 +228,7 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="7" class="text-center">
+                <td colspan="12" class="text-center">
                     <p>No book circulation found.</p>
                 </td>
             </tr>
@@ -190,7 +258,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="issuedBy">
                     Issued By<sup>*</sup>
                 </label>
-                <p-select id="issuedBy" [disabled] ="true" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
+                <p-select id="issuedBy" [disabled] ="selectedBook.IssuedByUserId !=null && selectedBook.IssuedByUserId>0" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
                     [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onIssuedChange()" />
                 <div *ngIf="errors.IssuedByUserName" class="text-danger mt-1 small">{{ errors.IssuedByUserName }}</div>
@@ -217,7 +285,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="status">
                     Status<sup>*</sup>
                 </label>
-                <p-select id="status" [disabled] ="selectedBook.BookId === 0" [(ngModel)]="selectedBook.Status" [ngModelOptions]="{standalone: true}"
+                <p-select id="status" [disabled] ="selectedBook.BookCirculationId === 0" [(ngModel)]="selectedBook.Status" [ngModelOptions]="{standalone: true}"
                     [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Select Status"
                     (ngModelChange)="onStatusChange()" styleClass="w-100" appendTo="body" />                
             </div>
