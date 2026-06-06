@@ -189,15 +189,15 @@ export class BooksOverdueComponent {
             }
             else if(this.searchBookTerm !="" && this.searchUserTerm !="")
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BookName?.includes(this.searchBookTerm) && x.BorrowerName?.includes(this.searchUserTerm));                
+                this.filteredOdDetails = this._odDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()) && x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));                
             }
             else if(this.searchBookTerm !="" && this.searchUserTerm =="")
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BookName?.includes(this.searchBookTerm));                
+                this.filteredOdDetails = this._odDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()));                
             }
             else if(this.searchBookTerm =="" && this.searchUserTerm !="")
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BorrowerName?.includes(this.searchUserTerm));
+                this.filteredOdDetails = this._odDetails.filter(x => x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
             }
             else
             {
