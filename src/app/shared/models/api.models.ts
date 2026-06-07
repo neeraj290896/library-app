@@ -283,6 +283,7 @@ export interface UserDetails {
     CreatedByUserId?: number | null;
     CreatedByUserName?: string | null;
     LastLogInTime?: string | null;
+    UserBarcode?: string | null;
     IsActive?: boolean | null;
 }
 

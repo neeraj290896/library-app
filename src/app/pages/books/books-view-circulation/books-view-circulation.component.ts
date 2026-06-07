@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BookCirculationDetails, UserDetails, BookDetails } from '@app/shared/models/api.models';
 import { AuthService } from '@app/shared/services/auth.service';
@@ -28,6 +28,7 @@ import { environment } from '../../../../environments/environment';
     styleUrl: './books-view-circulation.component.scss'
 })
 export class BooksViewCirculationComponent {
+    @Input() selectedBookId = 0;
     searchBookTerm = '';
     searchUserTerm = '';
     private messageService = inject(MessageService);
@@ -111,7 +112,7 @@ export class BooksViewCirculationComponent {
     }
 
     getAllBookCirculartion(): void {
-        this._bcService.getAllBookCirculationDetails('A').subscribe({
+        this._bcService.getBookCirculationDetailsById(this.selectedBookId).subscribe({
             next: (data: BookCirculationDetails[]) => {
                 this.bcDetails = data;
                 this.filteredBcDetails = data;
@@ -153,61 +154,61 @@ export class BooksViewCirculationComponent {
         });
     }
 
-    onBookSearch(term: string) {
-        this.searchBookTerm = term;
-        this.commonBookCirculationSearch();
-    }
+    // onBookSearch(term: string) {
+    //     this.searchBookTerm = term;
+    //     this.commonBookCirculationSearch();
+    // }
 
-    onUserSearch(term: string) {
-        this.searchUserTerm = term.trim();
-        this.commonBookCirculationSearch();
+    // onUserSearch(term: string) {
+    //     this.searchUserTerm = term.trim();
+    //     this.commonBookCirculationSearch();
 
-    }
+    // }
 
-    commonBookCirculationSearch() {
-        var _userBarcode: number = 0
-        var _bookBarcode: number = 0
+    // commonBookCirculationSearch() {
+    //     var _userBarcode: number = 0
+    //     var _bookBarcode: number = 0
 
 
-        if (this.searchUserTerm != "" && this.searchUserTerm.includes(environment.usersBarcodeSyntax)) {
-            let strSplitBarcode = this.searchUserTerm.split("_").pop() ?? '0';
-            _userBarcode = parseInt(strSplitBarcode);
-        }
+    //     if (this.searchUserTerm != "" && this.searchUserTerm.includes(environment.usersBarcodeSyntax)) {
+    //         let strSplitBarcode = this.searchUserTerm.split("_").pop() ?? '0';
+    //         _userBarcode = parseInt(strSplitBarcode);
+    //     }
 
-        if (this.searchBookTerm != "" && this.searchBookTerm.includes(environment.booksBarcodeSyntax)) {
-            let strSplitBarcode = this.searchBookTerm.split("_").pop() ?? '0';
-            _bookBarcode = parseInt(strSplitBarcode);
-        }
+    //     if (this.searchBookTerm != "" && this.searchBookTerm.includes(environment.booksBarcodeSyntax)) {
+    //         let strSplitBarcode = this.searchBookTerm.split("_").pop() ?? '0';
+    //         _bookBarcode = parseInt(strSplitBarcode);
+    //     }
 
-        if (this.bcDetails != null && this.bcDetails.length > 0) {
+    //     if (this.bcDetails != null && this.bcDetails.length > 0) {
 
-            if (_userBarcode > 0 && _bookBarcode > 0) {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerId == _userBarcode && x.BookId == _bookBarcode);
-            }
-            else if (_userBarcode == 0 && _bookBarcode > 0) {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BookId == _bookBarcode);
-            }
-            else if (_userBarcode > 0 && _bookBarcode == 0) {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerId == _userBarcode);
-            }
-            else if (this.searchBookTerm != "" && this.searchUserTerm != "") {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()) && x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
-            }
-            else if (this.searchBookTerm != "" && this.searchUserTerm == "") {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()));
-            }
-            else if (this.searchBookTerm == "" && this.searchUserTerm != "") {
-                this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
-            }
-            else {
-                this.filteredBcDetails = this.bcDetails;
-            }
+    //         if (_userBarcode > 0 && _bookBarcode > 0) {
+    //             this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerId == _userBarcode && x.BookId == _bookBarcode);
+    //         }
+    //         else if (_userBarcode == 0 && _bookBarcode > 0) {
+    //             this.filteredBcDetails = this.bcDetails.filter(x => x.BookId == _bookBarcode);
+    //         }
+    //         else if (_userBarcode > 0 && _bookBarcode == 0) {
+    //             this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerId == _userBarcode);
+    //         }
+    //         else if (this.searchBookTerm != "" && this.searchUserTerm != "") {
+    //             this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()) && x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
+    //         }
+    //         else if (this.searchBookTerm != "" && this.searchUserTerm == "") {
+    //             this.filteredBcDetails = this.bcDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()));
+    //         }
+    //         else if (this.searchBookTerm == "" && this.searchUserTerm != "") {
+    //             this.filteredBcDetails = this.bcDetails.filter(x => x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
+    //         }
+    //         else {
+    //             this.filteredBcDetails = this.bcDetails;
+    //         }
 
-        }
-        else {
-            this.filteredBcDetails = [];
-        }
-    }
+    //     }
+    //     else {
+    //         this.filteredBcDetails = [];
+    //     }
+    // }
 
     initializeFilterLists(): void {
         this.bookNameList = [...new Set(this.bcDetails.map(book => book.BookName))].map(e => ({ label: e ?? "", value: e ?? "" }));
@@ -230,7 +231,7 @@ export class BooksViewCirculationComponent {
         this.selectedReturnByList = [];
         this.searchBookTerm = '';
         this.searchUserTerm = '';
-        this.onBookSearch('');
+        // this.onBookSearch('');
         this.showFt = false;
     }
 

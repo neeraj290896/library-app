@@ -1,14 +1,21 @@
 <div class="manage-books-container">
     <div class="table-clear-filter">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
-            (onClick)="clear()"></p-button>
+            (onClick)="clear()"></p-button> &nbsp;&nbsp;&nbsp;
+            <p-button [disabled] ="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined" styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print" (onClick)="printBarcode()"></p-button>
     </div>
-    <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10"
+    <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails" 
+    (selectionChange)="onSelectionChange()"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
         <ng-template pTemplate="header">
             <tr class="border-bottom">
+                <th style="width: 3%">
+                    <!-- Header checkbox for selecting/deselecting all items -->
+                    <p-tableHeaderCheckbox>  id="chk-header-all"
+                    [value]="books" </p-tableHeaderCheckbox>
+                </th>
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
@@ -100,6 +107,7 @@
             @if (showFt) {
             <tr>
                 <th></th>
+                <th></th>
                 <th>
                     <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -177,6 +185,8 @@
 
         <ng-template pTemplate="body" let-book let-index="rowIndex">
             <tr class="border-bottom">
+                <td><p-tableCheckbox [index]="index" [value]="book"
+                    id="chk-row-{{book.BookId}}" /></td>
                 <td>{{ index + 1 }}</td>
                 <td>
                     <span [pTooltip]="book.BookName">
@@ -205,6 +215,8 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
+                        <button pButton icon="pi pi-eye" (click)="viewBook(book)"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
                         <button pButton icon="pi pi-pencil" (click)="editBook(book)"
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Book"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteBook(book)"
@@ -217,7 +229,7 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="9" class="text-center">
+                <td colspan="10" class="text-center">
                     No books found.
                 </td>
             </tr>
@@ -510,14 +522,14 @@
 
             <p-tabPanel header="View Book Circulation">
                 @if (activeTab === 1) {
-                <app-books-view-circulation></app-books-view-circulation>
+                <app-books-view-circulation [selectedBookId]="currentBook.BookId"></app-books-view-circulation>
                 }
             </p-tabPanel>
         </p-tabView>
         }
 
         <ng-template pTemplate="footer">
-            @if (header === 'Add Book' || (header === 'Edit Book' && activeTab === 0)) {
+            @if (header === 'Add Book' || (header === 'Edit Book' && activeTab === 0)|| (header === 'View Book' && activeTab === 0)) {
             <div class="d-flex justify-content-end align-items-center gap-3">
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     styleClass="btn-main-outlined" (click)="bookDialogVisible = false"></p-button>
@@ -804,5 +816,56 @@
                     (click)="saveImport()"></p-button>
             </div>
         </ng-template>
+    </p-dialog>
+
+    <p-dialog header="Print Books Barcode" [(visible)] ="printBarcodeDialogVisible" [modal] ="true" [style]="{ width: '80vw' }" appendTo="body">
+        <p-table [value]="selectedBookDetails" [autoLayout]="false">
+
+        <ng-template pTemplate="header">
+            <tr class="border-bottom">
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
+                            S.No
+                            <p-sortIcon field="sno"></p-sortIcon>
+                        </div>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 40%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                            Book Name
+                            <p-sortIcon field="bookName"></p-sortIcon>
+                        </div>                        
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 40%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                            Barcode                           
+                        </div>                        
+                    </div>
+                </th>
+            </tr>           
+        </ng-template>
+
+        <ng-template pTemplate="body" let-book let-index="rowIndex">
+            <tr class="border-bottom">
+                <td>{{ index + 1 }}</td>
+                <td>{{ book.BookName }}</td>
+                <td>
+                    <ngx-barcode6 [bc-value]="book.BookBarcode"  [bc-format]="'CODE128'" [bc-display-value]="false" [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
+                </td>                
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="3" class="text-center">
+                    <p>No book barcode found.</p>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
     </p-dialog>
 </div>

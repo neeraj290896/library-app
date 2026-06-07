@@ -1,5 +1,5 @@
 <div class="manage-bc-container">
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-6 position-relative">
             <span class="pi pi-search search-icon position-absolute text-muted searchIcon"></span>
             <input pInputText type="text" placeholder="Search by book" [(ngModel)]="searchBookTerm"
@@ -10,7 +10,7 @@
             <input pInputText type="text" placeholder="Search by user" [(ngModel)]="searchUserTerm"
                 (input)="onUserSearch(searchUserTerm)" class="form-control ps-5" />
         </div>
-    </div>
+    </div> -->
 
     <div class="table-clear-filter">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                <!-- <th class="text-start text-muted fw-medium" style="width: 20%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
                             Book Name
@@ -39,7 +39,7 @@
                         <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
-                </th>
+                </th> -->
                 <th class="text-start text-muted fw-medium" style="width: 15%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="borrowerName">
@@ -128,7 +128,7 @@
             @if (showFt) {
             <tr>
                 <th></th>
-                <th>
+                <!-- <th>
                     <p-columnFilter field="bookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                             <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
@@ -138,7 +138,7 @@
                             </p-multiSelect>
                         </ng-template>
                     </p-columnFilter>
-                </th>
+                </th> -->
                 <th>
                     <p-columnFilter field="borrowerName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                         <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -194,7 +194,7 @@
         <ng-template pTemplate="body" let-book let-index="rowIndex">
             <tr class="border-bottom">
                 <td>{{ index + 1 }}</td>
-                <td>{{ book.BookName }}</td>
+                <!-- <td>{{ book.BookName }}</td> -->
                 <td>{{ book.BorrowerName }}</td>
                 <td>{{ book.IssuedByUserName }}</td>
                 <td>{{ book.IssuedDate | date:'yyyy-MM-dd'}}</td>
@@ -232,7 +232,7 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="12" class="text-center">
+                <td colspan="11" class="text-center">
                     <p>No book circulation found.</p>
                 </td>
             </tr>
