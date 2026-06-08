@@ -36,13 +36,13 @@
         <h3 class="fs-5 fw-semibold mb-3">Quick Actions</h3>
         <div class="d-flex gap-2 flex-wrap">
             <p-button type="button" label="Add New Book" class="p-button-outlined" styleClass="btn-main-outlined"
-                (click)="setFilter('addNewBook')"></p-button>
+                (click)="openAddNewBookDialog()"></p-button>
             <p-button type="button" label="Register User" class="p-button-outlined" styleClass="btn-main-outlined"
-                (click)="setFilter('registerUser')"></p-button>
+                (click)="openRegisterUserDialog()"></p-button>
             <p-button type="button" label="Issue Books" class="p-button-outlined" styleClass="btn-main-outlined"
-                (click)="setFilter('issueBooks')"></p-button>
+                (click)="openIssueBooksDialog()"></p-button>
             <p-button type="button" label="Return Books" class="p-button-outlined" styleClass="btn-main-outlined"
-                (click)="setFilter('returnBooks')"></p-button>
+                (click)="openReturnBooksDialog()"></p-button>
         </div>
     </div>
 
@@ -54,26 +54,270 @@
 </div>
 
 <!-- Dialogs -->
-<p-dialog header="Manage Books" [(visible)]="booksManageDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+<p-dialog header="Manage Books" [(visible)]="booksManageDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+    appendTo="body">
     @if(booksManageDialogVisible) {
     <app-books-manage-books></app-books-manage-books>
     }
 </p-dialog>
 
-<p-dialog header="Issued Books" [(visible)]="issuedBooksDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+<p-dialog header="Issued Books" [(visible)]="issuedBooksDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+    appendTo="body">
     @if (issuedBooksDialogVisible) {
     <app-manage-issued-books></app-manage-issued-books>
     }
 </p-dialog>
 
-<p-dialog header="Overdue Books" [(visible)]="overdueDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+<p-dialog header="Overdue Books" [(visible)]="overdueDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+    appendTo="body">
     @if (overdueDialogVisible) {
     <app-books-overdue [totalOverDues]="overDues"></app-books-overdue>
     }
 </p-dialog>
 
-<p-dialog header="Manage Users" [(visible)]="usersDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+<p-dialog header="Manage Users" [(visible)]="usersDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+    appendTo="body">
     @if (usersDialogVisible) {
     <app-manage-users></app-manage-users>
     }
+</p-dialog>
+
+<p-dialog header="Return Books" [(visible)]="returnBooksDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+    appendTo="body">
+    @if (returnBooksDialogVisible) {
+    <app-manage-returned-books></app-manage-returned-books>
+    }
+</p-dialog>
+
+<p-dialog header="Add Book" [(visible)]="addNewBookDialogVisible" [modal]="true" [style]="{ width: '60vw' }"
+    appendTo="body" (onHide)="loadDashboardSummary()">
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
+                Book<sup>*</sup>
+            </label>
+            <input id="bookName" type="text" class="form-control" pInputText [(ngModel)]="currentBook.BookName"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter book"
+                (ngModelChange)="validateBookInput('BookName')" />
+            @if (bookErrors.BookName) {
+            <div class="text-danger mt-1 small">{{ bookErrors.BookName }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="authorId">
+                Author<sup>*</sup>
+            </label>
+            <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}"
+                [options]="authorOptions" optionLabel="label" optionValue="value" placeholder="Select author"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onAuthorChange()"></p-select>
+            @if (bookErrors.AuthorId) {
+            <div class="text-danger mt-1 small">{{ bookErrors.AuthorId }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="publisherId">
+                Publisher<sup>*</sup>
+            </label>
+            <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [ngModelOptions]="{standalone: true}"
+                [options]="publisherOptions" optionLabel="label" optionValue="value" placeholder="Select publisher"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onPublisherChange()"></p-select>
+            @if (bookErrors.PublisherId) {
+            <div class="text-danger mt-1 small">{{ bookErrors.PublisherId }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="categoryId">
+                Category<sup>*</sup>
+            </label>
+            <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [ngModelOptions]="{standalone: true}"
+                [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onCategoryChange()"></p-select>
+            @if (bookErrors.CategoryId) {
+            <div class="text-danger mt-1 small">{{ bookErrors.CategoryId }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="languageId">
+                Language<sup>*</sup>
+            </label>
+            <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [ngModelOptions]="{standalone: true}"
+                [options]="languageOptions" optionLabel="label" optionValue="value" placeholder="Select language"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onLanguageChange()"></p-select>
+            @if (bookErrors.LanguageId) {
+            <div class="text-danger mt-1 small">{{ bookErrors.LanguageId }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="publishedYear">
+                Published Year<sup>*</sup>
+            </label>
+            <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy"
+                placeholder="Select published year" styleClass="w-100" inputStyleClass="w-100" />
+            @if (bookErrors.PublishedYear) {
+            <div class="text-danger mt-1 small">{{ bookErrors.PublishedYear }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="price">
+                Price(₹)<sup>*</sup>
+            </label>
+            <input id="price" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Price"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter price"
+                (ngModelChange)="validateBookInput('Price')" />
+            @if (bookErrors.Price) {
+            <div class="text-danger mt-1 small">{{ bookErrors.Price }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="buildingId">
+                Building<sup>*</sup>
+            </label>
+            <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [ngModelOptions]="{standalone: true}"
+                [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select building"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onBuildingChange()"></p-select>
+            @if (bookErrors.BuildingId) {
+            <div class="text-danger mt-1 small">{{ bookErrors.BuildingId }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="floorId">
+                Floor<sup>*</sup>
+            </label>
+            <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}"
+                [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onFloorChange()"></p-select>
+            @if (bookErrors.FloorId) {
+            <div class="text-danger mt-1 small">{{ bookErrors.FloorId }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="rackId">
+                Rack<sup>*</sup>
+            </label>
+            <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}"
+                [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onRackChange()"></p-select>
+            @if (bookErrors.RackId) {
+            <div class="text-danger mt-1 small">{{ bookErrors.RackId }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="bookBarcode">
+                Barcode<sup>*</sup>
+            </label>
+            <input id="bookBarcode" type="text" class="form-control" pInputText [(ngModel)]="currentBook.BookBarcode"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter barcode"
+                (ngModelChange)="validateBookInput('BookBarcode')" />
+            @if (bookErrors.BookBarcode) {
+            <div class="text-danger mt-1 small">{{ bookErrors.BookBarcode }}</div>
+            }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                Status<sup>*</sup>
+            </label>
+            <p-select id="isActive" [(ngModel)]="currentBook.IsActive" [ngModelOptions]="{standalone: true}"
+                [options]="options" optionLabel="label" optionValue="value" placeholder="Select status"
+                styleClass="w-100" appendTo="body" (ngModelChange)="validateBookInput('IsActive')"></p-select>
+            @if (bookErrors.IsActive) {
+            <div class="text-danger mt-1 small">{{ bookErrors.IsActive }}</div>
+            }
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="d-flex justify-content-end align-items-center gap-3">
+            <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                styleClass="btn-main-outlined" (click)="addNewBookDialogVisible = false"></p-button>
+            <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                (click)="saveBook()"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Register User" [(visible)]="registerUserDialogVisible" [modal]="true" [style]="{ width: '60vw' }"
+    appendTo="body" (onHide)="loadDashboardSummary()">
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="fullName">
+                FullName<sup>*</sup>
+            </label>
+            <input id="fullName" type="text" class="form-control" pInputText [(ngModel)]="currentUser.FullName"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter FullName"
+                (ngModelChange)="validateUserInput('FullName')" />
+            <div *ngIf="userErrors.FullName" class="text-danger mt-1 small">{{ userErrors.FullName }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                RoleName<sup>*</sup>
+            </label>
+            <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"
+                [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Select Role"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onRoleChange()" />
+            <div *ngIf="userErrors.RoleId" class="text-danger mt-1 small">{{ userErrors.RoleId }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="gender">
+                Gender<sup>*</sup>
+            </label>
+            <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
+                [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
+                styleClass="w-100" appendTo="body" />
+            <!-- (ngModelChange)="onGenderChange()" -->
+            <div *ngIf="userErrors.Gender" class="text-danger mt-1 small">{{ userErrors.Gender }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="mailId">
+                MailId<sup>*</sup>
+            </label>
+            <input id="mailId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MailId"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter MailId"
+                (ngModelChange)="validateUserInput('MailId')" />
+            <div *ngIf="userErrors.MailId" class="text-danger mt-1 small">{{ userErrors.MailId }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="mobile">
+                MobileNo<sup>*</sup>
+            </label>
+            <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo"
+                (ngModelChange)="validateUserInput('MobileNo')" />
+            <div *ngIf="userErrors.MobileNo" class="text-danger mt-1 small">{{ userErrors.MobileNo }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="dob">
+                DOB<sup>*</sup>
+            </label>
+            <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [minDate]="minDate"
+                [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100" inputStyleClass="w-100" />
+            <div *ngIf="userErrors.DOB" class="text-danger mt-1 small">{{ userErrors.DOB }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="status">
+                Access Request Status<sup>*</sup>
+            </label>
+            <p-select id="status" [(ngModel)]="currentUser.Status" [ngModelOptions]="{standalone: true}"
+                [options]="statusOptions" optionLabel="label" optionValue="value"
+                placeholder="Select Access Request Status" styleClass="w-100" appendTo="body" />
+            <div *ngIf="userErrors.Status" class="text-danger mt-1 small">{{ userErrors.Status }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                Status<sup>*</sup>
+            </label>
+            <p-select id="isActive" [(ngModel)]="currentUser.IsActive" [ngModelOptions]="{standalone: true}"
+                [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
+                styleClass="w-100" appendTo="body" (ngModelChange)="validateUserInput('IsActive')" />
+            <div *ngIf="userErrors.IsActive" class="text-danger mt-1 small">{{ userErrors.IsActive }}</div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="d-flex justify-content-end align-items-center gap-3">
+            <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                styleClass="btn-main-outlined" (click)="registerUserDialogVisible = false"></p-button>
+            <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                (click)="saveUser()"></p-button>
+        </div>
+    </ng-template>
 </p-dialog>
