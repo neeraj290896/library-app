@@ -308,7 +308,25 @@
                 <p-select id="overDueStatus" [(ngModel)]="selectedBook.OverDueStatus" [ngModelOptions]="{standalone: true}"
                     [options]="overDueStatusOptions" optionLabel="label" optionValue="value" placeholder="Select OverDue Status"
                     styleClass="w-100" appendTo="body" />                
-            </div>  
+            </div> 
+            <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="paidAmount">
+                    Paid Amount<sup>*</sup>
+                </label>
+                <input id="paidAmount" type="text" class="form-control" pInputText [disabled]="false"
+                    [(ngModel)]="selectedBook.PaidAmount" [ngModelOptions]="{standalone: true}" (ngModelChange)="validateInput('PaidAmount')"
+                    placeholder="Enter Paid amount" /> 
+                <div *ngIf="errors.PaidAmount" class="text-danger mt-1 small">{{ errors.PaidAmount }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="paymentTypeId">
+                    Payment Type<sup>*</sup>
+                </label>
+                <p-select id="paymentTypeId" [disabled]="false" [(ngModel)]="selectedBook.PaymentTypeId" [ngModelOptions]="{standalone: true}"
+                    [options]="transactionTypeOptions" optionLabel="label" optionValue="value" placeholder="Select Payment Type"  (ngModelChange)="validateInput('PaymentType')"
+                    styleClass="w-100" appendTo="body"  />   
+                <div *ngIf="errors.PaymentTypeId" class="text-danger mt-1 small">{{ errors.PaymentTypeId }}</div>             
+            </div> 
         </div>
          <ng-template pTemplate="footer">
             <div class="d-flex justify-content-end align-items-center gap-3">

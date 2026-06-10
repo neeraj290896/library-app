@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BookCirculationDetails, BookDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookCirculationDetails, BookDetails, TransactionTypeDetails, UserDetails } from '@app/shared/models/api.models';
 import { BookCirculationService } from '@app/shared/services/book-circulation.service';
 import { BookService } from '@app/shared/services/book.service';
 import { UserService } from '@app/shared/services/user.service';
@@ -18,6 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../../environments/environment';
 import { DatePickerModule } from 'primeng/datepicker';
 import { AuthService } from '@app/shared/services/auth.service';
+import { TransactionTypeService } from '@app/shared/services/transactiontype.service';
 
 @Component({
   selector: 'app-manage-returned-books',
@@ -35,6 +36,7 @@ searchBookTerm = '';
   private _bookService = inject(BookService);
   private _userService = inject(UserService);
   private _authService = inject(AuthService);
+  private _ttService = inject(TransactionTypeService);
   @ViewChild('dt') dataTable: Table | undefined;
   public showFt: boolean = false;
   public bookNameList: { label: string, value: string }[] = [];
@@ -64,7 +66,8 @@ searchBookTerm = '';
       UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
     UpdatedByUserMailId:'' };
     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
-      Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
+      Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
+        PaymentTypeId:''
     };
   public bookOptions: { label: string; value: number; }[] = [];
   public availableBooks: { label: string; value: number; }[] = [];
@@ -81,6 +84,8 @@ searchBookTerm = '';
     maxDate: Date | undefined;
 
     isReturnByDifferentUser: boolean = false;
+
+    public transactionTypeOptions: { label: string; value: number; }[] = [];
 
     ngOnInit(): void {
 
@@ -100,6 +105,7 @@ searchBookTerm = '';
 
         this.loadBooks();
         this.loadUserDetails();
+        this.loadTransactionDetails();
         this.getAllBookCirculartion();
     }
 
@@ -143,7 +149,21 @@ searchBookTerm = '';
                     console.error('Error loading users:', err);
                 }
             });
-        }
+    }
+
+    loadTransactionDetails(): void {
+                this._ttService.getTransactionTypeDetails().subscribe({
+                    next: (data: TransactionTypeDetails[]) => {   
+                                      
+                        this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
+                            return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
+                        });
+                    },
+                    error: (err) => {
+                        console.error('Error loading transaction type details:', err);
+                    }
+                });
+    }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
