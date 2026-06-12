@@ -93,7 +93,7 @@ body {
                 &.pi-plus-circle {
                     font-size: 1.25rem !important;
                 }
-                
+
                 &.pi-upload {
                     font-size: 1rem !important;
                 }
@@ -495,40 +495,9 @@ select {
     }
 }
 
-// Table styles
-table {
-    width: 100%;
-    border-collapse: collapse;
-
-    thead tr {
-        border-bottom: 1px solid $color-gray-200;
-    }
-
-    tbody {
-        tr {
-            border-bottom: 1px solid $color-gray-200;
-
-            &:hover {
-                background-color: #f9fafb;
-            }
-        }
-    }
-
-    th,
-    td {
-        text-align: left;
-        padding: $spacing-4;
-    }
-
-    th {
-        font-weight: 600;
-        color: $color-gray-600;
-    }
-}
-
 .p-card {
     border-radius: var(--bs-border-radius) !important;
-    
+
     .p-card-body {
         padding: $spacing-4 !important;
     }
@@ -536,6 +505,10 @@ table {
 
 .cursor-pointer {
     cursor: pointer !important;
+}
+
+.font-regular {
+    font-size: 0.875rem;
 }
 
 // Badge styles

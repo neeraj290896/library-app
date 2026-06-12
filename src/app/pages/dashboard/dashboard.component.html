@@ -39,8 +39,8 @@
                 (click)="openAddNewBookDialog()"></p-button>
             <p-button type="button" label="Register User" class="p-button-outlined" styleClass="btn-main-outlined"
                 (click)="openRegisterUserDialog()"></p-button>
-            <p-button type="button" label="Issue Books" class="p-button-outlined" styleClass="btn-main-outlined"
-                (click)="openIssueBooksDialog()"></p-button>
+            <p-button type="button" label="Issue Book" class="p-button-outlined" styleClass="btn-main-outlined"
+                (click)="openIssueBookDialog()"></p-button>
             <p-button type="button" label="Return Books" class="p-button-outlined" styleClass="btn-main-outlined"
                 (click)="openReturnBooksDialog()"></p-button>
         </div>
@@ -289,8 +289,9 @@
                 DOB<sup>*</sup>
             </label>
             <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
-                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [minDate]="minDate"
-                [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100" inputStyleClass="w-100" />
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                [minDate]="userMinDate" [maxDate]="userMaxDate" placeholder="Select DOB" styleClass="w-100"
+                inputStyleClass="w-100" />
             <div *ngIf="userErrors.DOB" class="text-danger mt-1 small">{{ userErrors.DOB }}</div>
         </div>
         <div class="col-6 mb-3">
@@ -298,7 +299,7 @@
                 Access Request Status<sup>*</sup>
             </label>
             <p-select id="status" [(ngModel)]="currentUser.Status" [ngModelOptions]="{standalone: true}"
-                [options]="statusOptions" optionLabel="label" optionValue="value"
+                [options]="userStatusOptions" optionLabel="label" optionValue="value"
                 placeholder="Select Access Request Status" styleClass="w-100" appendTo="body" />
             <div *ngIf="userErrors.Status" class="text-danger mt-1 small">{{ userErrors.Status }}</div>
         </div>
@@ -318,6 +319,76 @@
                 styleClass="btn-main-outlined" (click)="registerUserDialogVisible = false"></p-button>
             <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
                 (click)="saveUser()"></p-button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Issue Book" [(visible)]="issueBookDialogVisible" [modal]="true" [style]="{ width: '60vw' }"
+    appendTo="body" (onHide)="loadDashboardSummary()">
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="book">
+                Book Name<sup>*</sup>
+            </label>
+            <p-select id="book" [(ngModel)]="currentIssueBook.BookId" [ngModelOptions]="{standalone: true}"
+                [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onBookChange()" />
+            <div *ngIf="issueBookErrors.BookName" class="text-danger mt-1 small">{{ issueBookErrors.BookName }}</div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="borrowerName">
+                Borrower Name<sup>*</sup>
+            </label>
+            <p-select id="borrowerName" [(ngModel)]="currentIssueBook.BorrowerId" [ngModelOptions]="{standalone: true}"
+                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
+            <div *ngIf="issueBookErrors.BorrowerName" class="text-danger mt-1 small">{{ issueBookErrors.BorrowerName }}
+            </div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="issuedBy">
+                Issued By<sup>*</sup>
+            </label>
+            <p-select id="issuedBy" [disabled]="true" [(ngModel)]="currentIssueBook.IssuedByUserId"
+                [ngModelOptions]="{standalone: true}" [options]="userOptions" optionLabel="label" optionValue="value"
+                placeholder="Select IssuedBy" styleClass="w-100" appendTo="body" (ngModelChange)="onIssuedChange()" />
+            <div *ngIf="issueBookErrors.IssuedByUserName" class="text-danger mt-1 small">
+                {{ issueBookErrors.IssuedByUserName }}
+            </div>
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="issuedDate">
+                Issued Date<sup>*</sup>
+            </label>
+            <p-datepicker [(ngModel)]="currentIssueBook.IssuedDate" [ngModelOptions]="{standalone: true}"
+                appendTo="body" [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd"
+                [minDate]="issueMinDate" [maxDate]="issueMaxDate" placeholder="Select Issued Date" styleClass="w-100"
+                inputStyleClass="w-100" />
+        </div>
+        <hr>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="comments">
+                Comments
+            </label>
+            <input id="comments" type="text" class="form-control" pInputText [(ngModel)]="currentIssueBook.Comments"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter Comments" />
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="status">
+                Status<sup>*</sup>
+            </label>
+            <p-select id="status" [disabled]="true" [(ngModel)]="currentIssueBook.Status"
+                [ngModelOptions]="{standalone: true}" [options]="issueStatusOptions" optionLabel="label"
+                optionValue="value" placeholder="Select Status" (ngModelChange)="validateIssueBookInput('Status')"
+                styleClass="w-100" appendTo="body" />
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="d-flex justify-content-end align-items-center gap-3">
+            <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                styleClass="btn-main-outlined" (click)="issueBookDialogVisible = false"></p-button>
+            <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                (click)="saveIssueBookDetails()"></p-button>
         </div>
     </ng-template>
 </p-dialog>

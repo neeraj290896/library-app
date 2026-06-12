@@ -12,15 +12,16 @@
         </div>
     </div>
 
-     <div class="table-clear-filter">
+     <div class="table-clear-filter d-flex align-items-center gap-4">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
-            (onClick)="clear()"></p-button> &nbsp;&nbsp;&nbsp;&nbsp;
-            <i class="pi pi-clock text-color-secondary"></i>
-                <span class="text-sm text-color-secondary">
-                    Last updated: <strong>{{ lastRefreshedDate | date:'yyyy-MM-dd hh:mm:ss a' }}</strong>
-                </span>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Refresh" icon="pi pi-refresh" (onClick)="refreshData()"></p-button>
+            (onClick)="clear()"></p-button>
+        <div class="d-flex align-items-center gap-1">
+            <i class="pi pi-clock text-color-secondary font-regular"></i>
+            <span class="text-sm text-color-secondary font-regular">
+                Last updated: <strong>{{ lastRefreshedDate | date:'yyyy-MM-dd hh:mm:ss a' }}</strong>
+            </span>
+        </div>
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Refresh" icon="pi pi-refresh" (onClick)="refreshData()"></p-button>
     </div>  
 
     
