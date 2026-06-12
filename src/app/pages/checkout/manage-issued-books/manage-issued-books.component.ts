@@ -101,7 +101,7 @@ export class ManageIssuedBooksComponent {
         // 3. Assemble into the exact "yyyy-mm-dd" layout match
         this.todayDate = this.parseCustomDateStringForUI(today);
 
-        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+        this.loggedInUserDetails = this._authService.userData() ?? {};
 
         this.loadBooks();
         this.loadUserDetails();
@@ -164,7 +164,7 @@ export class ManageIssuedBooksComponent {
                         console.error('Error loading transaction type details:', err);
                     }
                 });
-        }
+    }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
@@ -463,8 +463,18 @@ export class ManageIssuedBooksComponent {
                     this.errors.ReturnByUserName = '';
                 }
                 break;
+            
+            // case 'OverDueStatus':
+            //     if (this.selectedBook.Status?.trim() == "Returned" && this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.OverDueStatus !=null && !(this.selectedBook.OverDueStatus?.trim() == "Paid")) {
+            //         this.errors.OverDueStatus = 'OverDue Status is required.';
+            //         isValid = false;
+            //     } else {
+            //         this.errors.ReturnByUserName = '';
+            //     }
+            //     break;
+
             case 'PaidAmount':
-                if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.FineAmount !=null && this.selectedBook.FineAmount >0 && this.selectedBook.PaidAmount == null ) {
+                if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.FineAmount !=null && this.selectedBook.FineAmount >0 && this.selectedBook.OverDueStatus =="Paid" && this.selectedBook.PaidAmount == null ) {
                     this.errors.PaidAmount = 'Paid amount is required.';
                     isValid = false;
                 } else {
@@ -472,7 +482,7 @@ export class ManageIssuedBooksComponent {
                 }
                 break;
             case 'PaymentType':
-                if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && !(this.selectedBook.PaymentTypeId != null && this.selectedBook.PaymentTypeId >0)) {
+                if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.OverDueStatus =="Paid" && !(this.selectedBook.PaymentTypeId != null && this.selectedBook.PaymentTypeId >0)) {
                     this.errors.PaymentTypeId = 'PaymentType is required.';
                     isValid = false;
                 } else {
@@ -561,7 +571,7 @@ export class ManageIssuedBooksComponent {
         if(_issuedBook.Status =="Issued" &&  _issuedBook.ReturnByUserId !=null && _issuedBook.ReturnByUserId >0)
         {
             _issuedBook.ReturnByUserId = null;
-            _issuedBook.ReturnByUserId = null;
+            _issuedBook.ReturnByUserName = null;
             _issuedBook.ReturnByUserMailId = null;
         }
 

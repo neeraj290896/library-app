@@ -67,11 +67,11 @@ export class DashboardComponent {
     public overdueDialogVisible: boolean = false;
     public usersDialogVisible: boolean = false;
 
-    public dashboardSummary: { label: string; total: number; active: number }[] = [
-        { label: 'Total Books', total: 0, active: 0 },
-        { label: 'Borrowed Books', total: 0, active: 0 },
-        { label: 'Overdue Books', total: 0, active: 0 },
-        { label: 'Total Users', total: 0, active: 0 }
+    public dashboardSummary: { label: string; total: number; active: number, isTotalVisible : boolean }[] = [
+        { label: 'Total Books', total: 0, active: 0, isTotalVisible :true },
+        { label: 'Issued Books', total: 0, active: 0 , isTotalVisible :false},
+        { label: 'Overdue Books', total: 0, active: 0 , isTotalVisible :false},
+        { label: 'Total Users', total: 0, active: 0 , isTotalVisible :true}
     ];
     public overDues: OverDueDetails[] = [];
 
@@ -233,10 +233,10 @@ export class DashboardComponent {
             next: (data: DashboardSummaryDetails[]) => {
                 if (data && data.length > 0) {
                     this.dashboardSummary = [
-                        { label: 'Total Books', total: data[0].TotalBooks || 0, active: data[0].TotalActiveBooks || 0 },
-                        { label: 'Borrowed Books', total: data[0].TotalBorrowedBooks || 0, active: data[0].ActiveBorrowedBooks || 0 },
-                        { label: 'Overdue Books', total: data[0].TotalOverDue || 0, active: data[0].ActiveOverDue || 0 },
-                        { label: 'Total Users', total: data[0].TotalUsers || 0, active: data[0].ActiveUsers || 0 }
+                        { label: 'Total Books', total: data[0].TotalBooks || 0, active: data[0].TotalActiveBooks || 0, isTotalVisible : true },
+                        { label: 'Issued Books', total: data[0].TotalBorrowedBooks || 0, active: data[0].ActiveBorrowedBooks || 0, isTotalVisible : false },
+                        { label: 'Overdue Books', total: data[0].TotalOverDue || 0, active: data[0].ActiveOverDue || 0, isTotalVisible : false },
+                        { label: 'Total Users', total: data[0].TotalUsers || 0, active: data[0].ActiveUsers || 0, isTotalVisible : true }
                     ];
                 }
             },
@@ -249,7 +249,7 @@ export class DashboardComponent {
     loadOverDueDetails(): void {
         this.overDueService.getOverDueDetails().subscribe({
             next: (data: OverDueDetails[]) => {
-                this.overDues = data;
+                this.overDues = data?.filter(x => x.OverDueStatus == "Pending");
             },
             error: (err) => {
                 console.error('Error loading overDue :', err);
@@ -372,7 +372,7 @@ export class DashboardComponent {
             case 'Total Books':
                 this.booksManageDialogVisible = true;
                 break;
-            case 'Borrowed Books':
+            case 'Issued Books':
                 this.issuedBooksDialogVisible = true;
                 break;
             case 'Overdue Books':

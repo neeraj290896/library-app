@@ -522,7 +522,7 @@
 
             <p-tabPanel header="View Book Circulation">
                 @if (activeTab === 1) {
-                <app-books-view-circulation [selectedBookId]="currentBook.BookId"></app-books-view-circulation>
+                <app-books-view-circulation [selectedMainBook]="currentBook"></app-books-view-circulation>
                 }
             </p-tabPanel>
         </p-tabView>
