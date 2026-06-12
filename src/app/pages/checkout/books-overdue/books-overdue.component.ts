@@ -79,6 +79,8 @@ export class BooksOverdueComponent {
     ];
     minDate: Date | undefined;
     maxDate: Date | undefined;
+
+      isReturnByDifferentUser: boolean = false;
     public lastRefreshedDate: string = '';
     public lstBookDetails: BookDetails[] = [];    
     
@@ -341,7 +343,7 @@ export class BooksOverdueComponent {
        
     }
 
-    editBook(_odD: OverDueDetails): void {
+    editBook(_odD: OverDueDetails, type: string): void {
 
         if(_odD)
         {
@@ -366,6 +368,14 @@ export class BooksOverdueComponent {
             {
                 this.selectedOverDue.OverDueFrom = this.parseCustomDateStringForUI(new Date(_odD.OverDueFrom));
             } 
+
+             if(type =="CheckIn")
+            {
+                this.selectedOverDue.Status = "Returned";
+                this.selectedOverDue.OverDueStatus = "Paid";
+            }
+
+            this.returnByDifferentUser();
             
             console.log("selectedOverDue :", this.selectedOverDue);
 
@@ -596,6 +606,22 @@ export class BooksOverdueComponent {
         }
 
         this.validateInput('ReturnByUserName');
+    }
+
+    returnByDifferentUser(): void {
+        if (this.isReturnByDifferentUser) {
+            // If typing a manual name, clear out old selected User ID references
+            this.selectedOverDue.ReturnByUserName = null;
+            this.selectedOverDue.ReturnByUserId = null;
+            this.selectedOverDue.ReturnByUserMailId = null;
+        } else {
+            // If switching back to dropdown, clear manual text fields
+            this.selectedOverDue.ReturnByUserName = this.selectedOverDue.IssuedByUserName;
+            this.selectedOverDue.ReturnByUserId = this.selectedOverDue.IssuedByUserId;
+            this.selectedOverDue.ReturnByUserMailId = this.selectedOverDue.IssuedByUserMailId;
+        }
+
+         this.validateInput('ReturnByUserName');
     }
     
 }

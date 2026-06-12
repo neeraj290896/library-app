@@ -192,7 +192,10 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                        <button pButton icon="pi pi-pencil" (click)="editBook(book)" [disabled] = "book.OverDueStatus == 'Paid'"
+                        <button pButton icon="pi pi-sign-in" (click)="editBook(book, 'CheckIn')" *ngIf = "book.OverDueStatus == 'Pending'"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
+                        <button pButton icon="pi pi-pencil" (click)="editBook(book, 'CheckOut')" [disabled] = "book.OverDueStatus == 'Paid'"
                             class="p-button-rounded p-button-text p-button-sm"></button> 
 
                             <button pButton icon="pi pi-info-circle" (click)="viewOverDueDetails(book)"
@@ -218,7 +221,7 @@
                     Book Name<sup>*</sup>
                 </label>
                 <p-select id="book" [disabled]="true" [(ngModel)]="selectedOverDue.BookId" [ngModelOptions]="{standalone: true}"
-                    [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book"
+                    [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book" [editable]="true" 
                     styleClass="w-100" appendTo="body"  />
                 <div *ngIf="errors.BookName" class="text-danger mt-1 small">{{ errors.BookName }}</div>
             </div>
@@ -227,7 +230,7 @@
                     Borrower Name<sup>*</sup>
                 </label>
                 <p-select id="borrowerName" [disabled]="true" [(ngModel)]="selectedOverDue.BorrowerId" [ngModelOptions]="{standalone: true}"
-                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [editable]="true" 
                     styleClass="w-100" appendTo="body"  />
                 <div *ngIf="errors.BorrowerName" class="text-danger mt-1 small">{{ errors.BorrowerName }}</div>
             </div>
@@ -236,7 +239,7 @@
                     Issued By<sup>*</sup>
                 </label>
                 <p-select id="issuedBy" [disabled] ="true" [(ngModel)]="selectedOverDue.IssuedByUserId" [ngModelOptions]="{standalone: true}"
-                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy" [editable]="true" 
                     styleClass="w-100" appendTo="body"  />
                 <div *ngIf="errors.IssuedByUserName" class="text-danger mt-1 small">{{ errors.IssuedByUserName }}</div>
             </div>
@@ -271,7 +274,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="returnedBy">
                     Returned By<sup>*</sup>
                 </label>
-                <p-select id="returnedBy" [(ngModel)]="selectedOverDue.ReturnByUserId" [ngModelOptions]="{standalone: true}"
+                <p-select id="returnedBy" [(ngModel)]="selectedOverDue.ReturnByUserId" [ngModelOptions]="{standalone: true}" [editable]="true" [disabled]="!isReturnByDifferentUser" 
                     [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select ReturnedBy" (ngModelChange)="onReturnedChange()"
                     styleClass="w-100" appendTo="body" />
                 <div *ngIf="errors.ReturnByUserName" class="text-danger mt-1 small">{{ errors.ReturnByUserName }}</div>
@@ -338,6 +341,15 @@
         </div>       
          <ng-template pTemplate="footer">
             <div class="d-flex justify-content-end align-items-center gap-3">
+                <div *ngIf="this.isReturnBook">
+                    <label class="form-check-label small fw-medium text-secondary me-2" for="diffUserCheck">
+                        Return by different user
+                    </label>
+                    <input class="form-check-input m-0" type="checkbox" id="diffUserCheck" 
+                        [(ngModel)]="isReturnByDifferentUser" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="returnByDifferentUser()">
+                </div>
+
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     styleClass="btn-main-outlined" (click)="bcDialogVisible = false"></p-button>
                 <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main" [disabled] = 'selectedOverDue.OverDueStatus =="Pending"'

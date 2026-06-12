@@ -325,7 +325,7 @@ export class ManageIssuedBooksComponent {
        
     }
 
-    editBook(_bc: BookCirculationDetails | null = null): void {
+    editBook(_bc: BookCirculationDetails | null = null, type: string): void {
 
         if(_bc)
         {
@@ -355,6 +355,16 @@ export class ManageIssuedBooksComponent {
             if(this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId>0)
             {
                 this.isOverDue = true;
+                
+                if(type =="CheckIn")
+                {
+                    this.selectedBook.OverDueStatus = "Paid";
+                }
+            }
+
+            if(type =="CheckIn")
+            {
+                this.selectedBook.Status = "Returned";
             }
 
             this.returnByDifferentUser();

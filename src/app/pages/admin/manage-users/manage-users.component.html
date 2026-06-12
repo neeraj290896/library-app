@@ -188,6 +188,14 @@
                 <td>{{ user.LastLogInTime | date:'MM/dd/yyyy HH:mm:ss' }}</td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
+
+                         <button pButton icon="pi pi-sign-in" (click)="checkInBook(user.UserId)" 
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
+                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(user.UserId)"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
+
                         <button pButton icon="pi pi-pencil" (click)="editUser(user)"
                             class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Edit User"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteUser(user)"

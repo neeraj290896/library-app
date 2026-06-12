@@ -1376,4 +1376,12 @@ export class BooksManageBooksComponent implements OnInit {
             this.printBarcodeDialogVisible = true;
         }
     }
+
+    checkInBook(bookId: number) : void{
+
+    }
+
+    checkOutBook(bookId: number) : void{
+        
+    }
 }
