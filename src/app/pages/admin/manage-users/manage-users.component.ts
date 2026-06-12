@@ -891,4 +891,12 @@ export class ManageUsersComponent {
             this.printUserDialogVisible = true;
         }
     }
+
+    checkInBook(userId:number):void{
+
+    }
+
+    checkOutBook(userId:number):void{
+
+    }
 }

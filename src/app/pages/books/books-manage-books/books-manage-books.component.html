@@ -215,6 +215,12 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
+                        <button pButton icon="pi pi-sign-in" (click)="checkInBook(book.BookId)" *ngIf = "(book.Status == 'Issued')"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
+                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book.BookId)" *ngIf = "!(book.Status == 'Issued')"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
                         <button pButton icon="pi pi-eye" (click)="viewBook(book)"
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
                         <button pButton icon="pi pi-pencil" (click)="editBook(book)"
@@ -531,6 +537,13 @@
         <ng-template pTemplate="footer">
             @if (header === 'Add Book' || (header === 'Edit Book' && activeTab === 0)|| (header === 'View Book' && activeTab === 0)) {
             <div class="d-flex justify-content-end align-items-center gap-3">
+
+                <p-button type="button" label="CheckIn" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Issued'"
+                    (click)="checkInBook(currentBook.BookId)"></p-button>
+
+                <p-button type="button" label="CheckOut" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Available'"
+                    (click)="checkOutBook(currentBook.BookId)"></p-button>
+
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     styleClass="btn-main-outlined" (click)="bookDialogVisible = false"></p-button>
                 <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"

@@ -103,7 +103,7 @@
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
-                    <span class="pi pi-plus-circle" (click)="editBook()" pTooltip="Issue Book"></span>
+                    <span class="pi pi-plus-circle" (click)="editBook(null, 'CheckOut')" pTooltip="Issue Book"></span>
                 </th>
             </tr>
             @if (showFt) {
@@ -184,7 +184,11 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                        <button pButton icon="pi pi-pencil" (click)="editBook(book)"
+
+                        <button pButton icon="pi pi-sign-in" (click)="editBook(book, 'CheckIn')"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
+                        <button pButton icon="pi pi-pencil" (click)="editBook(book, 'CheckOut')"
                             class="p-button-rounded p-button-text p-button-sm"></button> 
 
                             <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
@@ -210,7 +214,7 @@
                     Book Name<sup>*</sup>
                 </label>
                 <p-select id="book" [disabled]="!isIssueNewBook" [(ngModel)]="selectedBook.BookId" [ngModelOptions]="{standalone: true}"
-                    [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book"
+                    [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book" [editable]="true" 
                     styleClass="w-100" appendTo="body" (ngModelChange)="onBookChange()" />
                 <div *ngIf="errors.BookName" class="text-danger mt-1 small">{{ errors.BookName }}</div>
             </div>
@@ -219,7 +223,7 @@
                     Borrower Name<sup>*</sup>
                 </label>
                 <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
-                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [editable]="true" 
                     styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
                 <div *ngIf="errors.BorrowerName" class="text-danger mt-1 small">{{ errors.BorrowerName }}</div>
             </div>
@@ -228,7 +232,7 @@
                     Issued By<sup>*</sup>
                 </label>
                 <p-select id="issuedBy" [disabled] ="true" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
-                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy" [editable]="true" 
                     styleClass="w-100" appendTo="body" (ngModelChange)="onIssuedChange()" />
                 <div *ngIf="errors.IssuedByUserName" class="text-danger mt-1 small">{{ errors.IssuedByUserName }}</div>
             </div>
@@ -264,7 +268,7 @@
                     Returned By<sup>*</sup>
                 </label>
                 <p-select id="returnedBy" [disabled]="!isReturnByDifferentUser" [(ngModel)]="selectedBook.ReturnByUserId" [ngModelOptions]="{standalone: true}"
-                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select ReturnedBy"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select ReturnedBy" [editable]="true" 
                     styleClass="w-100" appendTo="body" (ngModelChange)="onReturnedChange()" />
                 <div *ngIf="errors.ReturnByUserName" class="text-danger mt-1 small">{{ errors.ReturnByUserName }}</div>
             </div>
