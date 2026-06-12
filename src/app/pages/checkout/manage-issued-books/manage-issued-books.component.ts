@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BookCirculationDetails, BookDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookCirculationDetails, BookDetails, TransactionTypeDetails, UserDetails } from '@app/shared/models/api.models';
 import { BookCirculationService } from '@app/shared/services/book-circulation.service';
 import { BookService } from '@app/shared/services/book.service';
 import { UserService } from '@app/shared/services/user.service';
@@ -18,6 +18,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../../environments/environment';
 import { DatePickerModule } from 'primeng/datepicker';
 import { AuthService } from '@app/shared/services/auth.service';
+import { TransactionTypeService } from '@app/shared/services/transactiontype.service';
 
 @Component({
   selector: 'app-manage-issued-books',
@@ -35,6 +36,7 @@ export class ManageIssuedBooksComponent {
   private _bookService = inject(BookService);
   private _userService = inject(UserService);
   private _authService = inject(AuthService);
+  private _ttService = inject(TransactionTypeService);
   @ViewChild('dt') dataTable: Table | undefined;
   public showFt: boolean = false;
   public bookNameList: { label: string, value: string }[] = [];
@@ -60,9 +62,10 @@ export class ManageIssuedBooksComponent {
       IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
       ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
       UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
-    UpdatedByUserMailId:'' };
+    UpdatedByUserMailId:'', PaidAmount:0, PaymentTypeId: 0 };
     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
-      Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
+      Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
+        PaymentTypeId:''
     };
   public bookOptions: { label: string; value: number; }[] = [];
   public availableBooks: { label: string; value: number; }[] = [];
@@ -82,6 +85,8 @@ export class ManageIssuedBooksComponent {
     public lstBookDetails: BookDetails[] = [];
     public isIssueNewBook: boolean = false;
 
+    public transactionTypeOptions: { label: string; value: number; }[] = [];
+
     ngOnInit(): void {
 
         const today = new Date();
@@ -100,6 +105,7 @@ export class ManageIssuedBooksComponent {
 
         this.loadBooks();
         this.loadUserDetails();
+        this.loadTransactionDetails();
         this.getAllBookCirculartion();
     }
 
@@ -144,7 +150,21 @@ export class ManageIssuedBooksComponent {
                     console.error('Error loading users:', err);
                 }
             });
-        }
+    }
+
+    loadTransactionDetails(): void {
+                this._ttService.getTransactionTypeDetails().subscribe({
+                    next: (data: TransactionTypeDetails[]) => {   
+                                      
+                        this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
+                            return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
+                        });
+                    },
+                    error: (err) => {
+                        console.error('Error loading transaction type details:', err);
+                    }
+                });
+    }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
@@ -359,14 +379,14 @@ export class ManageIssuedBooksComponent {
                                 IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
                                 OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
                                 ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
-                                UpdatedByUserName :'', UpdatedDate: null };
+                                UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
 
             this.header = "Issue book";  
         }
 
         this.onStatusChange();
         
-        this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''} 
+        this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount: '', PaymentTypeId:''} 
             
         this.bcDialogVisible = true;
     }
@@ -443,6 +463,32 @@ export class ManageIssuedBooksComponent {
                     this.errors.ReturnByUserName = '';
                 }
                 break;
+            
+            // case 'OverDueStatus':
+            //     if (this.selectedBook.Status?.trim() == "Returned" && this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.OverDueStatus !=null && !(this.selectedBook.OverDueStatus?.trim() == "Paid")) {
+            //         this.errors.OverDueStatus = 'OverDue Status is required.';
+            //         isValid = false;
+            //     } else {
+            //         this.errors.ReturnByUserName = '';
+            //     }
+            //     break;
+
+            case 'PaidAmount':
+                if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.FineAmount !=null && this.selectedBook.FineAmount >0 && this.selectedBook.OverDueStatus =="Paid" && this.selectedBook.PaidAmount == null ) {
+                    this.errors.PaidAmount = 'Paid amount is required.';
+                    isValid = false;
+                } else {
+                    this.errors.PaidAmount = '';
+                }
+                break;
+            case 'PaymentType':
+                if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.OverDueStatus =="Paid" && !(this.selectedBook.PaymentTypeId != null && this.selectedBook.PaymentTypeId >0)) {
+                    this.errors.PaymentTypeId = 'PaymentType is required.';
+                    isValid = false;
+                } else {
+                    this.errors.PaymentTypeId = '';
+                }
+                break;
 
             default:
                 break;
@@ -457,7 +503,11 @@ export class ManageIssuedBooksComponent {
         const isIssuedByUserNameValid = this.validateInput('IssuedByUserName');
         const isStatusValid = this.validateInput('Status');
         const isReturnByUserNameValid = this.validateInput('ReturnByUserName');
-        return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid;
+        const isPaidAmountValid = this.validateInput('PaidAmount');
+        const isPaymentTypeValid = this.validateInput('PaymentType');
+        
+        return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid && isPaidAmountValid && isPaymentTypeValid;
+   
     }
 
     saveBcDetails(): void {
@@ -521,7 +571,7 @@ export class ManageIssuedBooksComponent {
         if(_issuedBook.Status =="Issued" &&  _issuedBook.ReturnByUserId !=null && _issuedBook.ReturnByUserId >0)
         {
             _issuedBook.ReturnByUserId = null;
-            _issuedBook.ReturnByUserId = null;
+            _issuedBook.ReturnByUserName = null;
             _issuedBook.ReturnByUserMailId = null;
         }
 
@@ -563,9 +613,16 @@ export class ManageIssuedBooksComponent {
         let _returnedBook = { ...this.selectedBook }; 
         _returnedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
         _returnedBook.ReturnDate = this.parseCustomDateStringForAPI(this.selectedBook.ReturnDate ?? "");
+        _returnedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
+
+        if(_returnedBook.OverDueId == null || _returnedBook.OverDueId ==0)
+        {
+            _returnedBook.PaidAmount = 0;
+            _returnedBook.PaymentTypeId = 0;
+        }
 
 
-        this._bcService.returnBook(this.selectedBook).subscribe({
+        this._bcService.returnBook(_returnedBook).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
@@ -579,10 +636,15 @@ export class ManageIssuedBooksComponent {
                         summary: 'Manage Book circulation - Success',
                         detail: 'Updated Book circulation successfully.'
                     });
+
+                    this.bcDialogVisible = false;
+                    this.loadBooks();
+                    this.getAllBookCirculartion();
+
                 }
 
-                this.getAllBookCirculartion();
-                this.bcDialogVisible = false;
+                
+                
             },
             error: () => {
                 this.messageService.add({

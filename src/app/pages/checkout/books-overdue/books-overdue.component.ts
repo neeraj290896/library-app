@@ -6,7 +6,7 @@ import { TagModule } from 'primeng/tag';
 import { PaginatorModule } from 'primeng/paginator';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
-import { BookDetails, OverDueDetails, OverDueRefreshDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookDetails, OverDueDetails, OverDueRefreshDetails, TransactionTypeDetails, UserDetails } from '@app/shared/models/api.models';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -18,6 +18,8 @@ import { BookService } from '@app/shared/services/book.service';
 import { UserService } from '@app/shared/services/user.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { AdminService } from '@app/shared/services/admin.service';
+import { TransactionTypeService } from '@app/shared/services/transactiontype.service';
 
 @Component({
     selector: 'app-books-overdue',
@@ -39,6 +41,7 @@ export class BooksOverdueComponent {
   private _bookService = inject(BookService);
   private _userService = inject(UserService);
   private _authService = inject(AuthService);
+  private _ttService = inject(TransactionTypeService);
   @ViewChild('dt') dataTable: Table | undefined;
   public showFt: boolean = false;
   public bookNameList: { label: string, value: string }[] = [];
@@ -62,8 +65,8 @@ export class BooksOverdueComponent {
         OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'', ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '', UpdatedByUserId : 0,  
         UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'', UpdatedByUserMailId:'' };
     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
-      Status : string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''
-    };
+      Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
+        PaymentTypeId:'' };
   public bookOptions: { label: string; value: number; }[] = [];
   public userOptions: { label: string; value: number; }[] = [];
   public overDueStatusOptions: { label: string; value: string; }[] = [
@@ -77,7 +80,9 @@ export class BooksOverdueComponent {
     minDate: Date | undefined;
     maxDate: Date | undefined;
     public lastRefreshedDate: string = '';
-    public lstBookDetails: BookDetails[] = [];
+    public lstBookDetails: BookDetails[] = [];    
+    
+    public transactionTypeOptions: { label: string; value: number; }[] = [];
 
     ngOnInit(): void {
 
@@ -94,9 +99,12 @@ export class BooksOverdueComponent {
         this.todayDate = this.parseCustomDateStringForUI(today);
 
         this.loggedInUserDetails = this._authService.userData() ?? {};
+
+        console.log('this.loggedInUserDetails : ', this.loggedInUserDetails);
         
         this.loadBooks();
         this.loadUserDetails();
+        this.loadTransactionDetails();
         this.getOverDueDetails();
     }
 
@@ -122,7 +130,7 @@ export class BooksOverdueComponent {
 
                     if(_refreshData)
                     {
-                        this.lastRefreshedDate = _refreshData.CreatedDate?.toString() ?? "";
+                        this.lastRefreshedDate = _refreshData.CreatedDate?.toString() ?? "";                        
                     }
                     
                 },
@@ -158,7 +166,21 @@ export class BooksOverdueComponent {
                     console.error('Error loading users:', err);
                 }
             });
-        }
+    }
+
+    loadTransactionDetails(): void {
+            this._ttService.getTransactionTypeDetails().subscribe({
+                next: (data: TransactionTypeDetails[]) => {   
+                                  
+                    this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
+                        return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
+                    });
+                },
+                error: (err) => {
+                    console.error('Error loading transaction type details:', err);
+                }
+            });
+    }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
@@ -353,7 +375,7 @@ export class BooksOverdueComponent {
             }            
         }        
 
-        this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : ''} 
+        this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount:'', PaymentTypeId:''} 
             
         this.bcDialogVisible = true;
     }
@@ -419,6 +441,22 @@ export class BooksOverdueComponent {
                     this.errors.ReturnByUserName = '';
                 }
                 break;
+            case 'PaidAmount':
+                if (this.selectedOverDue.FineAmount !=null && this.selectedOverDue.FineAmount >0 && this.selectedOverDue.PaidAmount == null ) {
+                    this.errors.PaidAmount = 'Paid amount is required.';
+                    isValid = false;
+                } else {
+                    this.errors.PaidAmount = '';
+                }
+                break;
+            case 'PaymentType':
+                if (!(this.selectedOverDue.PaymentTypeId != null && this.selectedOverDue.PaymentTypeId >0)) {
+                    this.errors.PaymentTypeId = 'PaymentType is required.';
+                    isValid = false;
+                } else {
+                    this.errors.PaymentTypeId = '';
+                }
+                break;
 
             default:
                 break;
@@ -433,7 +471,10 @@ export class BooksOverdueComponent {
         const isIssuedByUserNameValid = this.validateInput('IssuedByUserName');
         const isStatusValid = this.validateInput('Status');
         const isReturnByUserNameValid = this.validateInput('ReturnByUserName');
-        return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid;
+        const isPaidAmountValid = this.validateInput('PaidAmount');
+        const isPaymentTypeValid = this.validateInput('PaymentType');
+        
+        return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid && isPaidAmountValid && isPaymentTypeValid;
     }
 
     saveOdDetails(): void {
@@ -441,18 +482,24 @@ export class BooksOverdueComponent {
             return;
         }
 
-        if(this.selectedOverDue.Status == "Paid" )
+        // console.log('selectedOverDue :', this.selectedOverDue);
+
+        if(this.selectedOverDue.OverDueStatus == "Paid" )
         {
             this.updateOverDueDetails();
         }             
     } 
-    
-    updateOverDueDetails():void{
+        
 
+    updateOverDueDetails()
+    {
+        
         let _overDue = { ...this.selectedOverDue }; 
         _overDue.IssuedDate = this.parseCustomDateStringForAPI(this.selectedOverDue.IssuedDate ?? "");
-        _overDue.ReturnDate = this.parseCustomDateStringForAPI(this.selectedOverDue.ReturnDate ?? "");
+        _overDue.ReturnDate = this.parseCustomDateStringForAPI(this.selectedOverDue.ReturnDate ?? "");  
+        _overDue.UpdatedByUserId = this.loggedInUserDetails?.UserId ?? 1;          
 
+        // console.log('_overDue :', _overDue);
 
         this._odService.updateOverDueDetails(_overDue).subscribe({
             next: (res: any) => {
@@ -481,6 +528,7 @@ export class BooksOverdueComponent {
                 });
             }
         });
+                
     }
 
     parseCustomDateStringForAPI(dateStr: string): string | null {
@@ -527,7 +575,7 @@ export class BooksOverdueComponent {
                     });
                 }
 
-                this.getOverDueRefreshedDetails();
+                this.getOverDueDetails();
                 
             },
             error: () => {
@@ -538,6 +586,16 @@ export class BooksOverdueComponent {
                 });
             }
         });
+    }
+  
+     onReturnedChange(): void {
+        const _returnedBy = this.lstUserDetails.find(l => l.UserId === this.selectedOverDue.ReturnByUserId);
+        if (_returnedBy) {
+            this.selectedOverDue.ReturnByUserName = _returnedBy.FullName;
+            this.selectedOverDue.ReturnByUserMailId = _returnedBy.MailId;
+        }
+
+        this.validateInput('ReturnByUserName');
     }
     
 }

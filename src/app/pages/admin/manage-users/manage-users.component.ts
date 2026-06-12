@@ -18,6 +18,7 @@ import { saveAs } from 'file-saver';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
+import { NgxBarcode6 } from 'ngx-barcode6';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -27,7 +28,7 @@ type ImportUserDetails = UserDetails & {
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
-        SelectModule, FormsModule, TooltipModule],
+        SelectModule, FormsModule, TooltipModule, NgxBarcode6],
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.scss'
 })
@@ -127,6 +128,10 @@ export class ManageUsersComponent {
     public importSelectedMailIdList: string[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
+
+    selectedUserDetails: UserDetails[] = [];
+    selectedIds: number[] = [];
+    printUserDialogVisible : boolean = false;
 
     ngOnInit(): void {
         let today = new Date();
@@ -867,5 +872,23 @@ export class ManageUsersComponent {
                 });
             }
         });
+    }
+
+    onSelectionChange() {
+       
+        this.selectedIds = this.selectedUserDetails
+        .map(x => x.UserId)
+        .filter((id): id is number => id !== null && id !== undefined);
+
+        
+        console.log('Selected IDs:', this.selectedIds);
+    }
+
+    printBarcode()
+    {
+        if(this.selectedIds !=null && this.selectedIds.length>0)
+        {
+            this.printUserDialogVisible = true;
+        }
     }
 }

@@ -38,8 +38,8 @@ export class CheckoutComponent {
     loadOverDueDetails(): void {
         this._overDueService.getOverDueDetails().subscribe({
             next: (data: OverDueDetails[]) => {
-                this.overDues = data;
-                this.overDueCount = data.length;                
+                this.overDues = data.filter(x => x.OverDueStatus == 'Pending');
+                this.overDueCount = this.overDues.length;                
             },
             error: (err) => {
                 console.error('Error loading overDue:', err);

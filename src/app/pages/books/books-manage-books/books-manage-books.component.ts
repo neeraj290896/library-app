@@ -26,6 +26,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
 import { BooksViewCirculationComponent } from '../books-view-circulation/books-view-circulation.component';
+import { NgxBarcode6 } from 'ngx-barcode6';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -38,7 +39,7 @@ type ImportBookDetails = BookDetails & {
         CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
         SelectModule, FormsModule, DatePickerModule, TooltipModule,
-        TabViewModule, BooksViewCirculationComponent
+        TabViewModule, BooksViewCirculationComponent, NgxBarcode6
     ],
     templateUrl: './books-manage-books.component.html',
     styleUrl: './books-manage-books.component.scss'
@@ -169,6 +170,10 @@ export class BooksManageBooksComponent implements OnInit {
     public importSelectedErrorList: string[] = [];
 
     public activeTab: number = 0;
+
+    selectedBookDetails: BookDetails[] = [];
+    selectedIds: number[] = [];
+    printBarcodeDialogVisible : boolean = false;
 
     ngOnInit(): void {
         this.loadBooks();
@@ -409,6 +414,44 @@ export class BooksManageBooksComponent implements OnInit {
             this.header = 'Add Book';
             this.publishedDate = null;
         }
+        this.errors = {
+            BookName: '',
+            AuthorId: '',
+            PublisherId: '',
+            CategoryId: '',
+            LanguageId: '',
+            PublishedYear: '',
+            Price: '',
+            BuildingId: '',
+            FloorId: '',
+            RackId: '',
+            BookBarcode: '',
+            IsActive: ''
+        };
+        this.activeTab = 0;
+        this.bookDialogVisible = true;
+    }
+
+    viewBook(book: BookDetails): void {
+        if (book) {
+            this.currentBook = { ...book };
+            this.header = 'View Book';
+            this.publishedDate = book.PublishedYear ? new Date(book.PublishedYear, 0, 1) : null;
+
+            this.floorOptions = this.floors
+                .filter(floor => floor.BuildingId === this.currentBook.BuildingId)
+                .map(floor => {
+                    return { label: floor.FloorName ?? '', value: floor.FloorId };
+                });
+
+            this.rackOptions = this.racks
+                .filter(rack => rack.BuildingId === this.currentBook.BuildingId &&
+                    rack.FloorId === this.currentBook.FloorId)
+                .map(rack => {
+                    return { label: rack.RackLabel ?? '', value: rack.RackId };
+                });
+        }
+        
         this.errors = {
             BookName: '',
             AuthorId: '',
@@ -1317,5 +1360,20 @@ export class BooksManageBooksComponent implements OnInit {
                 });
             }
         });
+    }
+
+    onSelectionChange() {
+        // Extract only the IDs from the selected objects
+        this.selectedIds = this.selectedBookDetails.map(x => x.BookId);
+        
+        console.log('Selected IDs:', this.selectedIds);
+    }
+
+    printBarcode()
+    {
+        if(this.selectedIds !=null && this.selectedIds.length>0)
+        {
+            this.printBarcodeDialogVisible = true;
+        }
     }
 }

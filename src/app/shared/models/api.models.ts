@@ -94,6 +94,8 @@ export interface BookCirculationDetails {
     UpdatedByUserName?: string | null;
     UpdatedDate?: string | null;
     UpdatedByUserMailId?: string | null;  
+    PaidAmount?: number | 0;
+    PaymentTypeId?: number | 0;
 }
 
 export interface BuildingDetails {
@@ -283,6 +285,7 @@ export interface UserDetails {
     CreatedByUserId?: number | null;
     CreatedByUserName?: string | null;
     LastLogInTime?: string | null;
+    UserBarcode?: string | null;
     IsActive?: boolean | null;
 }
 
@@ -299,11 +302,6 @@ export interface DepartmentDetails {
     IsActive: boolean;
 }
 
-export interface TransactionTypeDetails {
-    TypeId: number;
-    TypeName?: string | null;
-    IsActive: boolean;
-}
 
 export interface OverDueDetails {
     OverDueId?: number | null;
@@ -333,6 +331,8 @@ export interface OverDueDetails {
     UpdatedByUserMailId?: string | null;
     Status?: string | null;
     Comments?: string | null;
+    PaidAmount?: number | 0;
+    PaymentTypeId?: number | 0;
 }
 
 export interface DashboardSummaryDetails {
