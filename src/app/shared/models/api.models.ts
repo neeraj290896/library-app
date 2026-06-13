@@ -287,6 +287,8 @@ export interface UserDetails {
     LastLogInTime?: string | null;
     UserBarcode?: string | null;
     IsActive?: boolean | null;
+    BorrowedBooksCount?: number | null;
+    OverDueBooksCount?: number | null;
 }
 
 

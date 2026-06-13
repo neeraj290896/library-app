@@ -379,8 +379,12 @@ export class ManageBookCirculationComponent {
             {
                 this.isOverDue = true;
             }
+            else
+            {
+              this.isOverDue = false;
+            }
 
-             if(type =="CheckIn")
+            if(type =="CheckIn")
             {
                 this.selectedBook.Status = "Returned";
             }

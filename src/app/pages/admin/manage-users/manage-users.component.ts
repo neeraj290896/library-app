@@ -18,7 +18,9 @@ import { saveAs } from 'file-saver';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
-import { NgxBarcode6 } from 'ngx-barcode6';
+import { QRCodeComponent  } from 'angularx-qrcode';
+import { TabViewModule } from 'primeng/tabview';
+import { UsersBookCirculationComponent } from '@app/pages/checkout/users-book-circulation/users-book-circulation.component';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -27,8 +29,8 @@ type ImportUserDetails = UserDetails & {
 @Component({
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
-        PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
-        SelectModule, FormsModule, TooltipModule, NgxBarcode6],
+        PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule,
+        SelectModule, FormsModule, TooltipModule, QRCodeComponent , UsersBookCirculationComponent],
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.scss'
 })
@@ -60,6 +62,8 @@ export class ManageUsersComponent {
     public selectedStatusList: boolean[] = [];
     public userDialogVisible = false;
     public header: string = '';
+    public activeTab: number = 0;
+
     public currentUser: UserDetails = {
         UserId: 0,
         FullName: '',
@@ -132,6 +136,10 @@ export class ManageUsersComponent {
     selectedUserDetails: UserDetails[] = [];
     selectedIds: number[] = [];
     printUserDialogVisible : boolean = false;
+    isViewOnly: boolean = false;
+    checkOutDialogVisible: boolean = false;
+    checkInDialogVisible: boolean = false;
+    checkIncheckOutHeader: string = "";
 
     ngOnInit(): void {
         let today = new Date();
@@ -252,12 +260,22 @@ export class ManageUsersComponent {
         else {
             this.currentUser = {
                 UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '',
-                RoleId: 0, RoleName: '', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: null
+                RoleId: 0, RoleName: '', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending'
             };
             this.header = 'Add User';
         }
         this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
         this.userDialogVisible = true;
+        this.isViewOnly = false;
+    }
+
+    viewUser(_user: UserDetails): void {
+        if (_user) {
+            this.currentUser = { ..._user };
+            this.header = 'View User';
+        }        
+        this.userDialogVisible = true;
+        this.isViewOnly = true;
     }
 
     onRoleChange(): void {
@@ -892,11 +910,21 @@ export class ManageUsersComponent {
         }
     }
 
-    checkInBook(userId:number):void{
-
+    checkInBook(_user:UserDetails):void{
+        if(_user.BorrowedBooksCount == 1)
+        {
+            this.checkOutDialogVisible = true;
+            this.checkIncheckOutHeader = "Return Book";
+        }
+        else
+        {
+            this.currentUser = { ..._user };
+            this.checkInDialogVisible = true;
+        }
     }
 
-    checkOutBook(userId:number):void{
-
+    checkOutBook(_user:UserDetails):void{
+        this.checkOutDialogVisible = true;
+        this.checkIncheckOutHeader = "Issue Book";
     }
 }

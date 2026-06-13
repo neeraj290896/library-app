@@ -361,6 +361,10 @@ export class ManageIssuedBooksComponent {
                     this.selectedBook.OverDueStatus = "Paid";
                 }
             }
+            else
+            {
+              this.isOverDue = false;
+            }
 
             if(type =="CheckIn")
             {

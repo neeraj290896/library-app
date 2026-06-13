@@ -216,10 +216,10 @@
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
                         <button pButton icon="pi pi-sign-in" (click)="checkInBook(book.BookId)" *ngIf = "(book.Status == 'Issued')"
-                            class="p-button-rounded p-button-text p-button-sm"></button> 
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckIn"></button> 
 
                         <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book.BookId)" *ngIf = "!(book.Status == 'Issued')"
-                            class="p-button-rounded p-button-text p-button-sm"></button> 
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckOut"></button> 
 
                         <button pButton icon="pi pi-eye" (click)="viewBook(book)"
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
@@ -397,7 +397,7 @@
         <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
             <p-tabPanel [header]="header">
                 @if (activeTab === 0) {
-                <div class="row mt-2">
+                <div class="row">
                     <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
                             Book<sup>*</sup>
@@ -560,10 +560,10 @@
             <div class="d-flex justify-content-end align-items-center gap-3">
 
                 <p-button pButton icon="pi pi-sign-in" type="button" label="CheckIn" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Issued'"
-                    (click)="checkInBook(currentBook.BookId)"></p-button>
+                    (click)="checkInBook(currentBook.BookId)" pTooltip="CheckIn"></p-button>
 
                 <p-button pButton icon="pi pi-sign-out" type="button" label="CheckOut" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Available'"
-                    (click)="checkOutBook(currentBook.BookId)"></p-button>
+                    (click)="checkOutBook(currentBook.BookId)" pTooltip="CheckOut"></p-button>
 
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined" *ngIf="!isViewOnly"
                     styleClass="btn-main-outlined" (click)="bookDialogVisible = false"></p-button>
@@ -852,7 +852,7 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Print Books Barcode" [(visible)] ="printBarcodeDialogVisible" [modal] ="true" [style]="{ width: '80vw' }" appendTo="body">
+    <p-dialog header="Print Books Barcode" [(visible)] ="printBarcodeDialogVisible" [modal] ="true" [style]="{ width: '30vw' }" appendTo="body">
         <p-table [value]="selectedBookDetails" [autoLayout]="false">
 
         <ng-template pTemplate="header">

@@ -1,11 +1,11 @@
 <div class="users-bc-container">
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-6 position-relative">
                 <span class="pi pi-search search-icon position-absolute text-muted searchIcon"></span>
             <input pInputText type="text" placeholder="Search by book" [(ngModel)]="searchBookTerm"
                 (input)="onBookSearch(searchBookTerm)" class="form-control ps-5" />
         </div>        
-    </div>
+    </div> -->
 
      <div class="table-clear-filter">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
@@ -247,7 +247,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="borrowerName">
                     Borrower Name<sup>*</sup>
                 </label>
-                <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
+                <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}" [disabled] = "true"
                     [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [editable]="true" 
                     styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
                 <div *ngIf="errors.BorrowerName" class="text-danger mt-1 small">{{ errors.BorrowerName }}</div>
@@ -257,7 +257,7 @@
                     Issued By<sup>*</sup>
                 </label>
                 <p-select id="issuedBy" [disabled] ="selectedBook.IssuedByUserId !=null && selectedBook.IssuedByUserId>0" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
-                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy" [editable]="true" 
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy" [editable]="true" [disabled] = "true"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onIssuedChange()" />
                 <div *ngIf="errors.IssuedByUserName" class="text-danger mt-1 small">{{ errors.IssuedByUserName }}</div>
             </div>

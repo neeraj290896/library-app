@@ -403,6 +403,10 @@ export class BooksViewCirculationComponent {
                 {
                     this.isOverDue = true;
                 }
+                else
+                {
+                    this.isOverDue = false;
+                }
     
                 this.returnByDifferentUser();
     
