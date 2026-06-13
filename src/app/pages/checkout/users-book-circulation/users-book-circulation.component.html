@@ -1,0 +1,379 @@
+<div class="users-bc-container">
+    <div class="row">
+        <div class="col-6 position-relative">
+                <span class="pi pi-search search-icon position-absolute text-muted searchIcon"></span>
+            <input pInputText type="text" placeholder="Search by book" [(ngModel)]="searchBookTerm"
+                (input)="onBookSearch(searchBookTerm)" class="form-control ps-5" />
+        </div>        
+    </div>
+
+     <div class="table-clear-filter">
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
+    </div>
+    <p-table [value]="filteredBcDetails" [autoLayout]="false" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <ng-template pTemplate="header">
+            <tr class="border-bottom">
+                <th class="text-start text-muted fw-medium" style="width: 5%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
+                            S.No
+                            <p-sortIcon field="sno"></p-sortIcon>
+                        </div>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                            Book Name
+                            <p-sortIcon field="bookName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="borrowerName">
+                            Borrower Name
+                            <p-sortIcon field="borrowerName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedBorrowerNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="issuedBy">
+                            Issued By
+                            <p-sortIcon field="issuedBy"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedIssuedByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="issuedDate">
+                            Issued On
+                            <p-sortIcon field="issuedDate"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="status">
+                            Status
+                            <p-sortIcon field="status"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 12%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnBy">
+                            Returned By
+                            <p-sortIcon field="returnBy"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedReturnByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnDate">
+                            Returned On
+                            <p-sortIcon field="returnDate"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueFrom">
+                            Over Due From
+                            <p-sortIcon field="overDueFrom"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
+                            Over Due in Days
+                            <p-sortIcon field="overDueDays"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
+                            Over Due Status
+                            <p-sortIcon field="overDueStatus"></p-sortIcon>
+                        </div>                       
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 5%;">
+                    <span class="pi pi-plus-circle" (click)="editBook(null, 'CheckOut')" pTooltip="Issue Book"></span>
+                </th>
+            </tr>
+            @if (showFt) {
+            <tr>
+                <th></th>
+                <th>
+                    <p-columnFilter field="bookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="borrowerName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="borrowerNameList" [(ngModel)]="selectedBorrowerNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="issuedBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="issuedByList" [(ngModel)]="selectedIssuedByList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+                <th>
+                    <p-columnFilter field="status" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th><p-columnFilter field="returnBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="returnByList" [(ngModel)]="selectedReturnByList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="body" let-book let-index="rowIndex">
+            <tr class="border-bottom">
+                <td>{{ index + 1 }}</td>
+                <td>{{ book.BookName }}</td>
+                <td>{{ book.BorrowerName }}</td>
+                <td>{{ book.IssuedByUserName }}</td>
+                <td>{{ book.IssuedDate | date:'yyyy-MM-dd'}}</td>
+                <td>
+                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
+                </td>
+                <td>{{ book.ReturnByUserName || '-' }}</td>
+                <td>{{ (book.ReturnDate | date:'yyyy-MM-dd') || '-'}}</td>
+                
+                <td>
+                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+
+                </td>
+                <td>
+                    <p-tag [value]="book.OverDueDays  ?? '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+                </td>
+                <td>
+                    <p-tag [value]="book.OverDueStatus  ?? '-'" [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2">
+                         <button pButton icon="pi pi-sign-in" (click)="editBook(book, 'CheckIn')" *ngIf = "!(book.Status == 'Returned')"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
+                        <button pButton icon="pi pi-pencil" (click)="editBook(book,'CheckOut')" *ngIf = "!(book.Status == 'Returned')"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+
+                            <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
+                            class="p-button-rounded p-button-text p-button-sm"></button> 
+                                              
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="12" class="text-center">
+                    <p>No book circulation found.</p>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
+        <div class="row">
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="book">
+                    Book Name<sup>*</sup>
+                </label>
+                <p-select id="book" [disabled]="!isIssueNewBook" [(ngModel)]="selectedBook.BookId" [ngModelOptions]="{standalone: true}"
+                    [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book" [editable]="true" 
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onBookChange()" />
+                <div *ngIf="errors.BookName" class="text-danger mt-1 small">{{ errors.BookName }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="borrowerName">
+                    Borrower Name<sup>*</sup>
+                </label>
+                <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [editable]="true" 
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
+                <div *ngIf="errors.BorrowerName" class="text-danger mt-1 small">{{ errors.BorrowerName }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="issuedBy">
+                    Issued By<sup>*</sup>
+                </label>
+                <p-select id="issuedBy" [disabled] ="selectedBook.IssuedByUserId !=null && selectedBook.IssuedByUserId>0" [(ngModel)]="selectedBook.IssuedByUserId" [ngModelOptions]="{standalone: true}"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select IssuedBy" [editable]="true" 
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onIssuedChange()" />
+                <div *ngIf="errors.IssuedByUserName" class="text-danger mt-1 small">{{ errors.IssuedByUserName }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="issuedDate">
+                    Issued Date<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="selectedBook.IssuedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [minDate]="minDate" 
+                    [maxDate]="maxDate" placeholder="Select Issued Date" styleClass="w-100" inputStyleClass="w-100" />                
+            </div>
+            <hr>
+             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="comments">
+                    Comments
+                    <!-- <sup>*</sup> -->
+                </label>
+                <input id="comments" type="text" class="form-control" pInputText
+                    [(ngModel)]="selectedBook.Comments" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Comments" />               
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="status">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="status" [disabled] ="selectedBook.BookCirculationId === 0" [(ngModel)]="selectedBook.Status" [ngModelOptions]="{standalone: true}"
+                    [options]="statusOptions" optionLabel="label" optionValue="value" placeholder="Select Status"
+                    (ngModelChange)="onStatusChange()" styleClass="w-100" appendTo="body" />                
+            </div>
+            <hr *ngIf="this.isReturnBook">            
+            <div class="col-6 mb-3" *ngIf="this.isReturnBook">
+                <label class="d-block small fw-medium text-secondary mb-1" for="returnedBy">
+                    Returned By<sup>*</sup>
+                </label>
+                <p-select id="returnedBy" [disabled]="!isReturnByDifferentUser" [(ngModel)]="selectedBook.ReturnByUserId" [ngModelOptions]="{standalone: true}"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select ReturnedBy" [editable]="true" 
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onReturnedChange()" />
+                <div *ngIf="errors.ReturnByUserName" class="text-danger mt-1 small">{{ errors.ReturnByUserName }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="this.isReturnBook">
+                <label class="d-block small fw-medium text-secondary mb-1" for="returnedDate">
+                    Returned Date<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="selectedBook.ReturnDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [maxDate]="maxDate"
+                    placeholder="Select Return Date" styleClass="w-100" inputStyleClass="w-100" />                
+            </div>
+            <hr *ngIf="this.isOverDue">
+             <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="overDueFrom">
+                    OverDue From<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="selectedBook.OverDueFrom" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [disabled] = "true"
+                    placeholder="Select Over Due Date" styleClass="w-100" inputStyleClass="w-100" />                
+            </div>
+            <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="overDueDays">
+                    OverDue Days<sup>*</sup>
+                </label>
+                <input id="overDueDays" type="text" class="form-control" pInputText [disabled] = "true"
+                    [(ngModel)]="selectedBook.OverDueDays" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Over Due days" />               
+            </div>
+            <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="fineAmount">
+                    Fine Amount<sup>*</sup>
+                </label>
+                <input id="fineAmount" type="text" class="form-control" pInputText [disabled] = "true"
+                    [(ngModel)]="selectedBook.FineAmount" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Fine amount" />               
+            </div>
+             <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="overDueStatus">
+                    OverDue Status<sup>*</sup>
+                </label>
+                <p-select id="overDueStatus" [(ngModel)]="selectedBook.OverDueStatus" [ngModelOptions]="{standalone: true}" [disabled] = "!(selectedBook.Status == 'Returned')"
+                    [options]="overDueStatusOptions" optionLabel="label" optionValue="value" placeholder="Select OverDue Status"
+                    styleClass="w-100" appendTo="body" />                
+            </div>
+            <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="paidAmount">
+                    Paid Amount<sup>*</sup>
+                </label>
+                <input id="paidAmount" type="text" class="form-control" pInputText [disabled]="false" [disabled] = "!(selectedBook.Status == 'Returned')"
+                    [(ngModel)]="selectedBook.PaidAmount" [ngModelOptions]="{standalone: true}" (ngModelChange)="validateInput('PaidAmount')"
+                    placeholder="Enter Paid amount" /> 
+                <div *ngIf="errors.PaidAmount" class="text-danger mt-1 small">{{ errors.PaidAmount }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="this.isOverDue">
+                <label class="d-block small fw-medium text-secondary mb-1" for="paymentTypeId">
+                    Payment Type<sup>*</sup>
+                </label>
+                <p-select id="paymentTypeId" [disabled]="false" [(ngModel)]="selectedBook.PaymentTypeId" [ngModelOptions]="{standalone: true}" [disabled] = "!(selectedBook.Status == 'Returned')"
+                    [options]="transactionTypeOptions" optionLabel="label" optionValue="value" placeholder="Select Payment Type"  (ngModelChange)="validateInput('PaymentType')"
+                    styleClass="w-100" appendTo="body"  />   
+                <div *ngIf="errors.PaymentTypeId" class="text-danger mt-1 small">{{ errors.PaymentTypeId }}</div>             
+            </div>  
+        </div>
+         <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <div *ngIf="this.isReturnBook">
+                    <label class="form-check-label small fw-medium text-secondary me-2" for="diffUserCheck">
+                        Return by different user
+                    </label>
+                    <input class="form-check-input m-0" type="checkbox" id="diffUserCheck" 
+                        [(ngModel)]="isReturnByDifferentUser" [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="returnByDifferentUser()">
+                </div>
+                
+
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="bcDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main" [disabled] = "(selectedBook.Status == 'Returned' && selectedBook.OverDueStatus == 'Pending')"
+                    (click)="saveBcDetails()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>
