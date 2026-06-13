@@ -189,13 +189,14 @@
                 <td>
                     <div class="d-flex align-items-center gap-2">
 
-                         <button pButton icon="pi pi-sign-in" (click)="checkInBook(user.UserId)" 
-                            class="p-button-rounded p-button-text p-button-sm"></button> 
+                         <button pButton icon="pi pi-sign-in" (click)="checkInBook(user)" *ngIf="user.BorrowedBooksCount >0"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckIn"></button> 
 
-                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(user.UserId)"
-                            class="p-button-rounded p-button-text p-button-sm"></button> 
+                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(user)"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckOut"></button> 
 
-
+                         <button pButton icon="pi pi-eye" (click)="viewUser(user)"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="View User"></button>
                         <button pButton icon="pi pi-pencil" (click)="editUser(user)"
                             class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Edit User"></button>
                         <button pButton icon="pi pi-trash" (click)="deleteUser(user)"
@@ -215,91 +216,198 @@
         </ng-template>
     </p-table>
 
-    <p-dialog [header]="header" [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
-        <div class="row">
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="fullName">
-                    FullName<sup>*</sup>
-                </label>
-                <input id="fullName" type="text" class="form-control" pInputText [(ngModel)]="currentUser.FullName"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter FullName"
-                    (ngModelChange)="validateInput('FullName')" />
-                <div *ngIf="errors.FullName" class="text-danger mt-1 small">{{ errors.FullName }}</div>
+    <p-dialog [header]="header" [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+         <ng-template pTemplate="header">
+            <span *ngIf="currentUser.UserId == null || currentUser.UserId == 0">{{header}}</span>
+            <!-- Empty span prevents layout collapse when text is hidden -->
+            <span *ngIf="currentUser.UserId !=null && currentUser.UserId >0">&nbsp;</span> 
+        </ng-template>
+        @if (header === 'Add User') {
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="fullName">
+                        FullName<sup>*</sup>
+                    </label>
+                    <input id="fullName" type="text" class="form-control" pInputText [(ngModel)]="currentUser.FullName"
+                        [ngModelOptions]="{standalone: true}" placeholder="Enter FullName"
+                        (ngModelChange)="validateInput('FullName')" />
+                    <div *ngIf="errors.FullName" class="text-danger mt-1 small">{{ errors.FullName }}</div>
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                        RoleName<sup>*</sup>
+                    </label>
+                    <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"
+                        [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Select Role"
+                        styleClass="w-100" appendTo="body" (ngModelChange)="onRoleChange()" />
+                    <div *ngIf="errors.RoleId" class="text-danger mt-1 small">{{ errors.RoleId }}</div>
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="gender">
+                        Gender<sup>*</sup>
+                    </label>
+                    <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
+                        [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
+                        styleClass="w-100" appendTo="body" />
+                    <!-- (ngModelChange)="onGenderChange()" -->
+                    <div *ngIf="errors.Gender" class="text-danger mt-1 small">{{ errors.Gender }}</div>
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="mailId">
+                        MailId<sup>*</sup>
+                    </label>
+                    <input id="mailId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MailId"
+                        [ngModelOptions]="{standalone: true}" placeholder="Enter MailId"
+                        (ngModelChange)="validateInput('MailId')" />
+                    <div *ngIf="errors.MailId" class="text-danger mt-1 small">{{ errors.MailId }}</div>
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="mobile">
+                        MobileNo<sup>*</sup>
+                    </label>
+                    <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
+                        [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo"
+                        (ngModelChange)="validateInput('MobileNo')" />
+                    <div *ngIf="errors.MobileNo" class="text-danger mt-1 small">{{ errors.MobileNo }}</div>
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="dob">
+                        DOB<sup>*</sup>
+                    </label>
+                    <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
+                        [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                        [minDate]="minDate" [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100"
+                        inputStyleClass="w-100" />
+                    <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
+                </div>
+                <!-- <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="status">
+                        Access Request Status<sup>*</sup>
+                    </label>
+                    <p-select id="status" [(ngModel)]="currentUser.Status" [ngModelOptions]="{standalone: true}"
+                        [options]="statusOptions" optionLabel="label" optionValue="value"
+                        placeholder="Select Access Request Status" styleClass="w-100" appendTo="body" />
+                    <!-- (ngModelChange)="onStatusChange()" ->
+                    <div *ngIf="errors.Status" class="text-danger mt-1 small">{{ errors.Status }}</div>
+                </div>
+                <div class="col-6 mb-3">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                        Status<sup>*</sup>
+                    </label>
+                    <p-select id="isActive" [(ngModel)]="currentUser.IsActive" [ngModelOptions]="{standalone: true}"
+                        [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
+                        styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                    <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                </div> -->
             </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="role">
-                    RoleName<sup>*</sup>
-                </label>
-                <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"
-                    [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Select Role"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onRoleChange()" />
-                <div *ngIf="errors.RoleId" class="text-danger mt-1 small">{{ errors.RoleId }}</div>
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="gender">
-                    Gender<sup>*</sup>
-                </label>
-                <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
-                    [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
-                    styleClass="w-100" appendTo="body" />
-                <!-- (ngModelChange)="onGenderChange()" -->
-                <div *ngIf="errors.Gender" class="text-danger mt-1 small">{{ errors.Gender }}</div>
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="mailId">
-                    MailId<sup>*</sup>
-                </label>
-                <input id="mailId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MailId"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter MailId"
-                    (ngModelChange)="validateInput('MailId')" />
-                <div *ngIf="errors.MailId" class="text-danger mt-1 small">{{ errors.MailId }}</div>
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="mobile">
-                    MobileNo<sup>*</sup>
-                </label>
-                <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo"
-                    (ngModelChange)="validateInput('MobileNo')" />
-                <div *ngIf="errors.MobileNo" class="text-danger mt-1 small">{{ errors.MobileNo }}</div>
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="dob">
-                    DOB<sup>*</sup>
-                </label>
-                <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
-                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
-                    [minDate]="minDate" [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100"
-                    inputStyleClass="w-100" />
-                <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="status">
-                    Access Request Status<sup>*</sup>
-                </label>
-                <p-select id="status" [(ngModel)]="currentUser.Status" [ngModelOptions]="{standalone: true}"
-                    [options]="statusOptions" optionLabel="label" optionValue="value"
-                    placeholder="Select Access Request Status" styleClass="w-100" appendTo="body" />
-                <!-- (ngModelChange)="onStatusChange()" -->
-                <div *ngIf="errors.Status" class="text-danger mt-1 small">{{ errors.Status }}</div>
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
-                    Status<sup>*</sup>
-                </label>
-                <p-select id="isActive" [(ngModel)]="currentUser.IsActive" [ngModelOptions]="{standalone: true}"
-                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
-                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
-            </div>
-        </div>
+            } @else {
+                <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
+            <p-tabPanel [header]="header">
+                @if (activeTab === 0) {
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="fullName">
+                                FullName<sup>*</sup>
+                            </label>
+                            <input id="fullName" type="text" class="form-control" pInputText [(ngModel)]="currentUser.FullName"
+                                [ngModelOptions]="{standalone: true}" placeholder="Enter FullName" [disabled]="isViewOnly"
+                                (ngModelChange)="validateInput('FullName')" />
+                            <div *ngIf="errors.FullName" class="text-danger mt-1 small">{{ errors.FullName }}</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                                RoleName<sup>*</sup>
+                            </label>
+                            <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}" [disabled]="isViewOnly"
+                                [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Select Role"
+                                styleClass="w-100" appendTo="body" (ngModelChange)="onRoleChange()" />
+                            <div *ngIf="errors.RoleId" class="text-danger mt-1 small">{{ errors.RoleId }}</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="gender">
+                                Gender<sup>*</sup>
+                            </label>
+                            <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}" [disabled]="isViewOnly"
+                                [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
+                                styleClass="w-100" appendTo="body" />
+                            <!-- (ngModelChange)="onGenderChange()" -->
+                            <div *ngIf="errors.Gender" class="text-danger mt-1 small">{{ errors.Gender }}</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="mailId">
+                                MailId<sup>*</sup>
+                            </label>
+                            <input id="mailId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MailId"
+                                [ngModelOptions]="{standalone: true}" placeholder="Enter MailId" [disabled]="isViewOnly"
+                                (ngModelChange)="validateInput('MailId')" />
+                            <div *ngIf="errors.MailId" class="text-danger mt-1 small">{{ errors.MailId }}</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="mobile">
+                                MobileNo<sup>*</sup>
+                            </label>
+                            <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
+                                [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" [disabled]="isViewOnly"
+                                (ngModelChange)="validateInput('MobileNo')" />
+                            <div *ngIf="errors.MobileNo" class="text-danger mt-1 small">{{ errors.MobileNo }}</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="dob">
+                                DOB<sup>*</sup>
+                            </label>
+                            <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
+                                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [disabled]="isViewOnly"
+                                [minDate]="minDate" [maxDate]="maxDate" placeholder="Select DOB" styleClass="w-100"
+                                inputStyleClass="w-100" />
+                            <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
+                        </div>
+                        <!-- <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="status">
+                                Access Request Status<sup>*</sup>
+                            </label>
+                            <p-select id="status" [(ngModel)]="currentUser.Status" [ngModelOptions]="{standalone: true}"
+                                [options]="statusOptions" optionLabel="label" optionValue="value"
+                                placeholder="Select Access Request Status" styleClass="w-100" appendTo="body" />
+                            <!-- (ngModelChange)="onStatusChange()" ->
+                            <div *ngIf="errors.Status" class="text-danger mt-1 small">{{ errors.Status }}</div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                                Status<sup>*</sup>
+                            </label>
+                            <p-select id="isActive" [(ngModel)]="currentUser.IsActive" [ngModelOptions]="{standalone: true}"
+                                [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
+                                styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                            <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                        </div> -->
+                    </div>
+                }
+            </p-tabPanel>
+
+            <p-tabPanel header="View Book Circulation">
+                @if (activeTab === 1) {
+                    <app-users-book-circulation [selectedUserDetails]="currentUser" [isReturnOnly] ="false"></app-users-book-circulation>
+                }
+            </p-tabPanel>
+        </p-tabView>
+        }
+
         <ng-template pTemplate="footer">
-            <div class="d-flex justify-content-end align-items-center gap-3">
-                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
-                    styleClass="btn-main-outlined" (click)="userDialogVisible = false"></p-button>
-                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
-                    (click)="saveUser()"></p-button>
-            </div>
+            @if (header === 'Add User' || (header === 'Edit User' && activeTab === 0)|| (header === 'View User' && activeTab === 0)) {
+                <div class="d-flex justify-content-end align-items-center gap-3">
+
+                    <p-button pButton icon="pi pi-sign-in" type="button" label="CheckIn" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="currentUser.BorrowedBooksCount"
+                    (click)="checkInBook(currentUser)"></p-button>
+
+                    <p-button pButton icon="pi pi-sign-out" type="button" label="CheckOut" [style]="{ width: '6rem' }" styleClass="btn-main" 
+                        (click)="checkOutBook(currentUser)"></p-button>
+
+                    <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined" *ngIf="!isViewOnly"
+                        styleClass="btn-main-outlined" (click)="userDialogVisible = false"></p-button>
+                    <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="!isViewOnly"
+                        (click)="saveUser()"></p-button>
+                </div>
+            }
         </ng-template>
     </p-dialog>
 
@@ -538,7 +646,7 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Print Users Barcode" [(visible)] ="printUserDialogVisible" [modal] ="true" [style]="{ width: '80vw' }" appendTo="body">
+    <p-dialog header="Print User's Barcode" [(visible)] ="printUserDialogVisible" [modal] ="true" [style]="{ width: '30vw' }" appendTo="body">
         <p-table [value]="selectedUserDetails" [autoLayout]="false">
 
         <ng-template pTemplate="header">
@@ -574,7 +682,8 @@
                 <td>{{ index + 1 }}</td>
                 <td>{{ user.FullName }}</td>
                 <td>
-                    <ngx-barcode6 [bc-value]="user.UserBarcode"  [bc-format]="'CODE128'" [bc-display-value]="false" [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
+                    <!-- <ngx-barcode6 [bc-value]="user.UserBarcode"  [bc-format]="'CODE128'" [bc-display-value]="false" [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6> -->
+                     <qrcode [qrdata]="user.UserBarcode" [width]="100" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
                 </td>                
             </tr>
         </ng-template>
@@ -586,4 +695,15 @@
         </ng-template>
     </p-table>
     </p-dialog>
+
+    <p-dialog [header]="checkIncheckOutHeader" [(visible)]="checkOutDialogVisible" [modal]="true" [style]="{ width: '80vw' }" appendTo="body">
+
+    </p-dialog>
+
+    <p-dialog header="Return Book" [(visible)]="checkInDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
+         @if (checkInDialogVisible) {
+            <app-users-book-circulation [selectedUserDetails]="currentUser" [isReturnOnly] ="true"></app-users-book-circulation>
+         }
+    </p-dialog>
+
 </div>

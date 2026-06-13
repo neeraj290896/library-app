@@ -203,6 +203,91 @@ export class ManageBookCirculationComponent {
     }
 
     editBook(_bc: BookCirculationDetails | null = null, type: string): void {
+
+        // if(_bc)
+        // {
+        //     this.isIssueNewBook = false;
+        //     this.bindOnlyActiveDetails();
+           
+        //     if(_bc.IssuedDate !=null)
+        //     {
+        //         this.setMinAndMaxDate(new Date(_bc.IssuedDate));
+        //     }
+        //     else
+        //     {
+        //          const today = new Date();
+        //         this.setMinAndMaxDate(today);   
+        //     }
+            
+            
+        //     this.selectedBook  = { ..._bc };
+
+        //     if(_bc.IssuedDate !=null && _bc.IssuedDate !="")
+        //     {
+        //         this.selectedBook.IssuedDate = this.parseCustomDateStringForUI(new Date(_bc.IssuedDate));
+        //     }
+           
+        //     if(_bc.ReturnDate !=null && _bc.ReturnDate !="")
+        //     {
+        //         this.selectedBook.ReturnDate = this.parseCustomDateStringForUI(new Date(_bc.ReturnDate));
+        //     }
+        //     else{
+        //         this.selectedBook.ReturnDate = this.todayDate;
+        //     }
+
+        //     if(_bc.OverDueFrom !=null && _bc.OverDueFrom !="")
+        //     {
+        //         this.selectedBook.OverDueFrom = this.parseCustomDateStringForUI(new Date(_bc.OverDueFrom));
+        //     } 
+            
+        //     if(this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId>0)
+        //     {
+        //         this.isOverDue = true;
+        //     }
+        //     else
+        //     {
+        //       this.isOverDue = false;
+        //     }
+
+        //     if(type =="CheckIn")
+        //     {
+        //         this.selectedBook.Status = "Returned";
+        //     }
+
+        //     this.returnByDifferentUser();
+
+        //      if (_bc.Status == "Issued") {
+                
+        //         this.header = 'Update Issued Book Details';
+        //     } 
+        //     else {                
+        //         this.header = 'Update Returned Book Details';
+        //     }
+        // }
+        // else
+        // {   
+        //     this.isIssueNewBook = true;
+        //     this.bindOnlyActiveDetails();     
+            
+        //     const today = new Date();
+        //     this.setMinAndMaxDate(today);               
+
+        //     this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
+        //                         IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
+        //                         IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+        //                         OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
+        //                         ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
+        //                         UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
+
+        //     this.header = "Issue book";  
+        // }
+
+        // console.log("selectedBook :", this.selectedBook);
+
+        // this.onStatusChange();
+        
+        // this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount: '', PaymentTypeId:''} 
+            
         this.bc = _bc;
         this.type = type;
         this.bcDialogVisible = true;

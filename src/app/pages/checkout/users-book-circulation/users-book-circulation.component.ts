@@ -30,6 +30,7 @@ import { environment } from '../../../../environments/environment';
 export class UsersBookCirculationComponent {
   searchBookTerm = '';  
   @Input() selectedUserDetails: UserDetails = {};
+  @Input() isReturnOnly : boolean = false;
   private messageService = inject(MessageService);
   private _bcService = inject(BookCirculationService);
   private _bookService = inject(BookService);
@@ -98,7 +99,7 @@ export class UsersBookCirculationComponent {
         // 3. Assemble into the exact "yyyy-mm-dd" layout match
         this.todayDate = this.parseCustomDateStringForUI(today);
 
-        this.loggedInUserDetails = this._authService.userData() ?? {};
+        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
 
         this.loadBooks();
         this.loadUserDetails();
@@ -122,7 +123,15 @@ export class UsersBookCirculationComponent {
         this._bcService.getBookCirculationDetailsByUserId(this.selectedUserDetails.UserId ?? 0).subscribe({
                 next: (data: BookCirculationDetails[]) => {
                     this.bcDetails = data;
-                    this.filteredBcDetails = data;
+                    if(this.isReturnOnly)
+                    {
+                      this.filteredBcDetails = data.filter(x => x.BorrowerId == this.selectedUserDetails.UserId && x.Status =="Issued");
+                    }
+                    else
+                    {
+                      this.filteredBcDetails = data;
+                    }
+                    
                     this.bcDetailsCount = data.length;    
                     
                     this.initializeFilterLists();
@@ -351,6 +360,10 @@ export class UsersBookCirculationComponent {
             {
                 this.isOverDue = true;
             }
+            else
+            {
+              this.isOverDue = false;
+            }
 
              if(type =="CheckIn")
             {
@@ -375,7 +388,7 @@ export class UsersBookCirculationComponent {
             const today = new Date();
             this.setMinAndMaxDate(today);               
 
-            this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
+            this.selectedBook  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId: this.selectedUserDetails.UserId, BorrowerName : this.selectedUserDetails.FullName, 
                                 IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
                                 IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
                                 OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
