@@ -40,8 +40,7 @@ import { BookCirculationService } from '@app/shared/services/book-circulation.se
         FormsModule, InputTextModule, PaginatorModule, DialogModule,
         BooksOverdueComponent, BooksManageBooksComponent,
         ManageIssuedBooksComponent, ManageUsersComponent,
-        ManageReturnedBooksComponent, MultiSelectModule, SelectModule,
-        DatePickerModule, TooltipModule
+        MultiSelectModule, SelectModule, DatePickerModule, TooltipModule
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'

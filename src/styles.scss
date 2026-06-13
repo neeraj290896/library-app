@@ -253,6 +253,10 @@ body {
     }
 }
 
+.p-checkbox {
+    vertical-align: text-top !important;
+}
+
 .p-button {
     font-size: 0.875rem !important;
     padding: 0.5rem 0.75rem !important;
@@ -538,6 +542,13 @@ select {
         background-color: #fee2e2 !important;
         color: #991b1b !important;
     }
+}
+
+hr {
+    border: none;
+    height: 2px;
+    background-color: #333;
+    width: 100%;
 }
 
 // Gradient background
