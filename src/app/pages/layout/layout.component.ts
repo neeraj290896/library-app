@@ -29,14 +29,6 @@ export class LayoutComponent {
         { path: '/help', label: 'Help', icon: 'pi pi-question-circle' },
     ];
 
-    constructor() {
-        // effect(() => {
-        //     if (!this.userRole()) {
-        //         this.router.navigate(['/login']);
-        //     }
-        // });
-    }
-
     logout(): void {
         this.authService.logout();
         this.router.navigate(['/login']);

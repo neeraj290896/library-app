@@ -71,18 +71,17 @@ export class DashboardComponent {
     public overdueDialogVisible: boolean = false;
     public usersDialogVisible: boolean = false;
 
-    public dashboardSummary: { label: string; total: number; active: number, isTotalVisible : boolean }[] = [
-        { label: 'Total Books', total: 0, active: 0, isTotalVisible :true },
-        { label: 'Issued Books', total: 0, active: 0 , isTotalVisible :false},
-        { label: 'Overdue Books', total: 0, active: 0 , isTotalVisible :false},
-        { label: 'Total Users', total: 0, active: 0 , isTotalVisible :true}
+    public dashboardSummary: { label: string; total: number; active: number, isActiveVisible: boolean }[] = [
+        { label: 'Total Books', total: 0, active: 0, isActiveVisible: true },
+        { label: 'Issued Books', total: 0, active: 0, isActiveVisible: false },
+        { label: 'Overdue Books', total: 0, active: 0, isActiveVisible: false },
+        { label: 'Total Users', total: 0, active: 0, isActiveVisible: true }
     ];
     public overDues: OverDueDetails[] = [];
 
     public addNewBookDialogVisible: boolean = false;
     public registerUserDialogVisible: boolean = false;
     public issueBookDialogVisible: boolean = false;
-    public returnBooksDialogVisible: boolean = false;
 
     public authors: AuthorDetails[] = [];
     public publishers: PublisherDetails[] = [];
@@ -294,10 +293,10 @@ export class DashboardComponent {
             next: (data: DashboardSummaryDetails[]) => {
                 if (data && data.length > 0) {
                     this.dashboardSummary = [
-                        { label: 'Total Books', total: data[0].TotalBooks || 0, active: data[0].TotalActiveBooks || 0, isTotalVisible : true },
-                        { label: 'Issued Books', total: data[0].TotalBorrowedBooks || 0, active: data[0].ActiveBorrowedBooks || 0, isTotalVisible : false },
-                        { label: 'Overdue Books', total: data[0].TotalOverDue || 0, active: data[0].ActiveOverDue || 0, isTotalVisible : false },
-                        { label: 'Total Users', total: data[0].TotalUsers || 0, active: data[0].ActiveUsers || 0, isTotalVisible : true }
+                        { label: 'Total Books', total: data[0].TotalBooks || 0, active: data[0].TotalActiveBooks || 0, isActiveVisible : true },
+                        { label: 'Issued Books', total: data[0].ActiveBorrowedBooks || 0, active: 0, isActiveVisible : false },
+                        { label: 'Overdue Books', total: data[0].ActiveOverDue || 0, active: 0, isActiveVisible : false },
+                        { label: 'Total Users', total: data[0].TotalUsers || 0, active: data[0].ActiveUsers || 0, isActiveVisible : true }
                     ];
                 }
             },
@@ -1077,6 +1076,6 @@ export class DashboardComponent {
     }
 
     openReturnBooksDialog(): void {
-        this.returnBooksDialogVisible = true;
+        this.issuedBooksDialogVisible = true;
     }
 }

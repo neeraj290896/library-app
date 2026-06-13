@@ -1,4 +1,4 @@
-<div class="d-flex flex-column gap-3">
+<div class="dashboard-container d-flex flex-column gap-3">
     <div class="card border-0 shadow-sm rounded p-3">
         <!-- Header -->
         <div class="d-flex align-items-center justify-content-between">
@@ -21,8 +21,8 @@
             <p-card>
                 <div class="large text-muted mb-2">{{ stat.label }}</div>
                 <div class="d-flex align-items-start gap-2">
-                    <div class="fs-4 fw-semibold" *ngIf="stat.isTotalVisible">{{ stat.total }}</div>
-                    <span class="badge stat-badge stat-badge-up">
+                    <div class="fs-4 fw-semibold">{{ stat.total }}</div>
+                    <span class="badge badge-green" *ngIf="stat.isActiveVisible">
                         {{ stat.active }}
                     </span>
                 </div>
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Overdue Books -->
-    <div class="card border-0 shadow-sm rounded p-3">
+    <div class="card border-0 shadow-sm rounded p-3 card-container">
         <h3 class="fs-5 fw-semibold mb-3">Overdue Books - {{ overDues.length }}</h3>
         <app-books-overdue [totalOverDues]="overDues"></app-books-overdue>
     </div>
@@ -55,37 +55,30 @@
 
 <!-- Dialogs -->
 <p-dialog header="Manage Books" [(visible)]="booksManageDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
-    appendTo="body">
+    appendTo="body" (onHide)="loadDashboardSummary()">
     @if(booksManageDialogVisible) {
     <app-books-manage-books></app-books-manage-books>
     }
 </p-dialog>
 
 <p-dialog header="Issued Books" [(visible)]="issuedBooksDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
-    appendTo="body">
+    appendTo="body" (onHide)="loadDashboardSummary()">
     @if (issuedBooksDialogVisible) {
     <app-manage-issued-books></app-manage-issued-books>
     }
 </p-dialog>
 
 <p-dialog header="Overdue Books" [(visible)]="overdueDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
-    appendTo="body">
+    appendTo="body" (onHide)="loadDashboardSummary()">
     @if (overdueDialogVisible) {
     <app-books-overdue [totalOverDues]="overDues"></app-books-overdue>
     }
 </p-dialog>
 
 <p-dialog header="Manage Users" [(visible)]="usersDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
-    appendTo="body">
+    appendTo="body" (onHide)="loadDashboardSummary()">
     @if (usersDialogVisible) {
     <app-manage-users></app-manage-users>
-    }
-</p-dialog>
-
-<p-dialog header="Return Books" [(visible)]="returnBooksDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
-    appendTo="body">
-    @if (returnBooksDialogVisible) {
-    <app-manage-issued-books></app-manage-issued-books>
     }
 </p-dialog>
 

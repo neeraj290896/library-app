@@ -514,29 +514,29 @@ select {
 // Badge styles
 .badge {
     display: inline-block;
-    padding: $spacing-1 $spacing-3;
-    border-radius: $border-radius-sm;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 0.25rem !important;
     font-size: 0.875rem !important;
-    font-weight: 600;
+    font-weight: 600 !important;
 
     &-blue {
-        background-color: #dbeafe;
-        color: #1e40af;
+        background-color: #dbeafe !important;
+        color: #1e40af !important;
     }
 
     &-orange {
-        background-color: #fed7aa;
-        color: #92400e;
+        background-color: #fed7aa !important;
+        color: #92400e !important;
     }
 
     &-green {
-        background-color: #dcfce7;
-        color: #166534;
+        background-color: #dcfce7 !important;
+        color: #15803d !important;
     }
 
     &-red {
-        background-color: #fee2e2;
-        color: #991b1b;
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
     }
 }
 
