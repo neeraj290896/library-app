@@ -23,19 +23,11 @@ export class LayoutComponent {
     public readonly menuItems = [
         { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar' },
         { path: '/books', label: 'Books', icon: 'pi pi-book' },
-        { path: '/checkout', label: 'Check-In/Out', icon: 'pi pi-sync' },
+        { path: '/transactions', label: 'Transactions', icon: 'pi pi-sync' },
         { path: '/admin', label: 'Admin', icon: 'pi pi-shield' },
         { path: '/settings', label: 'Settings', icon: 'pi pi-cog' },
         { path: '/help', label: 'Help', icon: 'pi pi-question-circle' },
     ];
-
-    constructor() {
-        // effect(() => {
-        //     if (!this.userRole()) {
-        //         this.router.navigate(['/login']);
-        //     }
-        // });
-    }
 
     logout(): void {
         this.authService.logout();
