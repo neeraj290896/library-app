@@ -21,6 +21,11 @@ export class BookCirculationService {
         return this.http.get(`${this.baseUrl}/GetBookCirculationDetailsById`, { params });
     }
 
+    getBookCirculationDetailsByUserId(userId: number): Observable<any> {
+        const params = new HttpParams().set('userId', userId);
+        return this.http.get(`${this.baseUrl}/GetBookCirculationDetailsByUserId`, { params });
+    }
+
     issueBook(payload: BookCirculationDetails): Observable<any> {
         return this.http.post(`${this.baseUrl}/IssueBook`, payload);
     }

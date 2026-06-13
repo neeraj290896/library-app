@@ -1,7 +1,7 @@
 $color-primary: #22c55e;
 
 ::ng-deep {
-    .manage-books-container {
+    .users-bc-container {
         .p-datatable {
             .p-datatable-table {
                 table-layout: fixed;
@@ -16,11 +16,7 @@ $color-primary: #22c55e;
                     text-overflow: ellipsis;
                     white-space: nowrap;
                 }
-            }          
-        }
-
-        .p-dialog-content {
-                margin-top: -2rem !important;
+            }
         }
 
         .p-tag {
@@ -32,7 +28,17 @@ $color-primary: #22c55e;
             margin-top: 0.5rem;
             z-index: 1;
         }
+
+        .searchIcon{
+            margin-left: 12px;
+            margin-top: 12px;
+        }
     }
 }
 
-
+hr {
+  border: none;
+  height: 2px;
+  background-color: #333;
+  width: 100%;
+}

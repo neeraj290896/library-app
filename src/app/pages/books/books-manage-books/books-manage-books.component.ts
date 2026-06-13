@@ -174,6 +174,7 @@ export class BooksManageBooksComponent implements OnInit {
     selectedBookDetails: BookDetails[] = [];
     selectedIds: number[] = [];
     printBarcodeDialogVisible : boolean = false;
+    isViewOnly: boolean = false;
 
     ngOnInit(): void {
         this.loadBooks();
@@ -409,7 +410,7 @@ export class BooksManageBooksComponent implements OnInit {
                 RackNumber: 0,
                 RackLabel: '',
                 BookBarcode: '',
-                IsActive: null
+                IsActive: true
             };
             this.header = 'Add Book';
             this.publishedDate = null;
@@ -430,6 +431,7 @@ export class BooksManageBooksComponent implements OnInit {
         };
         this.activeTab = 0;
         this.bookDialogVisible = true;
+        this.isViewOnly = false;
     }
 
     viewBook(book: BookDetails): void {
@@ -468,6 +470,7 @@ export class BooksManageBooksComponent implements OnInit {
         };
         this.activeTab = 0;
         this.bookDialogVisible = true;
+        this.isViewOnly = true;
     }
 
     onLanguageChange(): void {
