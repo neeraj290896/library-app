@@ -323,7 +323,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="book">
                 Book Name<sup>*</sup>
             </label>
-            <p-select id="book" [(ngModel)]="currentIssueBook.BookId" [ngModelOptions]="{standalone: true}"
+            <p-select id="book" [(ngModel)]="currentIssueBook.BookId" [ngModelOptions]="{standalone: true}" [editable]="true"
                 [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onBookChange()" />
             <div *ngIf="issueBookErrors.BookName" class="text-danger mt-1 small">{{ issueBookErrors.BookName }}</div>
@@ -333,7 +333,7 @@
                 Borrower Name<sup>*</sup>
             </label>
             <p-select id="borrowerName" [(ngModel)]="currentIssueBook.BorrowerId" [ngModelOptions]="{standalone: true}"
-                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"
+                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
             <div *ngIf="issueBookErrors.BorrowerName" class="text-danger mt-1 small">{{ issueBookErrors.BorrowerName }}
             </div>
