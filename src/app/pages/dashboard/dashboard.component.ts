@@ -29,9 +29,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
-import { AuthService } from '@app/shared/services/auth.service';
-import { BookCirculationService } from '@app/shared/services/book-circulation.service';
 import { IssueReturnBooksComponent } from '../checkout/issue-return-books/issue-return-books.component';
+import { SearchComponent } from '@app/shared/components/search/search.component';
 
 @Component({
     selector: 'app-dashboard',
@@ -41,7 +40,7 @@ import { IssueReturnBooksComponent } from '../checkout/issue-return-books/issue-
         BooksOverdueComponent, BooksManageBooksComponent,
         ManageIssuedBooksComponent, ManageUsersComponent,
         MultiSelectModule, SelectModule, DatePickerModule, TooltipModule,
-        IssueReturnBooksComponent
+        IssueReturnBooksComponent, SearchComponent
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
@@ -60,11 +59,8 @@ export class DashboardComponent {
     private rackService = inject(RackService);
     private userService = inject(UserService);
     private roleService = inject(RoleService);
-    private authService = inject(AuthService);
-    private bookCirculationService = inject(BookCirculationService);
 
     public currentDate: Date = new Date();
-    public searchTerm: string = '';
 
     public booksManageDialogVisible: boolean = false;
     public issuedBooksDialogVisible: boolean = false;
@@ -262,10 +258,10 @@ export class DashboardComponent {
             next: (data: DashboardSummaryDetails[]) => {
                 if (data && data.length > 0) {
                     this.dashboardSummary = [
-                        { label: 'Total Books', total: data[0].TotalBooks || 0, active: data[0].TotalActiveBooks || 0, isActiveVisible : true },
-                        { label: 'Issued Books', total: data[0].ActiveBorrowedBooks || 0, active: 0, isActiveVisible : false },
-                        { label: 'Overdue Books', total: data[0].ActiveOverDue || 0, active: 0, isActiveVisible : false },
-                        { label: 'Total Users', total: data[0].TotalUsers || 0, active: data[0].ActiveUsers || 0, isActiveVisible : true }
+                        { label: 'Total Books', total: data[0].TotalBooks || 0, active: data[0].TotalActiveBooks || 0, isActiveVisible: true },
+                        { label: 'Issued Books', total: data[0].ActiveBorrowedBooks || 0, active: 0, isActiveVisible: false },
+                        { label: 'Overdue Books', total: data[0].ActiveOverDue || 0, active: 0, isActiveVisible: false },
+                        { label: 'Total Users', total: data[0].TotalUsers || 0, active: data[0].ActiveUsers || 0, isActiveVisible: true }
                     ];
                 }
             },
@@ -390,10 +386,6 @@ export class DashboardComponent {
                 console.error('Error loading role:', err);
             }
         });
-    }
-
-    onSearch(term: string) {
-        this.searchTerm = term;
     }
 
     openSummaryDetails(label: string) {

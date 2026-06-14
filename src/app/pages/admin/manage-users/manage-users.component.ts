@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Table, TableModule } from 'primeng/table';
@@ -18,7 +18,7 @@ import { saveAs } from 'file-saver';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
-import { QRCodeComponent  } from 'angularx-qrcode';
+import { QRCodeComponent } from 'angularx-qrcode';
 import { TabViewModule } from 'primeng/tabview';
 import { UsersBookCirculationComponent } from '@app/pages/checkout/users-book-circulation/users-book-circulation.component';
 
@@ -30,11 +30,13 @@ type ImportUserDetails = UserDetails & {
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule,
-        SelectModule, FormsModule, TooltipModule, QRCodeComponent , UsersBookCirculationComponent],
+        SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent],
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.scss'
 })
 export class ManageUsersComponent {
+    @Input() public searchTerm: string = '';
+
     private messageService = inject(MessageService);
     private userService = inject(UserService);
     private roleService = inject(RoleService);
@@ -135,7 +137,7 @@ export class ManageUsersComponent {
 
     selectedUserDetails: UserDetails[] = [];
     selectedIds: number[] = [];
-    printUserDialogVisible : boolean = false;
+    printUserDialogVisible: boolean = false;
     isViewOnly: boolean = false;
     checkOutDialogVisible: boolean = false;
     checkInDialogVisible: boolean = false;
@@ -174,15 +176,28 @@ export class ManageUsersComponent {
     }
 
     loadUserDetails(): void {
-        this.userService.getAllUserDetails().subscribe({
-            next: (data: UserDetails[]) => {
-                this.users = data;
-                this.initializeFilterLists();
-            },
-            error: (err) => {
-                console.error('Error loading users:', err);
-            }
-        });
+        if (this.searchTerm) {
+            this.userService.searchUserDetails(this.searchTerm).subscribe({
+                next: (data: UserDetails[]) => {
+                    this.users = data;
+                    this.initializeFilterLists();
+                },
+                error: (err) => {
+                    console.error('Error loading users:', err);
+                }
+            });
+        }
+        else {
+            this.userService.getAllUserDetails().subscribe({
+                next: (data: UserDetails[]) => {
+                    this.users = data;
+                    this.initializeFilterLists();
+                },
+                error: (err) => {
+                    console.error('Error loading users:', err);
+                }
+            });
+        }
     }
 
     initializeFilterLists(): void {
@@ -273,7 +288,7 @@ export class ManageUsersComponent {
         if (_user) {
             this.currentUser = { ..._user };
             this.header = 'View User';
-        }        
+        }
         this.userDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -893,37 +908,33 @@ export class ManageUsersComponent {
     }
 
     onSelectionChange() {
-       
-        this.selectedIds = this.selectedUserDetails
-        .map(x => x.UserId)
-        .filter((id): id is number => id !== null && id !== undefined);
 
-        
+        this.selectedIds = this.selectedUserDetails
+            .map(x => x.UserId)
+            .filter((id): id is number => id !== null && id !== undefined);
+
+
         console.log('Selected IDs:', this.selectedIds);
     }
 
-    printBarcode()
-    {
-        if(this.selectedIds !=null && this.selectedIds.length>0)
-        {
+    printBarcode() {
+        if (this.selectedIds != null && this.selectedIds.length > 0) {
             this.printUserDialogVisible = true;
         }
     }
 
-    checkInBook(_user:UserDetails):void{
-        if(_user.BorrowedBooksCount == 1)
-        {
+    checkInBook(_user: UserDetails): void {
+        if (_user.BorrowedBooksCount == 1) {
             this.checkOutDialogVisible = true;
             this.checkIncheckOutHeader = "Return Book";
         }
-        else
-        {
+        else {
             this.currentUser = { ..._user };
             this.checkInDialogVisible = true;
         }
     }
 
-    checkOutBook(_user:UserDetails):void{
+    checkOutBook(_user: UserDetails): void {
         this.checkOutDialogVisible = true;
         this.checkIncheckOutHeader = "Issue Book";
     }

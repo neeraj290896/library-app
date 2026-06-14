@@ -6,11 +6,7 @@
                 <h2 class="fs-4 fw-semibold mb-1">Welcome!</h2>
                 <p class="small text-muted mb-0">{{ currentDate | date:'fullDate' }}</p>
             </div>
-            <div class="position-relative">
-                <span class="pi pi-search search-icon position-absolute text-muted"></span>
-                <input pInputText type="text" placeholder="Search" [(ngModel)]="searchTerm"
-                    (input)="onSearch(searchTerm)" class="form-control ps-5" />
-            </div>
+            <app-search></app-search>
         </div>
     </div>
 

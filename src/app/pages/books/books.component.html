@@ -6,20 +6,11 @@
                 <h2 class="fs-4 fw-semibold mb-1">Books</h2>
                 <p class="small text-muted mb-0">Manage books</p>
             </div>
-            <div class="position-relative">
-                <span class="pi pi-search search-icon position-absolute text-muted"></span>
-                <input pInputText type="text" placeholder="Search" [(ngModel)]="searchTerm"
-                    (input)="onSearch(searchTerm)" class="form-control ps-5" />
-            </div>
+            <app-search></app-search>
         </div>
 
         <!-- Filter Tabs -->
         <p-tabView [(activeIndex)]="activeTab" class="books-tabs">
-            <!-- <p-tabPanel [header]="'Overdue - ' + totalBooks()">
-                <app-books-overdue *ngIf="activeTab === 0" [totalBooks]="totalBooks()" [books]="filteredBooks()">
-                </app-books-overdue>
-            </p-tabPanel> -->
-
             <p-tabPanel header="Manage Books">
                 <app-books-manage-books *ngIf="activeTab === 0"></app-books-manage-books>
             </p-tabPanel>
