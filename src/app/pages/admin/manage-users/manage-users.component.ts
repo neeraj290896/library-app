@@ -8,7 +8,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { RoleDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookCirculationDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
 import { MessageService } from 'primeng/api';
 import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
@@ -21,6 +21,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { TabViewModule } from 'primeng/tabview';
 import { UsersBookCirculationComponent } from '@app/pages/checkout/users-book-circulation/users-book-circulation.component';
+import { BookCirculationService } from '@app/shared/services/book-circulation.service';
+import { AuthService } from '@app/shared/services/auth.service';
+import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -30,7 +33,7 @@ type ImportUserDetails = UserDetails & {
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule,
-        SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent],
+        SelectModule, FormsModule, TooltipModule, QRCodeComponent , UsersBookCirculationComponent, IssueReturnBooksComponent],
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.scss'
 })
@@ -40,6 +43,8 @@ export class ManageUsersComponent {
     private messageService = inject(MessageService);
     private userService = inject(UserService);
     private roleService = inject(RoleService);
+    private _bcService = inject(BookCirculationService);
+    private _authService = inject(AuthService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
@@ -139,15 +144,22 @@ export class ManageUsersComponent {
     selectedIds: number[] = [];
     printUserDialogVisible: boolean = false;
     isViewOnly: boolean = false;
-    checkOutDialogVisible: boolean = false;
+    bcDialogVisible: boolean = false;
     checkInDialogVisible: boolean = false;
-    checkIncheckOutHeader: string = "";
+    public bc: BookCirculationDetails | null = null;
+    public type: string = '';
+    public loggedInUserDetails: UserDetails = {};
+    public todayDate :string | undefined;
 
     ngOnInit(): void {
-        let today = new Date();
+        const today = new Date();
+        this.todayDate = this.parseCustomDateStringForUI(today);
+
         let year = today.getFullYear();
         let minYear = year - 100;
         let maxYear = year - 15;
+
+        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
 
         this.minDate = new Date();
         this.minDate.setMonth(1);
@@ -923,10 +935,10 @@ export class ManageUsersComponent {
         }
     }
 
-    checkInBook(_user: UserDetails): void {
-        if (_user.BorrowedBooksCount == 1) {
-            this.checkOutDialogVisible = true;
-            this.checkIncheckOutHeader = "Return Book";
+    checkInBook(_user:UserDetails):void{
+        if(_user.BorrowedBooksCount == 1)
+        {
+            this.getBookCirculartionByUserId(_user.UserId  ?? 0 );
         }
         else {
             this.currentUser = { ..._user };
@@ -934,8 +946,44 @@ export class ManageUsersComponent {
         }
     }
 
-    checkOutBook(_user: UserDetails): void {
-        this.checkOutDialogVisible = true;
-        this.checkIncheckOutHeader = "Issue Book";
+    checkOutBook(_user:UserDetails):void{
+
+        this.bc  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId: _user.UserId, BorrowerName : _user.FullName, 
+                        IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
+                        IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+                        OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
+                        ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
+                        UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
+        
+        this.type = "CheckOut";
+
+        this.bcDialogVisible = true;
+        
+    }
+
+    getBookCirculartionByUserId(_userId: number): void{
+
+        this._bcService.getBookCirculationDetailsByUserId(_userId).subscribe({
+            next: (data: BookCirculationDetails[]) => {
+                
+                this.bc = data.find(x => x.Status ==  "Issued" && x.BorrowerId == _userId) ?? null;              
+
+                this.type = "CheckIn";
+                this.bcDialogVisible = true;
+            },
+            error: (err) => {
+                console.error('Error loading book circulation by BookId:', err);
+            }
+        });
+    }
+
+    parseCustomDateStringForUI(dateStr: Date): string {
+            // 2. Pad single digits with leading zeros
+            const day = String(dateStr.getDate()).padStart(2, '0');
+            const month = String(dateStr.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const year = dateStr.getFullYear();      
+    
+            // 3. Assemble into the exact "yyyy-mm-dd" layout match        
+            return  `${year}-${month}-${day}`;
     }
 }

@@ -7,7 +7,9 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MessageService } from 'primeng/api';
-import { CredDetails } from '../../shared/models/api.models';
+import { CredDetails, OrganizationDetails } from '../../shared/models/api.models';
+import { OrganizationService } from '@app/shared/services/organization.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-login',
@@ -19,13 +21,33 @@ import { CredDetails } from '../../shared/models/api.models';
 export class LoginComponent {
     private authService = inject(AuthService);
     private userService = inject(UserService);
+    private orgService = inject(OrganizationService);
     private router = inject(Router);
     private messageService = inject(MessageService);
+    public _org: OrganizationDetails = environment.OrganizationDetails;
 
     username = signal('');
     password = signal('');
     validationError = signal('');
     loading = signal(false);
+
+    ngOnInit(): void {
+        this.getOrganizationDetails();
+    }
+
+    getOrganizationDetails():void{
+        this.orgService.getOrganizationDetails().subscribe({
+                    next: (data: OrganizationDetails[]) => {
+                        if (data && data.length > 0) {
+                            this._org = data.find(x => x.IsActive == true) ?? environment.OrganizationDetails;                            
+                            this.authService.setOrganizationDetails(this._org);
+                        }
+                    },
+                    error: (err) => {
+                        console.error('Error loading OrganizationDetails:', err);
+                    }
+                });
+    }
 
     handleLogin(e: Event): void {
         e.preventDefault();

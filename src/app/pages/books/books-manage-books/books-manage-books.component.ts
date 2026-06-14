@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { BookService } from '@services/book.service';
-import { AuthorDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails } from '@app/shared/models/api.models';
+import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, UserDetails } from '@app/shared/models/api.models';
 import { MessageService } from 'primeng/api';
 import { AuthorService } from '@app/shared/services/author.service';
 import { PublisherService } from '@app/shared/services/publisher.service';
@@ -27,6 +27,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TabViewModule } from 'primeng/tabview';
 import { BooksViewCirculationComponent } from '../books-view-circulation/books-view-circulation.component';
 import { NgxBarcode6 } from 'ngx-barcode6';
+import { BookCirculationService } from '@app/shared/services/book-circulation.service';
+import { AuthService } from '@app/shared/services/auth.service';
+import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -39,7 +42,7 @@ type ImportBookDetails = BookDetails & {
         CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
         SelectModule, FormsModule, DatePickerModule, TooltipModule,
-        TabViewModule, BooksViewCirculationComponent, NgxBarcode6
+        TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent
     ],
     templateUrl: './books-manage-books.component.html',
     styleUrl: './books-manage-books.component.scss'
@@ -56,7 +59,9 @@ export class BooksManageBooksComponent implements OnInit {
     private buildingService = inject(BuildingService);
     private floorService = inject(FloorService);
     private rackService = inject(RackService);
-
+    private _bcService = inject(BookCirculationService);
+    private _authService = inject(AuthService);
+    
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
 
@@ -178,7 +183,17 @@ export class BooksManageBooksComponent implements OnInit {
     printBarcodeDialogVisible: boolean = false;
     isViewOnly: boolean = false;
 
+    public loggedInUserDetails: UserDetails = {};
+    public bc: BookCirculationDetails | null = null;
+    public type: string = '';
+    public bcDialogVisible: boolean = false;
+    public todayDate :string | undefined;
+
     ngOnInit(): void {
+        const today = new Date();
+        this.todayDate = this.parseCustomDateStringForUI(today);
+
+        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
         this.loadBooks();
         this.loadAuthors();
         this.loadPublishers();
@@ -525,12 +540,13 @@ export class BooksManageBooksComponent implements OnInit {
     }
 
     onPublishedYearChange(): void {
+        
         if (this.publishedDate) {
             this.currentBook.PublishedYear = this.publishedDate.getFullYear();
         }
         else {
             this.currentBook.PublishedYear = null;
-        }
+        }       
 
         this.validateInput('PublishedYear');
     }
@@ -719,21 +735,71 @@ export class BooksManageBooksComponent implements OnInit {
         const isBuildingIdValid = this.validateInput('BuildingId');
         const isFloorIdValid = this.validateInput('FloorId');
         const isRackIdValid = this.validateInput('RackId');
-        const isBookBarcodeValid = this.validateInput('BookBarcode');
+        // const isBookBarcodeValid = this.validateInput('BookBarcode');
         const isStatusValid = this.validateInput('IsActive');
         return isBookNameValid && isAuthorIdValid && isPublisherIdValid &&
             isCategoryIdValid && isLanguageIdValid && isPublishedYearValid &&
             isPriceValid && isBuildingIdValid && isFloorIdValid &&
-            isRackIdValid && isBookBarcodeValid && isStatusValid;
+            isRackIdValid && isStatusValid;
     }
 
     saveBook(): void {
+
+        console.log('currentBook :', this.currentBook);
+
         if (!this.validateBook()) {
             return;
         }
 
         const payload = [this.currentBook];
-        this.bookService.updateBookDetails(payload).subscribe({
+
+        if(this.currentBook.BookId >0)
+        {
+            this.updateBook(payload);
+        }
+        else
+        {
+            this.addNewBook(payload);
+        }
+        
+        
+    }
+
+    addNewBook(_bookDetails: BookDetails[]): void
+    {
+        this.bookService.addBookDetails(_bookDetails).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage Book - Failed',
+                        detail: res ? res.Message : 'Failed to add new book. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage Book - Success',
+                        detail: 'Book added successfully.'
+                    });
+
+                    this.loadBooks();
+                    this.bookDialogVisible = false;
+                }
+
+                
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage Book - Failed',
+                    detail: 'Failed to add new book. Please try again.'
+                });
+            }
+        });
+    }
+
+    updateBook(_bookDetails: BookDetails[]): void{
+        this.bookService.updateBookDetails(_bookDetails).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
@@ -747,10 +813,12 @@ export class BooksManageBooksComponent implements OnInit {
                         summary: 'Manage Book - Success',
                         detail: 'Book updated successfully.'
                     });
+                    
+                    this.loadBooks();
+                    this.bookDialogVisible = false;
                 }
 
-                this.loadBooks();
-                this.bookDialogVisible = false;
+               
             },
             error: () => {
                 this.messageService.add({
@@ -1393,11 +1461,49 @@ export class BooksManageBooksComponent implements OnInit {
         }
     }
 
-    checkInBook(bookId: number): void {
-
+    checkInBook(_book: BookDetails) : void{
+        this.getBookCirculartionBookId(_book.BookId);
     }
 
-    checkOutBook(bookId: number): void {
+    checkOutBook(_book: BookDetails) : void{   
+          
+        
+        this.bc  = { BookCirculationId: 0, BookId: _book.BookId,  BookName: _book.BookName, BorrowerId:0, BorrowerName : '', 
+                        IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
+                        IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+                        OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
+                        ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
+                        UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
+        
+        this.type = "CheckOut";
+        this.bcDialogVisible = true;
 
+        // console.log('this.bc :', this.bc);
+    }
+
+    getBookCirculartionBookId(_bookId: number): void{
+
+        this._bcService.getBookCirculationDetailsById(_bookId).subscribe({
+            next: (data: BookCirculationDetails[]) => {
+                
+                this.bc = data.find(x => x.Status ==  "Issued") ?? null;              
+
+                this.type = "CheckIn";
+                this.bcDialogVisible = true;
+            },
+            error: (err) => {
+                console.error('Error loading book circulation by BookId:', err);
+            }
+        });
+    }
+
+    parseCustomDateStringForUI(dateStr: Date): string {
+            // 2. Pad single digits with leading zeros
+            const day = String(dateStr.getDate()).padStart(2, '0');
+            const month = String(dateStr.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const year = dateStr.getFullYear();      
+    
+            // 3. Assemble into the exact "yyyy-mm-dd" layout match        
+            return  `${year}-${month}-${day}`;
     }
 }

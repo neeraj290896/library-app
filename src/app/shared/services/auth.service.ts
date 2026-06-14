@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { UserDetails } from '../models/api.models';
+import { OrganizationDetails, UserDetails } from '../models/api.models';
 
 @Injectable({
     providedIn: 'root'
@@ -8,6 +8,7 @@ export class AuthService {
     readonly userRole = signal<string | null | undefined>(null);
     readonly userName = signal<string | null | undefined>(null);
     readonly userData = signal<UserDetails | null>(null);
+    readonly organizationDetails = signal<OrganizationDetails | null>(null);
 
     readonly userDataTemp = {
                         "UserId": 1,
@@ -32,6 +33,10 @@ export class AuthService {
         // this.userData.set(userDetails);
         this.userRole.set(userDetails.RoleName);
         this.userName.set(userDetails.FullName);
+    }
+
+    setOrganizationDetails(_org: OrganizationDetails): void {
+        this.organizationDetails.set(_org);        
     }
 
     logout(): void {

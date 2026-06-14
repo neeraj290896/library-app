@@ -131,7 +131,7 @@ export class BooksManageCategoryComponent implements OnInit {
             this.header = 'Edit Category';
         }
         else {
-            this.currentCategory = { CategoryId: 0, CategoryName: '', IsActive: null };
+            this.currentCategory = { CategoryId: 0, CategoryName: '', IsActive: true };
             this.header = 'Add Category';
         }
         this.errors = { CategoryName: '', IsActive: '' };

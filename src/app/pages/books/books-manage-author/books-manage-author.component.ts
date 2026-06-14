@@ -131,7 +131,7 @@ export class BooksManageAuthorComponent implements OnInit {
             this.header = 'Edit Author';
         }
         else {
-            this.currentAuthor = { AuthorId: 0, AuthorName: '', IsActive: null };
+            this.currentAuthor = { AuthorId: 0, AuthorName: '', IsActive: true };
             this.header = 'Add Author';
         }
         this.errors = { AuthorName: '', IsActive: '' };

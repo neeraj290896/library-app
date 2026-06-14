@@ -31,6 +31,7 @@ import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
 import { IssueReturnBooksComponent } from '../checkout/issue-return-books/issue-return-books.component';
 import { SearchComponent } from '@app/shared/components/search/search.component';
+import { AuthService } from '@app/shared/services/auth.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -59,6 +60,7 @@ export class DashboardComponent {
     private rackService = inject(RackService);
     private userService = inject(UserService);
     private roleService = inject(RoleService);
+    private authService = inject(AuthService);
 
     public currentDate: Date = new Date();
 
@@ -204,6 +206,7 @@ export class DashboardComponent {
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
     public bcDialogVisible: boolean = false;
+    public loggedInUserDetails: UserDetails = {};
 
     ngOnInit(): void {
         let today = new Date();
@@ -218,6 +221,12 @@ export class DashboardComponent {
         this.userMaxDate = new Date();
         this.userMaxDate.setMonth(12);
         this.userMaxDate.setFullYear(userMaxYear);
+
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+     
+
+        this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
 
         this.loadDashboardSummary();
         this.loadOverDueDetails();
@@ -377,7 +386,7 @@ export class DashboardComponent {
     loadRoleDetails(): void {
         this.roleService.getRoleDetails().subscribe({
             next: (data: RoleDetails[]) => {
-                this.roles = data;
+                this.roles = data.filter(x => x.RoleId >= (this.loggedInUserDetails?.RoleId ?? 0));
                 this.roleOptions = data.map(role => {
                     return { label: role.RoleName ?? '', value: role.RoleId };
                 });
@@ -429,7 +438,7 @@ export class DashboardComponent {
             RackNumber: 0,
             RackLabel: '',
             BookBarcode: '',
-            IsActive: null
+            IsActive: true
         };
         this.publishedDate = null;
         this.bookErrors = {
@@ -725,7 +734,7 @@ export class DashboardComponent {
     openRegisterUserDialog(): void {
         this.currentUser = {
             UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '',
-            RoleId: 0, RoleName: '', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: null
+            RoleId: 0, RoleName: '', CreatedByUserId: this.loggedInUserDetails.UserId, CreatedByUserName: this.loggedInUserDetails.FullName, IsActive: true, Status: 'Pending'
         };
         this.userErrors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
         this.registerUserDialogVisible = true;

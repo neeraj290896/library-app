@@ -215,12 +215,11 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                        <button pButton icon="pi pi-pencil" (click)="editBook(book)" *ngIf = "!(book.Status == 'Returned')"
-                            class="p-button-rounded p-button-text p-button-sm"></button> 
+                        <button pButton icon="pi pi-sign-in" (click)="editBook(book)" *ngIf = "!(book.Status == 'Returned')"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckIn"></button> 
 
-                            <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
-                            class="p-button-rounded p-button-text p-button-sm"></button> 
-                                              
+                        <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
+                            class="p-button-rounded p-button-text p-button-sm"></button>                                               
                     </div>
                 </td>
             </tr>
@@ -232,7 +231,7 @@
             </tr>
         </ng-template>
     </p-table>
-    <p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
+    <!-- <p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
         <div class="row">
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="book">
@@ -273,7 +272,7 @@
              <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="comments">
                     Comments
-                    <!-- <sup>*</sup> -->
+                    <!-- <sup>*</sup> ->
                 </label>
                 <input id="comments" type="text" class="form-control" pInputText
                     [(ngModel)]="selectedBook.Comments" [ngModelOptions]="{standalone: true}"
@@ -375,5 +374,11 @@
                     (click)="saveBcDetails()"></p-button>
             </div>
         </ng-template>
-    </p-dialog>
+    </p-dialog> -->
+
+     @if (bcDialogVisible) {
+    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = null [isViewOnly]="false"
+        (onSuccess)="getAllBookCirculartion()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
+    }
+
 </div>

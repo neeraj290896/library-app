@@ -1,8 +1,13 @@
 <p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body"
     (onHide)="hideDialog()">
-    <div class="mb-3">
+    <ng-template pTemplate="header">
+            <span *ngIf="selectedBook.BookCirculationId  == null || selectedBook.BookCirculationId  == 0">{{header}}</span>
+            <!-- Empty span prevents layout collapse when text is hidden -->
+            <span *ngIf="selectedBook.BookCirculationId  !=null && selectedBook.BookCirculationId  >0">{{header}} (Book Circulation ID: {{ selectedBook.BookCirculationId }})</span> 
+        </ng-template>
+    <!-- <div class="mb-3">
         <p class="small fw-medium text-secondary mb-1">Book Circulation ID: {{ selectedBook.BookCirculationId }}</p>
-    </div>
+    </div> -->
     <div class="row">
         <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="book">
@@ -19,7 +24,7 @@
                 Borrower Name<sup>*</sup>
             </label>
             <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
-                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"
+                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [disabled]="!isIssueNewBook"
                 [editable]="true" styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
             <div *ngIf="errors.BorrowerName" class="text-danger mt-1 small">{{ errors.BorrowerName }}</div>
         </div>
@@ -37,8 +42,8 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="issuedDate">
                 Issued Date<sup>*</sup>
             </label>
-            <p-datepicker [(ngModel)]="selectedBook.IssuedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
-                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [minDate]="minDate"
+            <p-datepicker [(ngModel)]="selectedBook.IssuedDate" [ngModelOptions]="{standalone: true}" appendTo="body" dataType="string"
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [minDate]="minDate" [disabled]="true"
                 [maxDate]="maxDate" placeholder="Select Issued Date" styleClass="w-100" inputStyleClass="w-100" />
         </div>
         <hr>
@@ -73,7 +78,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="returnedDate">
                 Returned Date<sup>*</sup>
             </label>
-            <p-datepicker [(ngModel)]="selectedBook.ReturnDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+            <p-datepicker [(ngModel)]="selectedBook.ReturnDate" [ngModelOptions]="{standalone: true}" appendTo="body" dataType="string"
                 [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [maxDate]="maxDate"
                 placeholder="Select Return Date" styleClass="w-100" inputStyleClass="w-100" />
         </div>
@@ -82,7 +87,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="overDueFrom">
                 OverDue From<sup>*</sup>
             </label>
-            <p-datepicker [(ngModel)]="selectedBook.OverDueFrom" [ngModelOptions]="{standalone: true}" appendTo="body"
+            <p-datepicker [(ngModel)]="selectedBook.OverDueFrom" [ngModelOptions]="{standalone: true}" appendTo="body" dataType="string"
                 [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [disabled]="true"
                 placeholder="Select Over Due Date" styleClass="w-100" inputStyleClass="w-100" />
         </div>

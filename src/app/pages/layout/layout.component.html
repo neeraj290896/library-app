@@ -55,8 +55,8 @@
             <div class="d-flex align-items-center justify-content-between py-1 px-4">
                 <div class="col-4"></div>
                 <div class="col-4 d-flex align-items-center justify-content-center">
-                    <img src="assets/images/logo.png" alt="Logo" class="header-logo me-3" />
-                    <h2 class="fs-5 fw-semibold mb-0">Mystic Falls High School</h2>
+                    <img src="{{organizationDetails()?.LogoPath}}" alt="Logo" class="header-logo me-3" />
+                    <h2 class="fs-5 fw-semibold mb-0">{{ organizationDetails()?.OrganizationName}}</h2>
                 </div>
                 <div class="col-4 d-flex align-items-center justify-content-end gap-3 fs-5">
                     <span>🔔</span>

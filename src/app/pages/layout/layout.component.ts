@@ -3,6 +3,8 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from "primeng/tooltip";
+import { OrganizationDetails } from '@app/shared/models/api.models';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-layout',
@@ -18,6 +20,7 @@ export class LayoutComponent {
 
     userRole = this.authService.userRole;
     userName = this.authService.userName;
+    public organizationDetails = this.authService.organizationDetails ?? environment.OrganizationDetails;
     sidebarCollapsed = signal(true);
 
     public readonly menuItems = [

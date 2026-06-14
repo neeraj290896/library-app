@@ -131,7 +131,7 @@ export class BooksManageLanguageComponent implements OnInit {
             this.header = 'Edit Language';
         }
         else {
-            this.currentLanguage = { LanguageId: 0, LanguageName: '', IsActive: null };
+            this.currentLanguage = { LanguageId: 0, LanguageName: '', IsActive: true };
             this.header = 'Add Language';
         }
         this.errors = { LanguageName: '', IsActive: '' };

@@ -131,7 +131,7 @@ export class BooksManagePublisherComponent implements OnInit {
             this.header = 'Edit Publisher';
         }
         else {
-            this.currentPublisher = { PublisherId: 0, PublisherName: '', IsActive: null };
+            this.currentPublisher = { PublisherId: 0, PublisherName: '', IsActive: true };
             this.header = 'Add Publisher';
         }
         this.errors = { PublisherName: '', IsActive: '' };
