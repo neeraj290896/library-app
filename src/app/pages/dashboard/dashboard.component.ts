@@ -14,7 +14,6 @@ import { BooksOverdueComponent } from '../checkout/books-overdue/books-overdue.c
 import { BooksManageBooksComponent } from '../books/books-manage-books/books-manage-books.component';
 import { ManageIssuedBooksComponent } from '../checkout/manage-issued-books/manage-issued-books.component';
 import { ManageUsersComponent } from '../admin/manage-users/manage-users.component';
-import { ManageReturnedBooksComponent } from '../checkout/manage-returned-books/manage-returned-books.component';
 import { AuthorService } from '@app/shared/services/author.service';
 import { BuildingService } from '@app/shared/services/building.service';
 import { CategoryService } from '@app/shared/services/category.service';
@@ -32,6 +31,7 @@ import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { BookCirculationService } from '@app/shared/services/book-circulation.service';
+import { IssueReturnBooksComponent } from '../checkout/issue-return-books/issue-return-books.component';
 
 @Component({
     selector: 'app-dashboard',
@@ -40,7 +40,8 @@ import { BookCirculationService } from '@app/shared/services/book-circulation.se
         FormsModule, InputTextModule, PaginatorModule, DialogModule,
         BooksOverdueComponent, BooksManageBooksComponent,
         ManageIssuedBooksComponent, ManageUsersComponent,
-        MultiSelectModule, SelectModule, DatePickerModule, TooltipModule
+        MultiSelectModule, SelectModule, DatePickerModule, TooltipModule,
+        IssueReturnBooksComponent
     ],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
@@ -204,30 +205,9 @@ export class DashboardComponent {
     public userMinDate: Date | undefined;
     public userMaxDate: Date | undefined;
 
-    public loggedInUserDetails: UserDetails = {};
-    public lstUserDetails: UserDetails[] = [];
-    public lstBookDetails: BookDetails[] = [];
-    public bookOptions: { label: string; value: number; }[] = [];
-    public userOptions: { label: string; value: number; }[] = [];
-    public issueStatusOptions: { label: string; value: string; }[] = [
-        { label: 'Issued', value: 'Issued' }
-    ];
-    public currentIssueBook: BookCirculationDetails = {
-        BookCirculationId: 0, BookId: 0, BookName: '', BorrowerId: 0, BorrowerName: '', IssuedByUserId: 0, IssuedByUserName: '',
-        IssuedDate: '', OverDueId: 0, FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: '',
-        ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: '', Comments: '', Status: '', UpdatedByUserId: 0,
-        UpdatedByUserName: '', UpdatedDate: '', BorrowerMailId: '', IssuedByUserMailId: '', ReturnByUserMailId: '',
-        UpdatedByUserMailId: ''
-    };
-    public issueBookErrors: {
-        BookName: string, BorrowerName: string, IssuedByUserName: string, Status: string
-    } = {
-            BookName: '', BorrowerName: '', IssuedByUserName: '', Status: ''
-        };
-
-    public todayDate: string | undefined;
-    public issueMinDate: Date | undefined;
-    public issueMaxDate: Date | undefined;
+    public bc: BookCirculationDetails | null = null;
+    public type: string = '';
+    public bcDialogVisible: boolean = false;
 
     ngOnInit(): void {
         let today = new Date();
@@ -242,16 +222,6 @@ export class DashboardComponent {
         this.userMaxDate = new Date();
         this.userMaxDate.setMonth(12);
         this.userMaxDate.setFullYear(userMaxYear);
-
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
-
-        this.issueMinDate = yesterday;
-        this.issueMaxDate = new Date();
-
-        this.todayDate = this.parseCustomDateStringForUI(today);
-
-        this.loggedInUserDetails = this.authService.userData() ?? {};
 
         this.loadDashboardSummary();
         this.loadOverDueDetails();
@@ -418,34 +388,6 @@ export class DashboardComponent {
             },
             error: (err) => {
                 console.error('Error loading role:', err);
-            }
-        });
-    }
-
-    loadBookDetails(): void {
-        this.bookService.getAllBookDetails().subscribe({
-            next: (data: BookDetails[]) => {
-                this.lstBookDetails = data;
-                this.bookOptions = data.filter(x => x.Status == "Available").map(book => {
-                    return { label: book.BookName ?? '', value: book.BookId };
-                });
-            },
-            error: (err) => {
-                console.error('Error loading books:', err);
-            }
-        });
-    }
-
-    loadUserDetails(): void {
-        this.userService.getAllUserDetails().subscribe({
-            next: (data: UserDetails[]) => {
-                this.lstUserDetails = data;
-                this.userOptions = data.filter(x => x.IsActive == true && x.FullName?.trim() != '').map(usr => {
-                    return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                });
-            },
-            error: (err) => {
-                console.error('Error loading users:', err);
             }
         });
     }
@@ -938,140 +880,9 @@ export class DashboardComponent {
     }
 
     openIssueBookDialog(): void {
-        this.loadBookDetails();
-        this.loadUserDetails();
-        this.currentIssueBook = {
-            BookCirculationId: 0, BookId: 0, BookName: '', BorrowerId: 0, BorrowerName: '',
-            IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
-            IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
-            OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
-            ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
-            UpdatedByUserName: '', UpdatedDate: null
-        };
-        this.issueBookErrors = { BookName: '', BorrowerName: '', IssuedByUserName: '', Status: '' };
+        this.bc = null;
+        this.type = 'CheckOut';
         this.issueBookDialogVisible = true;
-    }
-
-    onBookChange(): void {
-        const book = this.bookOptions.find(l => l.value === this.currentIssueBook.BookId);
-        if (book) {
-            this.currentIssueBook.BookName = book.label;
-        }
-
-        this.validateIssueBookInput('BookName');
-    }
-
-    onBorrowerChange(): void {
-        const _borrower = this.lstUserDetails.find(l => l.UserId === this.currentIssueBook.BorrowerId);
-        if (_borrower) {
-            this.currentIssueBook.BorrowerName = _borrower.FullName;
-            this.currentIssueBook.BorrowerMailId = _borrower.MailId;
-        }
-
-        this.validateIssueBookInput('BorrowerName');
-    }
-
-    onIssuedChange(): void {
-        const _issuedBy = this.lstUserDetails.find(l => l.UserId === this.currentIssueBook.IssuedByUserId);
-        if (_issuedBy) {
-            this.currentIssueBook.IssuedByUserName = _issuedBy.FullName;
-            this.currentIssueBook.IssuedByUserMailId = _issuedBy.MailId;
-        }
-
-        this.validateIssueBookInput('IssuedByUserName');
-    }
-
-    validateIssueBookInput(key: string): boolean {
-        let isValid = true;
-
-        switch (key) {
-            case 'BookName':
-                if (!this.currentIssueBook.BookName?.trim()) {
-                    this.issueBookErrors.BookName = 'Book name is required.';
-                    isValid = false;
-                }
-                else {
-                    this.issueBookErrors.BookName = '';
-                }
-                break;
-
-            case 'BorrowerName':
-                if (!this.currentIssueBook.BorrowerName?.trim()) {
-                    this.issueBookErrors.BorrowerName = 'Borrower Name is required.';
-                    isValid = false;
-                } else {
-                    this.issueBookErrors.BorrowerName = '';
-                }
-                break;
-
-            case 'IssuedByUserName':
-                if (!this.currentIssueBook.IssuedByUserName?.trim()) {
-                    this.issueBookErrors.IssuedByUserName = 'IssuedBy Name is required.';
-                    isValid = false;
-                } else {
-                    this.issueBookErrors.IssuedByUserName = '';
-                }
-                break;
-
-            case 'Status':
-                if (!this.currentIssueBook.Status?.trim()) {
-                    this.issueBookErrors.Status = 'Status is required.';
-                    isValid = false;
-                } else {
-                    this.issueBookErrors.Status = '';
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        return isValid;
-    }
-
-    validateIssueBookDetails(): boolean {
-        const isBookNameValid = this.validateIssueBookInput('BookName');
-        const isBorrowerNameValid = this.validateIssueBookInput('BorrowerName');
-        const isIssuedByUserNameValid = this.validateIssueBookInput('IssuedByUserName');
-        const isStatusValid = this.validateIssueBookInput('Status');
-        return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid;
-    }
-
-    saveIssueBookDetails(): void {
-        if (!this.validateIssueBookDetails()) {
-            return;
-        }
-
-        const payload = {
-            ...this.currentIssueBook,
-            IssuedDate: this.parseCustomDateStringForAPI(this.currentIssueBook.IssuedDate ?? "")
-        };
-        this.bookCirculationService.issueBook(payload).subscribe({
-            next: (res: any) => {
-                if (!res || !res.Status) {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Issue Book - Failed',
-                        detail: res ? res.Message : 'Failed to issue book. Please try again.'
-                    });
-                } else {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Issue Book - Success',
-                        detail: 'Issued book successfully.'
-                    });
-                }
-
-                this.issueBookDialogVisible = false;
-            },
-            error: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Issue Book - Failed',
-                    detail: 'Failed to issue book. Please try again.'
-                });
-            }
-        });
     }
 
     openReturnBooksDialog(): void {
