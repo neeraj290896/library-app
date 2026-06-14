@@ -6,11 +6,7 @@
                 <h2 class="fs-4 fw-semibold mb-1">Welcome!</h2>
                 <p class="small text-muted mb-0">{{ currentDate | date:'fullDate' }}</p>
             </div>
-            <div class="position-relative">
-                <span class="pi pi-search search-icon position-absolute text-muted"></span>
-                <input pInputText type="text" placeholder="Search" [(ngModel)]="searchTerm"
-                    (input)="onSearch(searchTerm)" class="form-control ps-5" />
-            </div>
+            <app-search></app-search>
         </div>
     </div>
 
@@ -316,72 +312,5 @@
     </ng-template>
 </p-dialog>
 
-<p-dialog header="Issue Book" [(visible)]="issueBookDialogVisible" [modal]="true" [style]="{ width: '60vw' }"
-    appendTo="body" (onHide)="loadDashboardSummary()">
-    <div class="row">
-        <div class="col-6 mb-3">
-            <label class="d-block small fw-medium text-secondary mb-1" for="book">
-                Book Name<sup>*</sup>
-            </label>
-            <p-select id="book" [(ngModel)]="currentIssueBook.BookId" [ngModelOptions]="{standalone: true}" [editable]="true"
-                [options]="bookOptions" optionLabel="label" optionValue="value" placeholder="Select Book"
-                styleClass="w-100" appendTo="body" (ngModelChange)="onBookChange()" />
-            <div *ngIf="issueBookErrors.BookName" class="text-danger mt-1 small">{{ issueBookErrors.BookName }}</div>
-        </div>
-        <div class="col-6 mb-3">
-            <label class="d-block small fw-medium text-secondary mb-1" for="borrowerName">
-                Borrower Name<sup>*</sup>
-            </label>
-            <p-select id="borrowerName" [(ngModel)]="currentIssueBook.BorrowerId" [ngModelOptions]="{standalone: true}"
-                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [editable]="true"
-                styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
-            <div *ngIf="issueBookErrors.BorrowerName" class="text-danger mt-1 small">{{ issueBookErrors.BorrowerName }}
-            </div>
-        </div>
-        <div class="col-6 mb-3">
-            <label class="d-block small fw-medium text-secondary mb-1" for="issuedBy">
-                Issued By<sup>*</sup>
-            </label>
-            <p-select id="issuedBy" [disabled]="true" [(ngModel)]="currentIssueBook.IssuedByUserId"
-                [ngModelOptions]="{standalone: true}" [options]="userOptions" optionLabel="label" optionValue="value"
-                placeholder="Select IssuedBy" styleClass="w-100" appendTo="body" (ngModelChange)="onIssuedChange()" />
-            <div *ngIf="issueBookErrors.IssuedByUserName" class="text-danger mt-1 small">
-                {{ issueBookErrors.IssuedByUserName }}
-            </div>
-        </div>
-        <div class="col-6 mb-3">
-            <label class="d-block small fw-medium text-secondary mb-1" for="issuedDate">
-                Issued Date<sup>*</sup>
-            </label>
-            <p-datepicker [(ngModel)]="currentIssueBook.IssuedDate" [ngModelOptions]="{standalone: true}"
-                appendTo="body" [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd"
-                [minDate]="issueMinDate" [maxDate]="issueMaxDate" placeholder="Select Issued Date" styleClass="w-100"
-                inputStyleClass="w-100" />
-        </div>
-        <hr>
-        <div class="col-6 mb-3">
-            <label class="d-block small fw-medium text-secondary mb-1" for="comments">
-                Comments
-            </label>
-            <input id="comments" type="text" class="form-control" pInputText [(ngModel)]="currentIssueBook.Comments"
-                [ngModelOptions]="{standalone: true}" placeholder="Enter Comments" />
-        </div>
-        <div class="col-6 mb-3">
-            <label class="d-block small fw-medium text-secondary mb-1" for="status">
-                Status<sup>*</sup>
-            </label>
-            <p-select id="status" [disabled]="true" [(ngModel)]="currentIssueBook.Status"
-                [ngModelOptions]="{standalone: true}" [options]="issueStatusOptions" optionLabel="label"
-                optionValue="value" placeholder="Select Status" (ngModelChange)="validateIssueBookInput('Status')"
-                styleClass="w-100" appendTo="body" />
-        </div>
-    </div>
-    <ng-template pTemplate="footer">
-        <div class="d-flex justify-content-end align-items-center gap-3">
-            <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
-                styleClass="btn-main-outlined" (click)="issueBookDialogVisible = false"></p-button>
-            <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
-                (click)="saveIssueBookDetails()"></p-button>
-        </div>
-    </ng-template>
-</p-dialog>
+<app-issue-return-books [bc]="bc" [type]="type" [showDialog]="issueBookDialogVisible"
+    (onSuccess)="loadDashboardSummary()" (onDialogClose)="issueBookDialogVisible = false"></app-issue-return-books>

@@ -1,0 +1,19 @@
+<div class="position-relative">
+    <span class="pi pi-search search-icon position-absolute text-muted"></span>
+    <input pInputText type="text" placeholder="Search" [(ngModel)]="searchTerm" (keydown.enter)="onSearch()"
+        class="form-control ps-5" />
+</div>
+
+<p-dialog header="Book Details" [(visible)]="showBookDialog" [modal]="true" [style]="{ width: '90vw' }"
+    (onHide)="onDialogClose()">
+    @if (showBookDialog) {
+    <app-books-manage-books [searchTerm]="searchTerm"></app-books-manage-books>
+    }
+</p-dialog>
+
+<p-dialog header="User Details" [(visible)]="showUserDialog" [modal]="true" [style]="{ width: '90vw' }"
+    (onHide)="onDialogClose()">
+    @if (showUserDialog) {
+    <app-manage-users [searchTerm]="searchTerm"></app-manage-users>
+    }
+</p-dialog>

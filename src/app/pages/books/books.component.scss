@@ -3,24 +3,5 @@ $color-primary: #22c55e;
 .books-container {
     .card-container {
         min-height: calc(100vh - 6rem);
-
-        .search-icon {
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
-        }
-
-        .form-control {
-            padding: 0.5rem 1rem 0.5rem 2.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-
-            &:focus {
-                border-color: $color-primary;
-                box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
-            }
-        }
     }
 }

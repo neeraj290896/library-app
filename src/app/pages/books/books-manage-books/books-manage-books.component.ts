@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Table, TableModule } from 'primeng/table';
@@ -48,6 +48,8 @@ type ImportBookDetails = BookDetails & {
     styleUrl: './books-manage-books.component.scss'
 })
 export class BooksManageBooksComponent implements OnInit {
+    @Input() public searchTerm: string = '';
+
     private messageService = inject(MessageService);
     private bookService = inject(BookService);
     private authorService = inject(AuthorService);
@@ -178,7 +180,7 @@ export class BooksManageBooksComponent implements OnInit {
 
     selectedBookDetails: BookDetails[] = [];
     selectedIds: number[] = [];
-    printBarcodeDialogVisible : boolean = false;
+    printBarcodeDialogVisible: boolean = false;
     isViewOnly: boolean = false;
 
     public loggedInUserDetails: UserDetails = {};
@@ -203,15 +205,28 @@ export class BooksManageBooksComponent implements OnInit {
     }
 
     loadBooks(): void {
-        this.bookService.getAllBookDetails().subscribe({
-            next: (data: BookDetails[]) => {
-                this.books = data;
-                this.initializeFilterLists();
-            },
-            error: (err) => {
-                console.error('Error loading books:', err);
-            }
-        });
+        if (this.searchTerm) {
+            this.bookService.searchBookDetails(this.searchTerm).subscribe({
+                next: (data: BookDetails[]) => {
+                    this.books = data;
+                    this.initializeFilterLists();
+                },
+                error: (err) => {
+                    console.error('Error loading books:', err);
+                }
+            });
+        }
+        else {
+            this.bookService.getAllBookDetails().subscribe({
+                next: (data: BookDetails[]) => {
+                    this.books = data;
+                    this.initializeFilterLists();
+                },
+                error: (err) => {
+                    console.error('Error loading books:', err);
+                }
+            });
+        }
     }
 
     loadAuthors(): void {
@@ -468,7 +483,7 @@ export class BooksManageBooksComponent implements OnInit {
                     return { label: rack.RackLabel ?? '', value: rack.RackId };
                 });
         }
-        
+
         this.errors = {
             BookName: '',
             AuthorId: '',
@@ -1436,14 +1451,12 @@ export class BooksManageBooksComponent implements OnInit {
     onSelectionChange() {
         // Extract only the IDs from the selected objects
         this.selectedIds = this.selectedBookDetails.map(x => x.BookId);
-        
+
         console.log('Selected IDs:', this.selectedIds);
     }
 
-    printBarcode()
-    {
-        if(this.selectedIds !=null && this.selectedIds.length>0)
-        {
+    printBarcode() {
+        if (this.selectedIds != null && this.selectedIds.length > 0) {
             this.printBarcodeDialogVisible = true;
         }
     }
