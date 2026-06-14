@@ -1,7 +1,7 @@
 <div class="position-relative">
     <span class="pi pi-search search-icon position-absolute text-muted"></span>
     <input pInputText type="text" placeholder="Search" [(ngModel)]="searchTerm" (keydown.enter)="onSearch()"
-        class="form-control ps-5" [style]="{ width: '20rem' }" />
+        class="form-control ps-5" />
 </div>
 
 <p-dialog header="Book Details" [(visible)]="showBookDialog" [modal]="true" [style]="{ width: '90vw' }"
