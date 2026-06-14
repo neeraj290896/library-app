@@ -183,7 +183,7 @@ export interface MultipleUserDetails {
 
 export interface OrganizationDetails {
     OrganizationId: number;
-    OrganizationName?: string | null;
+    OrganizationName: string | null;
     LogoPath?: string | null;
     ImagePath?: string | null;
     IsActive: boolean;

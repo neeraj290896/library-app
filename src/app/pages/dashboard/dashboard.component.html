@@ -312,5 +312,5 @@
     </ng-template>
 </p-dialog>
 
-<app-issue-return-books [bc]="bc" [type]="type" [showDialog]="issueBookDialogVisible"
+<app-issue-return-books [bc]="bc" [type]="type" [showDialog]="issueBookDialogVisible" [selectedBorrower] = null [isViewOnly]="false"
     (onSuccess)="loadDashboardSummary()" (onDialogClose)="issueBookDialogVisible = false"></app-issue-return-books>

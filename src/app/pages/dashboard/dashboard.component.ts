@@ -31,6 +31,7 @@ import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
 import { IssueReturnBooksComponent } from '../checkout/issue-return-books/issue-return-books.component';
 import { SearchComponent } from '@app/shared/components/search/search.component';
+import { AuthService } from '@app/shared/services/auth.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -59,6 +60,7 @@ export class DashboardComponent {
     private rackService = inject(RackService);
     private userService = inject(UserService);
     private roleService = inject(RoleService);
+    private authService = inject(AuthService);
 
     public currentDate: Date = new Date();
 
@@ -204,6 +206,7 @@ export class DashboardComponent {
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
     public bcDialogVisible: boolean = false;
+    public loggedInUserDetails: UserDetails = {};
 
     ngOnInit(): void {
         let today = new Date();
@@ -221,11 +224,7 @@ export class DashboardComponent {
 
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
-
-        this.issueMinDate = yesterday;
-        this.issueMaxDate = new Date();
-
-        this.todayDate = this.parseCustomDateStringForUI(today);
+     
 
         this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
 

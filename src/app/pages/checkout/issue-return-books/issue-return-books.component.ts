@@ -91,9 +91,10 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
 
     ngOnInit(): void {
         const today = new Date();
+        this.todayDate = this.parseCustomDateStringForUI(today);
         this.setMinAndMaxDate(today);
         this.todayDate = this.parseCustomDateStringForUI(today);
-        this.loggedInUserDetails = this.authService.userData() ?? {};
+        this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
 
         this.loadBooks();
         this.loadUserDetails();
@@ -146,6 +147,7 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
             
             if (this.type === 'CheckIn') {
                 this.selectedBook.Status = 'Returned';
+                this.selectedBook.ReturnDate = this.todayDate;
             }
 
             this.returnByDifferentUser();
@@ -178,11 +180,11 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
             this.selectedBook = {
                 BookCirculationId: 0, BookId: 0, BookName: '',
                 BorrowerId: 0, BorrowerName: '', IssuedByUserId: this.loggedInUserDetails.UserId,
-                IssuedByUserName: this.loggedInUserDetails.FullName, IssuedDate: '', OverDueId: 0,
+                IssuedByUserName: this.loggedInUserDetails.FullName, IssuedDate: this.todayDate, OverDueId: 0,
                 FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0,
                 OverDueStatus: '', SytemUpdatedDate: '',
                 ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: '',
-                Comments: '', Status: '',
+                Comments: '', Status: 'Issued',
                 UpdatedByUserId: 0, UpdatedByUserName: '', UpdatedDate: '',
                 BorrowerMailId: '', IssuedByUserMailId: '', ReturnByUserMailId: '',
                 UpdatedByUserMailId: '', PaidAmount: 0, PaymentTypeId: 0
