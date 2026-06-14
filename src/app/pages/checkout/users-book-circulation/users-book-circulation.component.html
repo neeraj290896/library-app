@@ -230,7 +230,13 @@
             </tr>
         </ng-template>
     </p-table>
-    <p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
+
+    @if (bcDialogVisible) {
+    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = "selectedUserDetails" [isViewOnly]="false"
+        (onSuccess)="getUsersBookCirculartion()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
+    }
+
+    <!-- <p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
         <div class="row">
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="book">
@@ -271,7 +277,7 @@
              <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="comments">
                     Comments
-                    <!-- <sup>*</sup> -->
+                    <!-- <sup>*</sup> ->
                 </label>
                 <input id="comments" type="text" class="form-control" pInputText
                     [(ngModel)]="selectedBook.Comments" [ngModelOptions]="{standalone: true}"
@@ -373,5 +379,5 @@
                     (click)="saveBcDetails()"></p-button>
             </div>
         </ng-template>
-    </p-dialog>
+    </p-dialog> -->
 </div>

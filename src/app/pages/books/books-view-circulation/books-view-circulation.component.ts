@@ -19,12 +19,13 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '../../../../environments/environment';
 import { TransactionTypeService } from '@app/shared/services/transactiontype.service';
+import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
 
 @Component({
     selector: 'app-books-view-circulation',
     imports: [CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule,
         MultiSelectModule, DialogModule, InputTextModule,
-        SelectModule, FormsModule, DatePickerModule, TooltipModule],
+        SelectModule, FormsModule, DatePickerModule, TooltipModule, IssueReturnBooksComponent],
     templateUrl: './books-view-circulation.component.html',
     styleUrl: './books-view-circulation.component.scss'
 })
@@ -112,6 +113,8 @@ export class BooksViewCirculationComponent {
         public isIssueNewBook: boolean = false;
     
         public transactionTypeOptions: { label: string; value: number; }[] = [];
+        public bc: BookCirculationDetails | null = null;
+        public type: string = '';
     
         ngOnInit(): void {
     
@@ -360,415 +363,477 @@ export class BooksViewCirculationComponent {
             return 'danger';
            
         }
-    
-        editBook(_bc: BookCirculationDetails | null = null): void {
-    
-            if(_bc)
+
+        editBook(_bCD: BookCirculationDetails | null = null): void {
+
+            if(_bCD)
             {
-                this.isIssueNewBook = false;
-                this.bindOnlyActiveDetails();
-               
-                if(_bc.IssuedDate !=null)
-                {
-                    this.setMinAndMaxDate(new Date(_bc.IssuedDate));
-                }
-                else
-                {
-                     const today = new Date();
-                    this.setMinAndMaxDate(today);   
-                }
-                
-                
-                this.selectedBook  = { ..._bc };
-    
-                if(_bc.IssuedDate !=null && _bc.IssuedDate !="")
-                {
-                    this.selectedBook.IssuedDate = this.parseCustomDateStringForUI(new Date(_bc.IssuedDate));
-                }
-               
-                if(_bc.ReturnDate !=null && _bc.ReturnDate !="")
-                {
-                    this.selectedBook.ReturnDate = this.parseCustomDateStringForUI(new Date(_bc.ReturnDate));
-                }
-                else{
-                    this.selectedBook.ReturnDate = this.todayDate;
-                }
-    
-                if(_bc.OverDueFrom !=null && _bc.OverDueFrom !="")
-                {
-                    this.selectedBook.OverDueFrom = this.parseCustomDateStringForUI(new Date(_bc.OverDueFrom));
-                } 
-                
-                if(this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId>0)
-                {
-                    this.isOverDue = true;
-                }
-                else
-                {
-                    this.isOverDue = false;
-                }
-    
-                this.returnByDifferentUser();
-    
-                 if (_bc.Status == "Issued") {
-                    
-                    this.header = 'Update Issued Book Details';
-                } 
-                else {                
-                    this.header = 'Update Returned Book Details';
-                }
+                this.bc = { ..._bCD };
+                this.type = "CheckIn";
             }
             else
-            {   
-                this.isIssueNewBook = true;
-                this.bindOnlyActiveDetails();     
-                
-                const today = new Date();
-                this.setMinAndMaxDate(today);               
-    
-                this.selectedBook  = { BookCirculationId: 0, BookId: this.selectedMainBook.BookId,  BookName: this.selectedMainBook.BookName, BorrowerId:0, BorrowerName : '', 
+            {
+                this.bc = { BookCirculationId: 0, BookId: this.selectedMainBook.BookId,  BookName: this.selectedMainBook.BookName, BorrowerId:0, BorrowerName : '', 
                                     IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
                                     IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
                                     OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
                                     ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
                                     UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
-    
-                this.header = "Issue book";  
-                this.onBookChange();
+
+                this.type = "CheckOut";
             }
-    
-            console.log("selectedBook :", this.selectedBook);
-    
-            this.onStatusChange();
-            
-            this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount: '', PaymentTypeId:''} 
-                
+
             this.bcDialogVisible = true;
+            console.log('this.bc :', this.bc);
         }
     
-        bindOnlyActiveDetails() : void{
-            if(this.isIssueNewBook)
-            {
-                this.userOptions = this.lstUserDetails.filter(x => x.IsActive == true && x.FullName?.trim() !='').map(usr => {
-                            return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                        });
+        // editBook(_bCD: BookCirculationDetails | null = null): void {
+    
+        //     // if(_bc)
+        //     // {
+        //     //     this.isIssueNewBook = false;
+        //     //     this.bindOnlyActiveDetails();
+               
+        //     //     if(_bc.IssuedDate !=null)
+        //     //     {
+        //     //         this.setMinAndMaxDate(new Date(_bc.IssuedDate));
+        //     //     }
+        //     //     else
+        //     //     {
+        //     //          const today = new Date();
+        //     //         this.setMinAndMaxDate(today);   
+        //     //     }
                 
-                this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
-                        return { label: book.BookName ?? '', value: book.BookId };
-                    }); 
-            }
-            else
-            {
-                this.userOptions = this.lstUserDetails.filter(x => x.FullName?.trim() !='').map(usr => {
-                            return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                        });
+                
+        //     //     this.selectedBook  = { ..._bc };
     
-                this.bookOptions = this.lstBookDetails.map(book => {
-                        return { label: book.BookName ?? '', value: book.BookId };
-                    }); 
-            }
-        }
+        //     //     if(_bc.IssuedDate !=null && _bc.IssuedDate !="")
+        //     //     {
+        //     //         this.selectedBook.IssuedDate = this.parseCustomDateStringForUI(new Date(_bc.IssuedDate));
+        //     //     }
+               
+        //     //     if(_bc.ReturnDate !=null && _bc.ReturnDate !="")
+        //     //     {
+        //     //         this.selectedBook.ReturnDate = this.parseCustomDateStringForUI(new Date(_bc.ReturnDate));
+        //     //     }
+        //     //     else{
+        //     //         this.selectedBook.ReturnDate = this.todayDate;
+        //     //     }
     
-        validateInput(key: string): boolean {
-            let isValid = true;
+        //     //     if(_bc.OverDueFrom !=null && _bc.OverDueFrom !="")
+        //     //     {
+        //     //         this.selectedBook.OverDueFrom = this.parseCustomDateStringForUI(new Date(_bc.OverDueFrom));
+        //     //     } 
+                
+        //     //     if(this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId>0)
+        //     //     {
+        //     //         this.isOverDue = true;
+        //     //     }
+        //     //     else
+        //     //     {
+        //     //         this.isOverDue = false;
+        //     //     }
     
-            switch (key) {
-                case 'BookName':
-                    if (!this.selectedBook.BookName?.trim()) {
-                        this.errors.BookName = 'Book name is required.';
-                        isValid = false;
-                    }                 
-                    else {
-                        this.errors.BookName = '';
-                    }
-                    break;
+        //     //     this.returnByDifferentUser();
     
-                case 'BorrowerName':
-                    if (!this.selectedBook.BorrowerName?.trim()) {
-                        this.errors.BorrowerName = 'Borrower Name is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.BorrowerName = '';
-                    }
-                    break;
+        //     //      if (_bc.Status == "Issued") {
+                    
+        //     //         this.header = 'Update Issued Book Details';
+        //     //     } 
+        //     //     else {                
+        //     //         this.header = 'Update Returned Book Details';
+        //     //     }
+        //     // }
+        //     // else
+        //     // {   
+        //     //     this.isIssueNewBook = true;
+        //     //     this.bindOnlyActiveDetails();     
+                
+        //     //     const today = new Date();
+        //     //     this.setMinAndMaxDate(today);               
     
-                case 'IssuedByUserName':
-                    if (!this.selectedBook.IssuedByUserName?.trim()) {
-                        this.errors.IssuedByUserName = 'IssuedBy Name is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.IssuedByUserName = '';
-                    }
-                    break;
+        //     //     this.selectedBook  = { BookCirculationId: 0, BookId: this.selectedMainBook.BookId,  BookName: this.selectedMainBook.BookName, BorrowerId:0, BorrowerName : '', 
+        //     //                         IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
+        //     //                         IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+        //     //                         OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
+        //     //                         ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
+        //     //                         UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
+    
+        //     //     this.header = "Issue book";  
+        //     //     this.onBookChange();
+        //     // }
+    
+        //     // console.log("selectedBook :", this.selectedBook);
+    
+        //     // this.onStatusChange();
+            
+        //     // this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount: '', PaymentTypeId:''} 
+                
+        //     // this.bcDialogVisible = true;
+
+        //     if(_bCD)
+        //     {
+        //         this.bc = { ..._bCD };
+        //         this.type = "CheckIn";
+        //     }
+        //     else
+        //     {
+        //         this.bc = { BookCirculationId: 0, BookId: this.selectedMainBook.BookId,  BookName: this.selectedMainBook.BookName, BorrowerId:0, BorrowerName : '', 
+        //                             IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
+        //                             IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+        //                             OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
+        //                             ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
+        //                             UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
+
+        //         this.type = "CheckOut";
+        //     }
+
+            
+        //     this.bcDialogVisible = true;
+
+        //     console.log('this.bc :', this.bc);
+
+        // }
+    
+        // bindOnlyActiveDetails() : void{
+        //     if(this.isIssueNewBook)
+        //     {
+        //         this.userOptions = this.lstUserDetails.filter(x => x.IsActive == true && x.FullName?.trim() !='').map(usr => {
+        //                     return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+        //                 });
+                
+        //         this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
+        //                 return { label: book.BookName ?? '', value: book.BookId };
+        //             }); 
+        //     }
+        //     else
+        //     {
+        //         this.userOptions = this.lstUserDetails.filter(x => x.FullName?.trim() !='').map(usr => {
+        //                     return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+        //                 });
+    
+        //         this.bookOptions = this.lstBookDetails.map(book => {
+        //                 return { label: book.BookName ?? '', value: book.BookId };
+        //             }); 
+        //     }
+        // }
+    
+        // validateInput(key: string): boolean {
+        //     let isValid = true;
+    
+        //     switch (key) {
+        //         case 'BookName':
+        //             if (!this.selectedBook.BookName?.trim()) {
+        //                 this.errors.BookName = 'Book name is required.';
+        //                 isValid = false;
+        //             }                 
+        //             else {
+        //                 this.errors.BookName = '';
+        //             }
+        //             break;
+    
+        //         case 'BorrowerName':
+        //             if (!this.selectedBook.BorrowerName?.trim()) {
+        //                 this.errors.BorrowerName = 'Borrower Name is required.';
+        //                 isValid = false;
+        //             } else {
+        //                 this.errors.BorrowerName = '';
+        //             }
+        //             break;
+    
+        //         case 'IssuedByUserName':
+        //             if (!this.selectedBook.IssuedByUserName?.trim()) {
+        //                 this.errors.IssuedByUserName = 'IssuedBy Name is required.';
+        //                 isValid = false;
+        //             } else {
+        //                 this.errors.IssuedByUserName = '';
+        //             }
+        //             break;
                   
-                case 'Status':
-                    if (!this.selectedBook.Status?.trim()) {
-                        this.errors.Status = 'Status is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.Status = '';
-                    }
-                    break;
+        //         case 'Status':
+        //             if (!this.selectedBook.Status?.trim()) {
+        //                 this.errors.Status = 'Status is required.';
+        //                 isValid = false;
+        //             } else {
+        //                 this.errors.Status = '';
+        //             }
+        //             break;
     
-                case 'ReturnByUserName':
-                    if (this.selectedBook.Status?.trim() == "Returned" && !this.selectedBook.ReturnByUserName?.trim()) {
-                        this.errors.ReturnByUserName = 'ReturnBy Name is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.ReturnByUserName = '';
-                    }
-                    break;
-                case 'PaidAmount':
-                    if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.FineAmount !=null && this.selectedBook.FineAmount >0 && this.selectedBook.OverDueStatus =="Paid" && this.selectedBook.PaidAmount == null ) {
-                        this.errors.PaidAmount = 'Paid amount is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.PaidAmount = '';
-                    }
-                    break;
-                case 'PaymentType':
-                    if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.OverDueStatus =="Paid" && !(this.selectedBook.PaymentTypeId != null && this.selectedBook.PaymentTypeId >0)) {
-                        this.errors.PaymentTypeId = 'PaymentType is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.PaymentTypeId = '';
-                    }
-                    break;
+        //         case 'ReturnByUserName':
+        //             if (this.selectedBook.Status?.trim() == "Returned" && !this.selectedBook.ReturnByUserName?.trim()) {
+        //                 this.errors.ReturnByUserName = 'ReturnBy Name is required.';
+        //                 isValid = false;
+        //             } else {
+        //                 this.errors.ReturnByUserName = '';
+        //             }
+        //             break;
+        //         case 'PaidAmount':
+        //             if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.FineAmount !=null && this.selectedBook.FineAmount >0 && this.selectedBook.OverDueStatus =="Paid" && this.selectedBook.PaidAmount == null ) {
+        //                 this.errors.PaidAmount = 'Paid amount is required.';
+        //                 isValid = false;
+        //             } else {
+        //                 this.errors.PaidAmount = '';
+        //             }
+        //             break;
+        //         case 'PaymentType':
+        //             if (this.selectedBook.OverDueId !=null && this.selectedBook.OverDueId >0 && this.selectedBook.OverDueStatus =="Paid" && !(this.selectedBook.PaymentTypeId != null && this.selectedBook.PaymentTypeId >0)) {
+        //                 this.errors.PaymentTypeId = 'PaymentType is required.';
+        //                 isValid = false;
+        //             } else {
+        //                 this.errors.PaymentTypeId = '';
+        //             }
+        //             break;
     
-                default:
-                    break;
-            }
+        //         default:
+        //             break;
+        //     }
     
-            return isValid;
-        }
+        //     return isValid;
+        // }
     
-        validateBcDetails(): boolean {
-            const isBookNameValid = this.validateInput('BookName');
-            const isBorrowerNameValid = this.validateInput('BorrowerName');
-            const isIssuedByUserNameValid = this.validateInput('IssuedByUserName');
-            const isStatusValid = this.validateInput('Status');
-            const isReturnByUserNameValid = this.validateInput('ReturnByUserName');
-            const isPaidAmountValid = this.validateInput('PaidAmount');
-            const isPaymentTypeValid = this.validateInput('PaymentType');
+        // validateBcDetails(): boolean {
+        //     const isBookNameValid = this.validateInput('BookName');
+        //     const isBorrowerNameValid = this.validateInput('BorrowerName');
+        //     const isIssuedByUserNameValid = this.validateInput('IssuedByUserName');
+        //     const isStatusValid = this.validateInput('Status');
+        //     const isReturnByUserNameValid = this.validateInput('ReturnByUserName');
+        //     const isPaidAmountValid = this.validateInput('PaidAmount');
+        //     const isPaymentTypeValid = this.validateInput('PaymentType');
             
-            return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid && isPaidAmountValid && isPaymentTypeValid;
+        //     return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid && isPaidAmountValid && isPaymentTypeValid;
        
-        }
+        // }
     
-        saveBcDetails(): void {
-            if (!this.validateBcDetails()) {
-                return;
-            }
+        // saveBcDetails(): void {
+        //     if (!this.validateBcDetails()) {
+        //         return;
+        //     }
     
-            if(this.selectedBook.Status == "Returned" )
-            {
-                this.returnBook();
-            }
-            else if(this.selectedBook.BookCirculationId >0 )
-            {
-                this.updateBcBook();
-            }
-            else
-            {
-                this.issueBook();
-            }       
-        } 
+        //     if(this.selectedBook.Status == "Returned" )
+        //     {
+        //         this.returnBook();
+        //     }
+        //     else if(this.selectedBook.BookCirculationId >0 )
+        //     {
+        //         this.updateBcBook();
+        //     }
+        //     else
+        //     {
+        //         this.issueBook();
+        //     }       
+        // } 
     
-        issueBook():void {
+        // issueBook():void {
     
-            let _issuedBook = { ...this.selectedBook }; 
-            _issuedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
+        //     let _issuedBook = { ...this.selectedBook }; 
+        //     _issuedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
     
-            this._bcService.issueBook(_issuedBook).subscribe({
-                next: (res: any) => {
-                    if (!res || !res.Status) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Manage Book circulation - Failed',
-                            detail: res ? res.Message : 'Failed to Issue book. Please try again.'
-                        });
-                    } else {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Manage Book circulation - Success',
-                            detail: 'Updated Book circulation successfully.'
-                        });
+        //     this._bcService.issueBook(_issuedBook).subscribe({
+        //         next: (res: any) => {
+        //             if (!res || !res.Status) {
+        //                 this.messageService.add({
+        //                     severity: 'error',
+        //                     summary: 'Manage Book circulation - Failed',
+        //                     detail: res ? res.Message : 'Failed to Issue book. Please try again.'
+        //                 });
+        //             } else {
+        //                 this.messageService.add({
+        //                     severity: 'success',
+        //                     summary: 'Manage Book circulation - Success',
+        //                     detail: 'Updated Book circulation successfully.'
+        //                 });
     
-                        this.loadBooks();
-                        this.getAllBookCirculartion();
-                        this.bcDialogVisible = false;
-                    }
+        //                 this.loadBooks();
+        //                 this.getAllBookCirculartion();
+        //                 this.bcDialogVisible = false;
+        //             }
                     
-                },
-                error: () => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Manage Book circulation - Failed',
-                        detail: 'Failed to Issue book. Please try again.'
-                    });
-                }
-            });
-        }
+        //         },
+        //         error: () => {
+        //             this.messageService.add({
+        //                 severity: 'error',
+        //                 summary: 'Manage Book circulation - Failed',
+        //                 detail: 'Failed to Issue book. Please try again.'
+        //             });
+        //         }
+        //     });
+        // }
     
-        updateBcBook():void {
+        // updateBcBook():void {
     
-            let _issuedBook = { ...this.selectedBook }; 
-            _issuedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
+        //     let _issuedBook = { ...this.selectedBook }; 
+        //     _issuedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
     
-            if(_issuedBook.Status =="Issued" &&  _issuedBook.ReturnByUserId !=null && _issuedBook.ReturnByUserId >0)
-            {
-                _issuedBook.ReturnByUserId = null;
-                _issuedBook.ReturnByUserName = null;
-                _issuedBook.ReturnByUserMailId = null;
-            }
+        //     if(_issuedBook.Status =="Issued" &&  _issuedBook.ReturnByUserId !=null && _issuedBook.ReturnByUserId >0)
+        //     {
+        //         _issuedBook.ReturnByUserId = null;
+        //         _issuedBook.ReturnByUserName = null;
+        //         _issuedBook.ReturnByUserMailId = null;
+        //     }
     
-            _issuedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
-            _issuedBook.UpdatedByUserMailId = this.loggedInUserDetails.MailId;
-            _issuedBook.UpdatedByUserName = this.loggedInUserDetails.FullName;
+        //     _issuedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
+        //     _issuedBook.UpdatedByUserMailId = this.loggedInUserDetails.MailId;
+        //     _issuedBook.UpdatedByUserName = this.loggedInUserDetails.FullName;
     
-            this._bcService.updateBookCirculation(_issuedBook).subscribe({
-                next: (res: any) => {
-                    if (!res || !res.Status) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Manage Book circulation - Failed',
-                            detail: res ? res.Message : 'Failed to Issue book. Please try again.'
-                        });
-                    } else {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Manage Book circulation - Success',
-                            detail: 'Updated Book circulation successfully.'
-                        });
+        //     this._bcService.updateBookCirculation(_issuedBook).subscribe({
+        //         next: (res: any) => {
+        //             if (!res || !res.Status) {
+        //                 this.messageService.add({
+        //                     severity: 'error',
+        //                     summary: 'Manage Book circulation - Failed',
+        //                     detail: res ? res.Message : 'Failed to Issue book. Please try again.'
+        //                 });
+        //             } else {
+        //                 this.messageService.add({
+        //                     severity: 'success',
+        //                     summary: 'Manage Book circulation - Success',
+        //                     detail: 'Updated Book circulation successfully.'
+        //                 });
     
-                        this.loadBooks();
-                        this.getAllBookCirculartion();
-                        this.bcDialogVisible = false;
-                    }
+        //                 this.loadBooks();
+        //                 this.getAllBookCirculartion();
+        //                 this.bcDialogVisible = false;
+        //             }
     
-                },
-                error: () => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Manage Book circulation - Failed',
-                        detail: 'Failed to Issue book. Please try again.'
-                    });
-                }
-            });
-        }
+        //         },
+        //         error: () => {
+        //             this.messageService.add({
+        //                 severity: 'error',
+        //                 summary: 'Manage Book circulation - Failed',
+        //                 detail: 'Failed to Issue book. Please try again.'
+        //             });
+        //         }
+        //     });
+        // }
         
-        returnBook():void{
+        // returnBook():void{
     
-            let _returnedBook = { ...this.selectedBook }; 
-            _returnedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
-            _returnedBook.ReturnDate = this.parseCustomDateStringForAPI(this.selectedBook.ReturnDate ?? "");
-            _returnedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
+        //     let _returnedBook = { ...this.selectedBook }; 
+        //     _returnedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
+        //     _returnedBook.ReturnDate = this.parseCustomDateStringForAPI(this.selectedBook.ReturnDate ?? "");
+        //     _returnedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
     
-            if(_returnedBook.OverDueId == null || _returnedBook.OverDueId ==0)
-            {
-                _returnedBook.PaidAmount = 0;
-                _returnedBook.PaymentTypeId = 0;
-            }
+        //     if(_returnedBook.OverDueId == null || _returnedBook.OverDueId ==0)
+        //     {
+        //         _returnedBook.PaidAmount = 0;
+        //         _returnedBook.PaymentTypeId = 0;
+        //     }
             
     
-            this._bcService.returnBook(this.selectedBook).subscribe({
-                next: (res: any) => {
-                    if (!res || !res.Status) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Manage Book circulation - Failed',
-                            detail: res ? res.Message : 'Failed to Return book. Please try again.'
-                        });
-                    } else {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Manage Book circulation - Success',
-                            detail: 'Updated Book circulation successfully.'
-                        });
+        //     this._bcService.returnBook(this.selectedBook).subscribe({
+        //         next: (res: any) => {
+        //             if (!res || !res.Status) {
+        //                 this.messageService.add({
+        //                     severity: 'error',
+        //                     summary: 'Manage Book circulation - Failed',
+        //                     detail: res ? res.Message : 'Failed to Return book. Please try again.'
+        //                 });
+        //             } else {
+        //                 this.messageService.add({
+        //                     severity: 'success',
+        //                     summary: 'Manage Book circulation - Success',
+        //                     detail: 'Updated Book circulation successfully.'
+        //                 });
                         
-                        this.loadBooks();
-                        this.getAllBookCirculartion();
-                        this.bcDialogVisible = false;
-                    }
+        //                 this.loadBooks();
+        //                 this.getAllBookCirculartion();
+        //                 this.bcDialogVisible = false;
+        //             }
                     
-                },
-                error: () => {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Manage Book circulation - Failed',
-                        detail: 'Failed to Return book. Please try again.'
-                    });
-                }
-            });
-        }
+        //         },
+        //         error: () => {
+        //             this.messageService.add({
+        //                 severity: 'error',
+        //                 summary: 'Manage Book circulation - Failed',
+        //                 detail: 'Failed to Return book. Please try again.'
+        //             });
+        //         }
+        //     });
+        // }
     
-        onBookChange():void{
-            const book = this.bookOptions.find(l => l.value === this.selectedBook.BookId);
-            if (book) {
-                this.selectedBook.BookName = book.label;
-            }
+        // onBookChange():void{
+        //     const book = this.bookOptions.find(l => l.value === this.selectedBook.BookId);
+        //     if (book) {
+        //         this.selectedBook.BookName = book.label;
+        //     }
     
-            this.validateInput('BookName');
-        }
+        //     this.validateInput('BookName');
+        // }
     
-        onBorrowerChange():void{
-            const _borrower = this.lstUserDetails.find(l => l.UserId === this.selectedBook.BorrowerId);
-            if (_borrower) {
-                this.selectedBook.BorrowerName = _borrower.FullName;
-                this.selectedBook.BorrowerMailId = _borrower.MailId;
-            }
+        // onBorrowerChange():void{
+        //     const _borrower = this.lstUserDetails.find(l => l.UserId === this.selectedBook.BorrowerId);
+        //     if (_borrower) {
+        //         this.selectedBook.BorrowerName = _borrower.FullName;
+        //         this.selectedBook.BorrowerMailId = _borrower.MailId;
+        //     }
     
-            this.validateInput('BorrowerName');
-        }
+        //     this.validateInput('BorrowerName');
+        // }
     
-        onIssuedChange():void{
-             const _issuedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.IssuedByUserId);
-            if (_issuedBy) {
-                this.selectedBook.IssuedByUserName = _issuedBy.FullName;
-                this.selectedBook.IssuedByUserMailId = _issuedBy.MailId;
-            }
+        // onIssuedChange():void{
+        //      const _issuedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.IssuedByUserId);
+        //     if (_issuedBy) {
+        //         this.selectedBook.IssuedByUserName = _issuedBy.FullName;
+        //         this.selectedBook.IssuedByUserMailId = _issuedBy.MailId;
+        //     }
     
-            this.validateInput('IssuedByUserName');
-        }
+        //     this.validateInput('IssuedByUserName');
+        // }
     
-        onStatusChange():void{
+        // onStatusChange():void{
     
-            if(this.selectedBook.Status == "Returned")
-            {
-                this.isReturnBook = true;
-            }
-            else
-            {
-                this.isReturnBook = false;
-            }
+        //     if(this.selectedBook.Status == "Returned")
+        //     {
+        //         this.isReturnBook = true;
+        //     }
+        //     else
+        //     {
+        //         this.isReturnBook = false;
+        //     }
     
-            this.validateInput('Status');
-        }
+        //     this.validateInput('Status');
+        // }
     
-        onReturnedChange():void{
-                const _returnedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.ReturnByUserId);
-            if (_returnedBy) {
-                this.selectedBook.ReturnByUserName = _returnedBy.FullName;
-                this.selectedBook.ReturnByUserMailId = _returnedBy.MailId;
-            }
+        // onReturnedChange():void{
+        //         const _returnedBy = this.lstUserDetails.find(l => l.UserId === this.selectedBook.ReturnByUserId);
+        //     if (_returnedBy) {
+        //         this.selectedBook.ReturnByUserName = _returnedBy.FullName;
+        //         this.selectedBook.ReturnByUserMailId = _returnedBy.MailId;
+        //     }
     
-            this.validateInput('ReturnByUserName');
-        }
+        //     this.validateInput('ReturnByUserName');
+        // }
     
-        parseCustomDateStringForAPI(dateStr: string): string | null {
-            if (!dateStr) return null;
+        // parseCustomDateStringForAPI(dateStr: string): string | null {
+        //     if (!dateStr) return null;
             
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return null;
+        //     const parts = dateStr.split('-');
+        //     if (parts.length !== 3) return null;
     
-            const day = parseInt(parts[2], 10);
-            const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
-            const year = parseInt(parts[0], 10);
+        //     const day = parseInt(parts[2], 10);
+        //     const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
+        //     const year = parseInt(parts[0], 10);
     
-            const nativeDate = new Date(year, month, day);
-            return nativeDate.toISOString(); // Generates "2026-06-01T00:00:00.000Z"
-        }
+        //     const nativeDate = new Date(year, month, day);
+        //     return nativeDate.toISOString(); // Generates "2026-06-01T00:00:00.000Z"
+        // }
     
+        // returnByDifferentUser(): void {
+        //     if (this.isReturnByDifferentUser) {
+        //         // If typing a manual name, clear out old selected User ID references
+        //         this.selectedBook.ReturnByUserName = null;
+        //         this.selectedBook.ReturnByUserId = null;
+        //         this.selectedBook.ReturnByUserMailId = null;
+        //     } else {
+        //         // If switching back to dropdown, clear manual text fields
+        //         this.selectedBook.ReturnByUserName = this.selectedBook.IssuedByUserName;
+        //         this.selectedBook.ReturnByUserId = this.selectedBook.IssuedByUserId;
+        //         this.selectedBook.ReturnByUserMailId = this.selectedBook.IssuedByUserMailId;
+        //     }
+    
+        //      this.validateInput('ReturnByUserName');
+        // }
+
         parseCustomDateStringForUI(dateStr: Date): string {
             // 2. Pad single digits with leading zeros
             const day = String(dateStr.getDate()).padStart(2, '0');
@@ -777,22 +842,6 @@ export class BooksViewCirculationComponent {
     
             // 3. Assemble into the exact "yyyy-mm-dd" layout match        
             return  `${year}-${month}-${day}`;
-        }
-    
-        returnByDifferentUser(): void {
-            if (this.isReturnByDifferentUser) {
-                // If typing a manual name, clear out old selected User ID references
-                this.selectedBook.ReturnByUserName = null;
-                this.selectedBook.ReturnByUserId = null;
-                this.selectedBook.ReturnByUserMailId = null;
-            } else {
-                // If switching back to dropdown, clear manual text fields
-                this.selectedBook.ReturnByUserName = this.selectedBook.IssuedByUserName;
-                this.selectedBook.ReturnByUserId = this.selectedBook.IssuedByUserId;
-                this.selectedBook.ReturnByUserMailId = this.selectedBook.IssuedByUserMailId;
-            }
-    
-             this.validateInput('ReturnByUserName');
         }
     
         viewBookCirculationDetails(_bc: BookCirculationDetails): void{

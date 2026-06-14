@@ -29,6 +29,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     @Input() public bc: BookCirculationDetails | null = null;
     @Input() public type: string = "";
     @Input() public showDialog: boolean = false;
+    @Input() public isViewOnly: boolean = false;
+    @Input() public selectedBorrower: UserDetails | null = null;
     @Output() private onSuccess: EventEmitter<void> = new EventEmitter<void>();
     @Output() private onDialogClose: EventEmitter<void> = new EventEmitter<void>();
 
@@ -96,6 +98,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
         this.loadBooks();
         this.loadUserDetails();
         this.loadTransactionDetails();
+
+        console.log('ngOnInit() --> this.selectedBorrower :', this.selectedBorrower);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -109,8 +113,7 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
         this.isOverDue = false;
         this.isReturnBook = false;
 
-        if (this.bc) {
-            this.bindOnlyActiveDetails();
+        if (this.bc) {            
 
             if (this.bc.IssuedDate != null && this.bc.IssuedDate !== '') {
                 this.setMinAndMaxDate(new Date(this.bc.IssuedDate));
@@ -140,21 +143,33 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
             if (this.selectedBook.OverDueId != null && this.selectedBook.OverDueId > 0) {
                 this.isOverDue = true;
             }
-
+            
             if (this.type === 'CheckIn') {
                 this.selectedBook.Status = 'Returned';
             }
 
             this.returnByDifferentUser();
 
-            if (this.bc.Status === 'Issued') {
+            if (this.bc.Status === 'Issued' && (this.bc.BookCirculationId  == null || this.bc.BookCirculationId == 0)) {
+                this.header = 'Issue Book';
+                this.isIssueNewBook = true;
+            }
+            else if (this.bc.Status === 'Issued' && this.bc.BookCirculationId > 0) {
                 this.header = 'Update Issued Book Details';
             }
-            else {
+            else  {
                 this.header = 'Update Returned Book Details';
             }
+
+            console.log('openDialog(if) --> this.isIssueNewBook :', this.isIssueNewBook);
+
+            this.bindOnlyActiveDetails();
         }
         else {
+            this.isIssueNewBook = true;
+
+            console.log('openDialog(if) --> this.isIssueNewBook :', this.isIssueNewBook);
+
             this.bindOnlyActiveDetails();
 
             const today = new Date();
@@ -162,8 +177,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
 
             this.selectedBook = {
                 BookCirculationId: 0, BookId: 0, BookName: '',
-                BorrowerId: 0, BorrowerName: '', IssuedByUserId: 0,
-                IssuedByUserName: '', IssuedDate: '', OverDueId: 0,
+                BorrowerId: 0, BorrowerName: '', IssuedByUserId: this.loggedInUserDetails.UserId,
+                IssuedByUserName: this.loggedInUserDetails.FullName, IssuedDate: '', OverDueId: 0,
                 FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0,
                 OverDueStatus: '', SytemUpdatedDate: '',
                 ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: '',
@@ -172,6 +187,15 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
                 BorrowerMailId: '', IssuedByUserMailId: '', ReturnByUserMailId: '',
                 UpdatedByUserMailId: '', PaidAmount: 0, PaymentTypeId: 0
             };
+
+            if(this.selectedBorrower !=null && this.selectedBorrower?.UserId !=null &&  this.selectedBorrower.UserId > 0)
+            {
+                this.selectedBook.IssuedByUserId = this.selectedBorrower.UserId;
+                this.selectedBook.IssuedByUserName = this.selectedBorrower.FullName;
+                this.selectedBook.IssuedByUserMailId = this.selectedBorrower.MailId;
+            }
+            
+            
 
             this.header = 'Issue book';
         }
@@ -188,6 +212,10 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     }
 
     bindOnlyActiveDetails(): void {
+
+        console.log('bindOnlyActiveDetails() --> this.isIssueNewBook :', this.isIssueNewBook);
+        console.log('bindOnlyActiveDetails() --> this.lstUserDetails :', this.lstUserDetails);
+
         if (this.isIssueNewBook) {
             this.userOptions = this.lstUserDetails.filter(x => x.IsActive == true && x.FullName?.trim() != '').map(usr => {
                 return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
@@ -206,6 +234,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
                 return { label: book.BookName ?? '', value: book.BookId };
             });
         }
+
+        console.log('bindOnlyActiveDetails() --> this.bookOptions :', this.bookOptions);
     }
 
     setMinAndMaxDate(dateStr: Date): void {
@@ -218,6 +248,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
 
     parseCustomDateStringForAPI(dateStr: string): string | null {
         if (!dateStr) return null;
+
+        console.log('dateStr :', dateStr);
 
         const parts = dateStr.split('-');
         if (parts.length !== 3) return null;
@@ -242,9 +274,16 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
         this.bookService.getAllBookDetails().subscribe({
             next: (data: BookDetails[]) => {
                 this.lstBookDetails = data;
-                this.bookOptions = data.map(book => {
-                    return { label: book.BookName ?? '', value: book.BookId };
-                });
+                if (this.isIssueNewBook) {
+                     this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
+                        return { label: book.BookName ?? '', value: book.BookId };
+                    });
+                }
+                else {
+                    this.bookOptions = data.map(book => {
+                        return { label: book.BookName ?? '', value: book.BookId };
+                    });
+                }
             },
             error: (err) => {
                 console.error('Error loading books:', err);
@@ -255,10 +294,19 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     loadUserDetails(): void {
         this.userService.getAllUserDetails().subscribe({
             next: (data: UserDetails[]) => {
-                this.lstUserDetails = data;
-                this.userOptions = data.filter(x => x.FullName?.trim() != '').map(usr => {
-                    return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                });
+                this.lstUserDetails = data;               
+
+                 if (this.isIssueNewBook) {
+                    this.userOptions = data.filter(x => x.IsActive == true && x.FullName?.trim() != '').map(usr => {
+                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+                    });
+                    
+                }
+                else {
+                    this.userOptions = data.filter(x => x.FullName?.trim() != '').map(usr => {
+                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+                    });
+                }                
             },
             error: (err) => {
                 console.error('Error loading users:', err);
@@ -369,6 +417,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
         if (!this.validateBcDetails()) {
             return;
         }
+
+        console.log('this.selectedBook :', this.selectedBook);
 
         if (this.selectedBook.Status == "Returned") {
             this.returnBook();

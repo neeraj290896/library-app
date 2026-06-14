@@ -143,7 +143,7 @@
                     Status<sup>*</sup>
                 </label>
                 <p-select id="isActive" [(ngModel)]="currentRole.IsActive" [ngModelOptions]="{standalone: true}"
-                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status" [disabled] = "currentRole.RoleId == 0"
                     styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
                 <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
             </div>

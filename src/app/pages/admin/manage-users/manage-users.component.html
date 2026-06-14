@@ -696,9 +696,10 @@
     </p-table>
     </p-dialog>
 
-    <p-dialog [header]="checkIncheckOutHeader" [(visible)]="checkOutDialogVisible" [modal]="true" [style]="{ width: '80vw' }" appendTo="body">
-
-    </p-dialog>
+    @if (bcDialogVisible) {
+    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = "currentUser" [isViewOnly]="false"
+        (onSuccess)="loadUserDetails()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
+    }
 
     <p-dialog header="Return Book" [(visible)]="checkInDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">
          @if (checkInDialogVisible) {
