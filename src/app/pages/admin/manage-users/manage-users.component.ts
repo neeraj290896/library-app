@@ -521,7 +521,7 @@ export class ManageUsersComponent {
 
         const worksheet = workbook.addWorksheet('Users');
         worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID',
-            'DOB', 'ACCESS STATUS', 'STATUS']);
+            'DOB']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -529,11 +529,11 @@ export class ManageUsersComponent {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'H1'
+            to: 'F1'
         };
 
         const rolesSheet = workbook.addWorksheet('RoleList');
-        this.roles.forEach((role, idx) => {
+        this.roles.filter(x => x.IsActive == true && x.RoleId >= (this.loggedInUserDetails.RoleId || 0)).forEach((role, idx) => {
             rolesSheet.getCell(idx + 1, 1).value = role.RoleName;
         });
         rolesSheet.state = 'hidden';
@@ -590,25 +590,25 @@ export class ManageUsersComponent {
                 error: 'Please enter a valid date of birth.'
             };
 
-            const accessStatusCell = worksheet.getCell(rowIndex, 7);
-            accessStatusCell.dataValidation = {
-                type: 'list',
-                allowBlank: false,
-                formulae: ['"Approved,Rejected,Pending"'],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Access Status',
-                error: 'Please select a valid access status from the list.'
-            };
+            // const accessStatusCell = worksheet.getCell(rowIndex, 7);
+            // accessStatusCell.dataValidation = {
+            //     type: 'list',
+            //     allowBlank: false,
+            //     formulae: ['"Approved,Rejected,Pending"'],
+            //     showErrorMessage: true,
+            //     errorTitle: 'Invalid Access Status',
+            //     error: 'Please select a valid access status from the list.'
+            // };
 
-            const statusCell = worksheet.getCell(rowIndex, 8);
-            statusCell.dataValidation = {
-                type: 'list',
-                allowBlank: false,
-                formulae: ['"Active,In-Active"'],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Status',
-                error: 'Please select Active or In-Active.'
-            };
+            // const statusCell = worksheet.getCell(rowIndex, 8);
+            // statusCell.dataValidation = {
+            //     type: 'list',
+            //     allowBlank: false,
+            //     formulae: ['"Active,In-Active"'],
+            //     showErrorMessage: true,
+            //     errorTitle: 'Invalid Status',
+            //     error: 'Please select Active or In-Active.'
+            // };
         }
 
         worksheet.columns.forEach(col => {
@@ -672,7 +672,7 @@ export class ManageUsersComponent {
 
                 const headerRow = Object.keys(rows[0] || {});
                 const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID',
-                    'DOB', 'ACCESS STATUS', 'STATUS'];
+                    'DOB'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -685,8 +685,8 @@ export class ManageUsersComponent {
                     const mobileNo = row['MOBILE NO']?.toString().trim();
                     const mailId = row['MAIL ID']?.toString().trim();
                     const dob = row['DOB']?.toString().trim();
-                    const status = row['ACCESS STATUS']?.toString().trim();
-                    const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
+                    // const status = row['ACCESS STATUS']?.toString().trim();
+                    // const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
 
                     const importItem: ImportUserDetails = {
                         UserId: 0,
@@ -700,8 +700,8 @@ export class ManageUsersComponent {
                         RoleName: roleName,
                         CreatedByUserId: 0,
                         CreatedByUserName: '',
-                        IsActive: isActive,
-                        Status: status,
+                        IsActive: true,
+                        Status: 'Pending',
                         Error: ''
                     };
                     this.importPreview.push(importItem);

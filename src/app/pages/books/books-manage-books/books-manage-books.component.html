@@ -676,7 +676,7 @@
                                 (click)="showImportFilter()"></span>
                         </div>
                     </th>
-                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <!-- <th class="text-start text-muted fw-medium" style="width: 10%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
                                 Status
@@ -686,7 +686,7 @@
                                 [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                                 (click)="showImportFilter()"></span>
                         </div>
-                    </th>
+                    </th> -->
                     <th class="text-start text-muted fw-medium">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
@@ -771,7 +771,7 @@
                             </ng-template>
                         </p-columnFilter>
                     </th>
-                    <th>
+                    <!-- <th>
                         <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                 <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
@@ -780,7 +780,7 @@
                                     placeholder="All"></p-multiSelect>
                             </ng-template>
                         </p-columnFilter>
-                    </th>
+                    </th> -->
                     <th>
                         <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -821,10 +821,10 @@
                         </span>
                     </td>
                     <td>{{ book.PublishedYear }}</td>
-                    <td>
+                    <!-- <td>
                         <p-tag [value]="book.IsActive ? 'Active' : 'In-Active'"
                             [severity]="getStatusSeverity(book.IsActive)"></p-tag>
-                    </td>
+                    </td> -->
                     <td>
                         <span [pTooltip]="book.Error" class="text-danger">
                             {{ book.Error }}
@@ -835,7 +835,7 @@
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="9" class="text-center">
+                    <td colspan="8" class="text-center">
                         No books found.
                     </td>
                 </tr>
