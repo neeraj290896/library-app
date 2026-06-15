@@ -377,7 +377,7 @@
     </p-dialog> -->
 
      @if (bcDialogVisible) {
-    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = null [isViewOnly]="false"
+    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = null [isViewOnly]="isViewOnly"
         (onSuccess)="getAllBookCirculartion()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
     }
 

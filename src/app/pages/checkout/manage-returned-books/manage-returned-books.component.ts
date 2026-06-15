@@ -19,12 +19,12 @@ import { environment } from '../../../../environments/environment';
 import { DatePickerModule } from 'primeng/datepicker';
 import { AuthService } from '@app/shared/services/auth.service';
 import { TransactionTypeService } from '@app/shared/services/transactiontype.service';
+import { IssueReturnBooksComponent } from '../issue-return-books/issue-return-books.component';
 
 @Component({
   selector: 'app-manage-returned-books',
-  imports: [CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, 
-          MultiSelectModule, DialogModule, InputTextModule,
-                  SelectModule, FormsModule, DatePickerModule, TooltipModule],
+  imports: [CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
+                  SelectModule, FormsModule, DatePickerModule, TooltipModule, IssueReturnBooksComponent],
   templateUrl: './manage-returned-books.component.html',
   styleUrl: './manage-returned-books.component.scss'
 })
@@ -59,33 +59,35 @@ searchBookTerm = '';
   public isReturnBook: boolean = true;
   public isOverDue: boolean = false;
   public lstUserDetails: UserDetails[] = [];
-  public selectedBook: BookCirculationDetails = 
-    { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'',
-      IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
-      ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
-      UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
-    UpdatedByUserMailId:'' };
-    public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
-      Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
-        PaymentTypeId:''
-    };
-  public bookOptions: { label: string; value: number; }[] = [];
-  public availableBooks: { label: string; value: number; }[] = [];
-  public userOptions: { label: string; value: number; }[] = [];
-  public overDueStatusOptions: { label: string; value: string; }[] = [
-        { label: 'Pending', value: 'Pending' },
-        { label: 'Paid', value: 'Paid' }
-    ];
-  public statusOptions: { label: string; value: string; }[] = [
-        { label: 'Issued', value: 'Issued' },
-        { label: 'Returned', value: 'Returned' }
-    ];
-    minDate: Date | undefined;
-    maxDate: Date | undefined;
+//   public selectedBook: BookCirculationDetails = 
+//     { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'',
+//       IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
+//       ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
+//       UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
+//     UpdatedByUserMailId:'' };
+//     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
+//       Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
+//         PaymentTypeId:''
+//     };
+//   public bookOptions: { label: string; value: number; }[] = [];
+//   public availableBooks: { label: string; value: number; }[] = [];
+//   public userOptions: { label: string; value: number; }[] = [];
+//   public overDueStatusOptions: { label: string; value: string; }[] = [
+//         { label: 'Pending', value: 'Pending' },
+//         { label: 'Paid', value: 'Paid' }
+//     ];
+//   public statusOptions: { label: string; value: string; }[] = [
+//         { label: 'Issued', value: 'Issued' },
+//         { label: 'Returned', value: 'Returned' }
+//     ];
+//     minDate: Date | undefined;
+//     maxDate: Date | undefined;
 
-    isReturnByDifferentUser: boolean = false;
+//     isReturnByDifferentUser: boolean = false;
 
-    public transactionTypeOptions: { label: string; value: number; }[] = [];
+//     public transactionTypeOptions: { label: string; value: number; }[] = [];
+    public bc: BookCirculationDetails | null = null;
+    public type: string = '';
 
     ngOnInit(): void {
 
@@ -94,18 +96,18 @@ searchBookTerm = '';
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
 
-        this.minDate = yesterday;
-        this.maxDate = new Date();
+        // this.minDate = yesterday;
+        // this.maxDate = new Date();
     
        
         // 3. Assemble into the exact "yyyy-mm-dd" layout match
         this.todayDate = this.parseCustomDateStringForUI(today);
 
-        this.loggedInUserDetails = this._authService.userData() ?? {};
+        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
 
-        this.loadBooks();
-        this.loadUserDetails();
-        this.loadTransactionDetails();
+        // this.loadBooks();
+        // this.loadUserDetails();
+        // this.loadTransactionDetails();
         this.getAllBookCirculartion();
     }
 
@@ -124,46 +126,46 @@ searchBookTerm = '';
             });
     }
 
-    loadBooks(): void {
-        this._bookService.getAllBookDetails().subscribe({
-            next: (data: BookDetails[]) => {
-                this.bookOptions = data.map(book => {
-                    return { label: book.BookName ?? '', value: book.BookId };
-                });                
-            },
-            error: (err) => {
-                console.error('Error loading books:', err);
-            }
-        });
-    }
+    // loadBooks(): void {
+    //     this._bookService.getAllBookDetails().subscribe({
+    //         next: (data: BookDetails[]) => {
+    //             this.bookOptions = data.map(book => {
+    //                 return { label: book.BookName ?? '', value: book.BookId };
+    //             });                
+    //         },
+    //         error: (err) => {
+    //             console.error('Error loading books:', err);
+    //         }
+    //     });
+    // }
 
-    loadUserDetails(): void {
-            this._userService.getAllUserDetails().subscribe({
-                next: (data: UserDetails[]) => {
-                    this.lstUserDetails = data;
-                    this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
-                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                    });
-                },
-                error: (err) => {
-                    console.error('Error loading users:', err);
-                }
-            });
-    }
+    // loadUserDetails(): void {
+    //         this._userService.getAllUserDetails().subscribe({
+    //             next: (data: UserDetails[]) => {
+    //                 this.lstUserDetails = data;
+    //                 this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
+    //                     return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+    //                 });
+    //             },
+    //             error: (err) => {
+    //                 console.error('Error loading users:', err);
+    //             }
+    //         });
+    // }
 
-    loadTransactionDetails(): void {
-                this._ttService.getTransactionTypeDetails().subscribe({
-                    next: (data: TransactionTypeDetails[]) => {   
+    // loadTransactionDetails(): void {
+    //             this._ttService.getTransactionTypeDetails().subscribe({
+    //                 next: (data: TransactionTypeDetails[]) => {   
                                       
-                        this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
-                            return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
-                        });
-                    },
-                    error: (err) => {
-                        console.error('Error loading transaction type details:', err);
-                    }
-                });
-    }
+    //                     this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
+    //                         return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
+    //                     });
+    //                 },
+    //                 error: (err) => {
+    //                     console.error('Error loading transaction type details:', err);
+    //                 }
+    //             });
+    // }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
@@ -332,8 +334,10 @@ searchBookTerm = '';
         return  `${year}-${month}-${day}`;
     }
 
-    viewBookCirculationDetails(_bc: BookCirculationDetails): void{
-
+    viewBookCirculationDetails(_bcD: BookCirculationDetails): void{
+        this.bc = _bcD;
+            this.type = "CheckIn";
+            this.bcDialogVisible = true;
     }
 }
 

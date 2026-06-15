@@ -26,6 +26,10 @@ export class SearchComponent {
     public showUserDialog: boolean = false;
 
     onSearch(): void {
+
+        const isMobile = /^[6-9]\d{9}$/.test(this.searchTerm);
+        const isEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this.searchTerm);
+
         if (this.searchTerm.includes(environment.usersBarcodeSyntax)) {
             this.showUserDialog = true;
             this.showBookDialog = false;
@@ -34,6 +38,11 @@ export class SearchComponent {
             this.showBookDialog = true;
             this.showUserDialog = false;
         }
+        else if(isMobile || isEmail)
+        {
+            this.showUserDialog = true;
+            this.showBookDialog = false;
+        }       
         else {
             this.showBookDialog = false;
             this.showUserDialog = false;

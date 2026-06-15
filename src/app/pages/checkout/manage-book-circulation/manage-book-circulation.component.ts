@@ -44,6 +44,7 @@ export class ManageBookCirculationComponent {
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
     public bcDialogVisible: boolean = false;
+    public isViewOnly: boolean = false;
 
     ngOnInit(): void {
         this.getAllBookCirculartion();
@@ -290,8 +291,16 @@ export class ManageBookCirculationComponent {
             
         this.bc = _bc;
         this.type = type;
+        this.isViewOnly = false;
         this.bcDialogVisible = true;
     }
 
-    viewBookCirculationDetails(_bc: BookCirculationDetails): void { }
+    viewBookCirculationDetails(_bcD: BookCirculationDetails): void {
+
+        this.bc = _bcD;
+        this.type = (_bcD.Status == "Returned") ? "CheckIn" : "CheckOut";
+        this.isViewOnly = true;
+        this.bcDialogVisible = true;
+
+     }
 }
