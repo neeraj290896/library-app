@@ -138,7 +138,7 @@
         </div>
     </div>
     <ng-template pTemplate="footer">
-        <div class="d-flex justify-content-end align-items-center gap-3">
+        <div class="d-flex justify-content-end align-items-center gap-3" *ngIf="!isViewOnly">
             <div class="d-flex align-items-center" *ngIf="this.isReturnBook">
                 <label class="form-check-label small fw-medium text-secondary me-2" for="diffUserCheck">
                     Return By Different User

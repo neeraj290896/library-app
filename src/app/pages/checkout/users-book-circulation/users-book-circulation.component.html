@@ -232,7 +232,7 @@
     </p-table>
 
     @if (bcDialogVisible) {
-    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = "selectedUserDetails" [isViewOnly]="false"
+        <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = "selectedUserDetails" [isViewOnly]="isViewOnly"
         (onSuccess)="getUsersBookCirculartion()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
     }
 

@@ -887,7 +887,7 @@ export class BooksManageBooksComponent implements OnInit {
 
         const worksheet = workbook.addWorksheet('Books');
         worksheet.addRow(['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)',
-            'BUILDING', 'FLOOR', 'RACK', 'BARCODE', 'STATUS']);
+            'BUILDING', 'FLOOR', 'RACK']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -895,47 +895,47 @@ export class BooksManageBooksComponent implements OnInit {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'L1'
+            to: 'J1'
         };
 
         const authorsSheet = workbook.addWorksheet('AuthorList');
-        this.authors.forEach((author, idx) => {
+        this.authors.filter(x => x.IsActive == true).forEach((author, idx) => {
             authorsSheet.getCell(idx + 1, 1).value = author.AuthorName;
         });
         authorsSheet.state = 'hidden';
 
         const publishersSheet = workbook.addWorksheet('PublisherList');
-        this.publishers.forEach((pub, idx) => {
+        this.publishers.filter(x => x.IsActive == true).forEach((pub, idx) => {
             publishersSheet.getCell(idx + 1, 1).value = pub.PublisherName;
         });
         publishersSheet.state = 'hidden';
 
         const categoriesSheet = workbook.addWorksheet('CategoryList');
-        this.categories.forEach((cat, idx) => {
+        this.categories.filter(x => x.IsActive == true).forEach((cat, idx) => {
             categoriesSheet.getCell(idx + 1, 1).value = cat.CategoryName;
         });
         categoriesSheet.state = 'hidden';
 
         const languagesSheet = workbook.addWorksheet('LanguageList');
-        this.languages.forEach((lang, idx) => {
+        this.languages.filter(x => x.IsActive == true).forEach((lang, idx) => {
             languagesSheet.getCell(idx + 1, 1).value = lang.LanguageName;
         });
         languagesSheet.state = 'hidden';
 
         const buildingsSheet = workbook.addWorksheet('BuildingList');
-        this.buildings.forEach((building, idx) => {
+        this.buildings.filter(x => x.IsActive == true).forEach((building, idx) => {
             buildingsSheet.getCell(idx + 1, 1).value = building.BuildingName;
         });
         buildingsSheet.state = 'hidden';
 
         const floorsSheet = workbook.addWorksheet('FloorList');
-        this.floors.forEach((floor, idx) => {
+        this.floors.filter(x => x.IsActive == true).forEach((floor, idx) => {
             floorsSheet.getCell(idx + 1, 1).value = floor.FloorName;
         });
         floorsSheet.state = 'hidden';
 
         const racksSheet = workbook.addWorksheet('RackList');
-        this.racks.forEach((rack, idx) => {
+        this.racks.filter(x => x.IsActive == true).forEach((rack, idx) => {
             racksSheet.getCell(idx + 1, 1).value = rack.RackLabel;
         });
         racksSheet.state = 'hidden';
@@ -1033,15 +1033,15 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid rack for the selected floor.'
             };
 
-            const statusCell = worksheet.getCell(rowIndex, 12);
-            statusCell.dataValidation = {
-                type: 'list',
-                allowBlank: false,
-                formulae: ['"Active,In-Active"'],
-                showErrorMessage: true,
-                errorTitle: 'Invalid Status',
-                error: 'Please select Active or In-Active.'
-            };
+            // const statusCell = worksheet.getCell(rowIndex, 12);
+            // statusCell.dataValidation = {
+            //     type: 'list',
+            //     allowBlank: false,
+            //     formulae: ['"Active,In-Active"'],
+            //     showErrorMessage: true,
+            //     errorTitle: 'Invalid Status',
+            //     error: 'Please select Active or In-Active.'
+            // };
         }
 
         worksheet.columns.forEach(col => {
@@ -1122,8 +1122,8 @@ export class BooksManageBooksComponent implements OnInit {
                     const buildingName = row['BUILDING']?.toString().trim();
                     const floorName = row['FLOOR']?.toString().trim();
                     const rackLabel = row['RACK']?.toString().trim();
-                    const bookBarcode = row['BARCODE']?.toString().trim();
-                    const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
+                    // const bookBarcode = row['BARCODE']?.toString().trim();
+                    // const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
 
                     const importItem: ImportBookDetails = {
                         BookId: 0,
@@ -1147,8 +1147,8 @@ export class BooksManageBooksComponent implements OnInit {
                         RackId: null,
                         RackNumber: 0,
                         RackLabel: rackLabel,
-                        BookBarcode: bookBarcode,
-                        IsActive: isActive,
+                        BookBarcode: '',
+                        IsActive: true,
                         Error: ''
                     };
                     this.importPreview.push(importItem);
@@ -1338,15 +1338,15 @@ export class BooksManageBooksComponent implements OnInit {
                 }
                 break;
 
-            case 'BookBarcode':
-                if (!this.importPreview[index].BookBarcode?.trim()) {
-                    this.importPreview[index].Error = 'Barcode is required.';
-                    isValid = false;
-                }
-                else {
-                    this.importPreview[index].Error = '';
-                }
-                break;
+            // case 'BookBarcode':
+            //     if (!this.importPreview[index].BookBarcode?.trim()) {
+            //         this.importPreview[index].Error = 'Barcode is required.';
+            //         isValid = false;
+            //     }
+            //     else {
+            //         this.importPreview[index].Error = '';
+            //     }
+            //     break;
 
             case 'IsActive':
                 if (this.importPreview[index].IsActive === null) {
@@ -1377,7 +1377,7 @@ export class BooksManageBooksComponent implements OnInit {
                 this.validateImportInput('BuildingName', index) &&
                 this.validateImportInput('FloorName', index) &&
                 this.validateImportInput('RackLabel', index) &&
-                this.validateImportInput('BookBarcode', index) &&
+                // this.validateImportInput('BookBarcode', index) &&
                 this.validateImportInput('IsActive', index);
         });
     }

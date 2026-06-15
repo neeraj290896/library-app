@@ -6,7 +6,7 @@ import { TagModule } from 'primeng/tag';
 import { PaginatorModule } from 'primeng/paginator';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { FormsModule } from '@angular/forms';
-import { BookDetails, OverDueDetails, OverDueRefreshDetails, TransactionTypeDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookCirculationDetails, BookDetails, OverDueDetails, OverDueRefreshDetails, TransactionTypeDetails, UserDetails } from '@app/shared/models/api.models';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -20,13 +20,13 @@ import { AuthService } from '@app/shared/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { AdminService } from '@app/shared/services/admin.service';
 import { TransactionTypeService } from '@app/shared/services/transactiontype.service';
+import { IssueReturnBooksComponent } from '../issue-return-books/issue-return-books.component';
 
 @Component({
     selector: 'app-books-overdue',
     standalone: true,
-    imports: [CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, 
-            MultiSelectModule, DialogModule, InputTextModule,
-                    SelectModule, FormsModule, DatePickerModule, TooltipModule],
+    imports: [CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, SelectModule, 
+        FormsModule, DatePickerModule, TooltipModule, IssueReturnBooksComponent],
     templateUrl: './books-overdue.component.html',
     styleUrl: './books-overdue.component.scss'
 })
@@ -60,41 +60,43 @@ export class BooksOverdueComponent {
   public loggedInUserDetails: UserDetails = {};
   public isReturnBook: boolean = true;
   public lstUserDetails: UserDetails[] = [];
-  public selectedOverDue: OverDueDetails = 
-    { OverDueId: 0, BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'', IssuedDate : '', FineAmount: 0.0, 
-        OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'', ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '', UpdatedByUserId : 0,  
-        UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'', UpdatedByUserMailId:'' };
-    public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
-      Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
-        PaymentTypeId:'' };
-  public bookOptions: { label: string; value: number; }[] = [];
-  public userOptions: { label: string; value: number; }[] = [];
-  public overDueStatusOptions: { label: string; value: string; }[] = [
-        { label: 'Pending', value: 'Pending' },
-        { label: 'Paid', value: 'Paid' }
-    ];
-  public statusOptions: { label: string; value: string; }[] = [
-        { label: 'Issued', value: 'Issued' },
-        { label: 'Returned', value: 'Returned' }
-    ];
-    minDate: Date | undefined;
-    maxDate: Date | undefined;
+//   public selectedOverDue: OverDueDetails = 
+//     { OverDueId: 0, BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'', IssuedDate : '', FineAmount: 0.0, 
+//         OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'', ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '', UpdatedByUserId : 0,  
+//         UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'', UpdatedByUserMailId:'' };
+//     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
+//       Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
+//         PaymentTypeId:'' };
+//   public bookOptions: { label: string; value: number; }[] = [];
+//   public userOptions: { label: string; value: number; }[] = [];
+//   public overDueStatusOptions: { label: string; value: string; }[] = [
+//         { label: 'Pending', value: 'Pending' },
+//         { label: 'Paid', value: 'Paid' }
+//     ];
+//   public statusOptions: { label: string; value: string; }[] = [
+//         { label: 'Issued', value: 'Issued' },
+//         { label: 'Returned', value: 'Returned' }
+//     ];
+//     minDate: Date | undefined;
+//     maxDate: Date | undefined;
 
-      isReturnByDifferentUser: boolean = false;
+    //   isReturnByDifferentUser: boolean = false;
     public lastRefreshedDate: string = '';
-    public lstBookDetails: BookDetails[] = [];    
+    // public lstBookDetails: BookDetails[] = [];    
     
     public transactionTypeOptions: { label: string; value: number; }[] = [];
+    public bc: BookCirculationDetails | null = null;
+    public type: string = '';
 
     ngOnInit(): void {
 
         const today = new Date();
 
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
+        // const yesterday = new Date();
+        // yesterday.setDate(today.getDate() - 1);
 
-        this.minDate = yesterday;
-        this.maxDate = new Date();
+        // this.minDate = yesterday;
+        // this.maxDate = new Date();
     
        
         // 3. Assemble into the exact "yyyy-mm-dd" layout match
@@ -104,9 +106,9 @@ export class BooksOverdueComponent {
 
         console.log('this.loggedInUserDetails : ', this.loggedInUserDetails);
         
-        this.loadBooks();
-        this.loadUserDetails();
-        this.loadTransactionDetails();
+        // this.loadBooks();
+        // this.loadUserDetails();
+        // this.loadTransactionDetails();
         this.getOverDueDetails();
     }
 
@@ -142,47 +144,47 @@ export class BooksOverdueComponent {
             });
     }
 
-    loadBooks(): void {
-        this._bookService.getAllBookDetails().subscribe({
-            next: (data: BookDetails[]) => {
-                this.lstBookDetails = data;
-                this.bookOptions = data.map(book => {
-                    return { label: book.BookName ?? '', value: book.BookId };
-                });                
-            },
-            error: (err) => {
-                console.error('Error loading books:', err);
-            }
-        });
-    }
+    // loadBooks(): void {
+    //     this._bookService.getAllBookDetails().subscribe({
+    //         next: (data: BookDetails[]) => {
+    //             this.lstBookDetails = data;
+    //             this.bookOptions = data.map(book => {
+    //                 return { label: book.BookName ?? '', value: book.BookId };
+    //             });                
+    //         },
+    //         error: (err) => {
+    //             console.error('Error loading books:', err);
+    //         }
+    //     });
+    // }
 
-    loadUserDetails(): void {
-            this._userService.getAllUserDetails().subscribe({
-                next: (data: UserDetails[]) => {
-                    this.lstUserDetails = data;
-                    this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
-                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                    });
-                },
-                error: (err) => {
-                    console.error('Error loading users:', err);
-                }
-            });
-    }
+    // loadUserDetails(): void {
+    //         this._userService.getAllUserDetails().subscribe({
+    //             next: (data: UserDetails[]) => {
+    //                 this.lstUserDetails = data;
+    //                 this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
+    //                     return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+    //                 });
+    //             },
+    //             error: (err) => {
+    //                 console.error('Error loading users:', err);
+    //             }
+    //         });
+    // }
 
-    loadTransactionDetails(): void {
-            this._ttService.getTransactionTypeDetails().subscribe({
-                next: (data: TransactionTypeDetails[]) => {   
+    // loadTransactionDetails(): void {
+    //         this._ttService.getTransactionTypeDetails().subscribe({
+    //             next: (data: TransactionTypeDetails[]) => {   
                                   
-                    this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
-                        return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
-                    });
-                },
-                error: (err) => {
-                    console.error('Error loading transaction type details:', err);
-                }
-            });
-    }
+    //                 this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
+    //                     return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
+    //                 });
+    //             },
+    //             error: (err) => {
+    //                 console.error('Error loading transaction type details:', err);
+    //             }
+    //         });
+    // }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
@@ -344,216 +346,226 @@ export class BooksOverdueComponent {
     }
 
     editBook(_odD: OverDueDetails, type: string): void {
+        
+        _odD.ReturnDate = this.todayDate;
 
-        if(_odD)
-        {
-            this.bindActiveDetails();
-            
-            this.selectedOverDue  = { ..._odD };
-
-            if(_odD.IssuedDate !=null && _odD.IssuedDate !="")
-            {
-                this.selectedOverDue.IssuedDate = this.parseCustomDateStringForUI(new Date(_odD.IssuedDate));
-            }
-           
-            if(_odD.ReturnDate !=null && _odD.ReturnDate !="")
-            {
-                this.selectedOverDue.ReturnDate = this.parseCustomDateStringForUI(new Date(_odD.ReturnDate));
-            }
-            else{
-                this.selectedOverDue.ReturnDate = this.todayDate;
-            }
-
-            if(_odD.OverDueFrom !=null && _odD.OverDueFrom !="")
-            {
-                this.selectedOverDue.OverDueFrom = this.parseCustomDateStringForUI(new Date(_odD.OverDueFrom));
-            } 
-
-             if(type =="CheckIn")
-            {
-                this.selectedOverDue.Status = "Returned";
-                this.selectedOverDue.OverDueStatus = "Paid";
-            }
-
-            this.returnByDifferentUser();
-            
-            console.log("selectedOverDue :", this.selectedOverDue);
-
-             if (_odD.OverDueStatus == "Pending") {
-                
-                this.header = 'Update OverDue Details';
-            }            
-        }        
-
-        this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount:'', PaymentTypeId:''} 
-            
+        this.bc = {..._odD};              
+        this.type = "CheckIn";
         this.bcDialogVisible = true;
+        console.log('this.bc :', this.bc);
     }
 
-    bindActiveDetails() : void{
-        
-        this.userOptions = this.lstUserDetails.filter(x => x.FullName?.trim() !='').map(usr => {
-                    return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                });
+    // editBook(_odD: OverDueDetails, type: string): void {
 
-        this.bookOptions = this.lstBookDetails.map(book => {
-                return { label: book.BookName ?? '', value: book.BookId };
-            }); 
-        
-    }
+    //     if(_odD)
+    //     {
+    //         this.bindActiveDetails();
+            
+    //         this.selectedOverDue  = { ..._odD };
 
-    validateInput(key: string): boolean {
-        let isValid = true;
+    //         if(_odD.IssuedDate !=null && _odD.IssuedDate !="")
+    //         {
+    //             this.selectedOverDue.IssuedDate = this.parseCustomDateStringForUI(new Date(_odD.IssuedDate));
+    //         }
+           
+    //         if(_odD.ReturnDate !=null && _odD.ReturnDate !="")
+    //         {
+    //             this.selectedOverDue.ReturnDate = this.parseCustomDateStringForUI(new Date(_odD.ReturnDate));
+    //         }
+    //         else{
+    //             this.selectedOverDue.ReturnDate = this.todayDate;
+    //         }
 
-        switch (key) {
-            case 'BookName':
-                if (!this.selectedOverDue.BookName?.trim()) {
-                    this.errors.BookName = 'Book name is required.';
-                    isValid = false;
-                }                 
-                else {
-                    this.errors.BookName = '';
-                }
-                break;
+    //         if(_odD.OverDueFrom !=null && _odD.OverDueFrom !="")
+    //         {
+    //             this.selectedOverDue.OverDueFrom = this.parseCustomDateStringForUI(new Date(_odD.OverDueFrom));
+    //         } 
 
-            case 'BorrowerName':
-                if (!this.selectedOverDue.BorrowerName?.trim()) {
-                    this.errors.BorrowerName = 'Borrower Name is required.';
-                    isValid = false;
-                } else {
-                    this.errors.BorrowerName = '';
-                }
-                break;
+    //          if(type =="CheckIn")
+    //         {
+    //             this.selectedOverDue.Status = "Returned";
+    //             this.selectedOverDue.OverDueStatus = "Paid";
+    //         }
 
-            case 'IssuedByUserName':
-                if (!this.selectedOverDue.IssuedByUserName?.trim()) {
-                    this.errors.IssuedByUserName = 'IssuedBy Name is required.';
-                    isValid = false;
-                } else {
-                    this.errors.IssuedByUserName = '';
-                }
-                break;
-              
-            case 'Status':
-                if (!this.selectedOverDue.Status?.trim()) {
-                    this.errors.Status = 'Status is required.';
-                    isValid = false;
-                } else {
-                    this.errors.Status = '';
-                }
-                break;
+    //         this.returnByDifferentUser();
+            
+    //         console.log("selectedOverDue :", this.selectedOverDue);
 
-            case 'ReturnByUserName':
-                if (!this.selectedOverDue.ReturnByUserName?.trim()) {
-                    this.errors.ReturnByUserName = 'ReturnBy Name is required.';
-                    isValid = false;
-                } else {
-                    this.errors.ReturnByUserName = '';
-                }
-                break;
-            case 'PaidAmount':
-                if (this.selectedOverDue.FineAmount !=null && this.selectedOverDue.FineAmount >0 && this.selectedOverDue.PaidAmount == null ) {
-                    this.errors.PaidAmount = 'Paid amount is required.';
-                    isValid = false;
-                } else {
-                    this.errors.PaidAmount = '';
-                }
-                break;
-            case 'PaymentType':
-                if (!(this.selectedOverDue.PaymentTypeId != null && this.selectedOverDue.PaymentTypeId >0)) {
-                    this.errors.PaymentTypeId = 'PaymentType is required.';
-                    isValid = false;
-                } else {
-                    this.errors.PaymentTypeId = '';
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        return isValid;
-    }
-
-    validateOdDetails(): boolean {
-        const isBookNameValid = this.validateInput('BookName');
-        const isBorrowerNameValid = this.validateInput('BorrowerName');
-        const isIssuedByUserNameValid = this.validateInput('IssuedByUserName');
-        const isStatusValid = this.validateInput('Status');
-        const isReturnByUserNameValid = this.validateInput('ReturnByUserName');
-        const isPaidAmountValid = this.validateInput('PaidAmount');
-        const isPaymentTypeValid = this.validateInput('PaymentType');
-        
-        return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid && isPaidAmountValid && isPaymentTypeValid;
-    }
-
-    saveOdDetails(): void {
-        if (!this.validateOdDetails()) {
-            return;
-        }
-
-        // console.log('selectedOverDue :', this.selectedOverDue);
-
-        if(this.selectedOverDue.OverDueStatus == "Paid" )
-        {
-            this.updateOverDueDetails();
-        }             
-    } 
-        
-
-    updateOverDueDetails()
-    {
-        
-        let _overDue = { ...this.selectedOverDue }; 
-        _overDue.IssuedDate = this.parseCustomDateStringForAPI(this.selectedOverDue.IssuedDate ?? "");
-        _overDue.ReturnDate = this.parseCustomDateStringForAPI(this.selectedOverDue.ReturnDate ?? "");  
-        _overDue.UpdatedByUserId = this.loggedInUserDetails?.UserId ?? 1;          
-
-        // console.log('_overDue :', _overDue);
-
-        this._odService.updateOverDueDetails(_overDue).subscribe({
-            next: (res: any) => {
-                if (!res || !res.Status) {
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Manage Over Due - Failed',
-                        detail: res ? res.Message : 'Failed to Update Over Due details. Please try again.'
-                    });
-                } else {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Manage Over Due - Success',
-                        detail: 'Updated Over Due details successfully.'
-                    });
-                }
-
-                this.getOverDueDetails();
-                this.bcDialogVisible = false;
-            },
-            error: () => {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Manage Over Due - Failed',
-                    detail: 'Failed to Update Over Due details. Please try again.'
-                });
-            }
-        });
+    //          if (_odD.OverDueStatus == "Pending") {
                 
-    }
+    //             this.header = 'Update OverDue Details';
+    //         }            
+    //     }        
 
-    parseCustomDateStringForAPI(dateStr: string): string | null {
-        if (!dateStr) return null;
+    //     this.errors = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount:'', PaymentTypeId:''} 
+            
+    //     this.bcDialogVisible = true;
+    // }
+
+    // bindActiveDetails() : void{
         
-        const parts = dateStr.split('-');
-        if (parts.length !== 3) return null;
+    //     this.userOptions = this.lstUserDetails.filter(x => x.FullName?.trim() !='').map(usr => {
+    //                 return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+    //             });
 
-        const day = parseInt(parts[2], 10);
-        const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
-        const year = parseInt(parts[0], 10);
+    //     this.bookOptions = this.lstBookDetails.map(book => {
+    //             return { label: book.BookName ?? '', value: book.BookId };
+    //         }); 
+        
+    // }
 
-        const nativeDate = new Date(year, month, day);
-        return nativeDate.toISOString(); // Generates "2026-06-01T00:00:00.000Z"
-    }
+    // validateInput(key: string): boolean {
+    //     let isValid = true;
+
+    //     switch (key) {
+    //         case 'BookName':
+    //             if (!this.selectedOverDue.BookName?.trim()) {
+    //                 this.errors.BookName = 'Book name is required.';
+    //                 isValid = false;
+    //             }                 
+    //             else {
+    //                 this.errors.BookName = '';
+    //             }
+    //             break;
+
+    //         case 'BorrowerName':
+    //             if (!this.selectedOverDue.BorrowerName?.trim()) {
+    //                 this.errors.BorrowerName = 'Borrower Name is required.';
+    //                 isValid = false;
+    //             } else {
+    //                 this.errors.BorrowerName = '';
+    //             }
+    //             break;
+
+    //         case 'IssuedByUserName':
+    //             if (!this.selectedOverDue.IssuedByUserName?.trim()) {
+    //                 this.errors.IssuedByUserName = 'IssuedBy Name is required.';
+    //                 isValid = false;
+    //             } else {
+    //                 this.errors.IssuedByUserName = '';
+    //             }
+    //             break;
+              
+    //         case 'Status':
+    //             if (!this.selectedOverDue.Status?.trim()) {
+    //                 this.errors.Status = 'Status is required.';
+    //                 isValid = false;
+    //             } else {
+    //                 this.errors.Status = '';
+    //             }
+    //             break;
+
+    //         case 'ReturnByUserName':
+    //             if (!this.selectedOverDue.ReturnByUserName?.trim()) {
+    //                 this.errors.ReturnByUserName = 'ReturnBy Name is required.';
+    //                 isValid = false;
+    //             } else {
+    //                 this.errors.ReturnByUserName = '';
+    //             }
+    //             break;
+    //         case 'PaidAmount':
+    //             if (this.selectedOverDue.FineAmount !=null && this.selectedOverDue.FineAmount >0 && this.selectedOverDue.PaidAmount == null ) {
+    //                 this.errors.PaidAmount = 'Paid amount is required.';
+    //                 isValid = false;
+    //             } else {
+    //                 this.errors.PaidAmount = '';
+    //             }
+    //             break;
+    //         case 'PaymentType':
+    //             if (!(this.selectedOverDue.PaymentTypeId != null && this.selectedOverDue.PaymentTypeId >0)) {
+    //                 this.errors.PaymentTypeId = 'PaymentType is required.';
+    //                 isValid = false;
+    //             } else {
+    //                 this.errors.PaymentTypeId = '';
+    //             }
+    //             break;
+
+    //         default:
+    //             break;
+    //     }
+
+    //     return isValid;
+    // }
+
+    // validateOdDetails(): boolean {
+    //     const isBookNameValid = this.validateInput('BookName');
+    //     const isBorrowerNameValid = this.validateInput('BorrowerName');
+    //     const isIssuedByUserNameValid = this.validateInput('IssuedByUserName');
+    //     const isStatusValid = this.validateInput('Status');
+    //     const isReturnByUserNameValid = this.validateInput('ReturnByUserName');
+    //     const isPaidAmountValid = this.validateInput('PaidAmount');
+    //     const isPaymentTypeValid = this.validateInput('PaymentType');
+        
+    //     return isBookNameValid && isBorrowerNameValid && isIssuedByUserNameValid && isStatusValid && isReturnByUserNameValid && isPaidAmountValid && isPaymentTypeValid;
+    // }
+
+    // saveOdDetails(): void {
+    //     if (!this.validateOdDetails()) {
+    //         return;
+    //     }
+
+    //     // console.log('selectedOverDue :', this.selectedOverDue);
+
+    //     if(this.selectedOverDue.OverDueStatus == "Paid" )
+    //     {
+    //         this.updateOverDueDetails();
+    //     }             
+    // } 
+        
+
+    // updateOverDueDetails()
+    // {
+        
+    //     let _overDue = { ...this.selectedOverDue }; 
+    //     _overDue.IssuedDate = this.parseCustomDateStringForAPI(this.selectedOverDue.IssuedDate ?? "");
+    //     _overDue.ReturnDate = this.parseCustomDateStringForAPI(this.selectedOverDue.ReturnDate ?? "");  
+    //     _overDue.UpdatedByUserId = this.loggedInUserDetails?.UserId ?? 1;          
+
+    //     // console.log('_overDue :', _overDue);
+
+    //     this._odService.updateOverDueDetails(_overDue).subscribe({
+    //         next: (res: any) => {
+    //             if (!res || !res.Status) {
+    //                 this.messageService.add({
+    //                     severity: 'error',
+    //                     summary: 'Manage Over Due - Failed',
+    //                     detail: res ? res.Message : 'Failed to Update Over Due details. Please try again.'
+    //                 });
+    //             } else {
+    //                 this.messageService.add({
+    //                     severity: 'success',
+    //                     summary: 'Manage Over Due - Success',
+    //                     detail: 'Updated Over Due details successfully.'
+    //                 });
+    //             }
+
+    //             this.getOverDueDetails();
+    //             this.bcDialogVisible = false;
+    //         },
+    //         error: () => {
+    //             this.messageService.add({
+    //                 severity: 'error',
+    //                 summary: 'Manage Over Due - Failed',
+    //                 detail: 'Failed to Update Over Due details. Please try again.'
+    //             });
+    //         }
+    //     });
+                
+    // }
+
+    // parseCustomDateStringForAPI(dateStr: string): string | null {
+    //     if (!dateStr) return null;
+        
+    //     const parts = dateStr.split('-');
+    //     if (parts.length !== 3) return null;
+
+    //     const day = parseInt(parts[2], 10);
+    //     const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
+    //     const year = parseInt(parts[0], 10);
+
+    //     const nativeDate = new Date(year, month, day);
+    //     return nativeDate.toISOString(); // Generates "2026-06-01T00:00:00.000Z"
+    // }
 
     parseCustomDateStringForUI(dateStr: Date): string {
         // 2. Pad single digits with leading zeros
@@ -598,30 +610,30 @@ export class BooksOverdueComponent {
         });
     }
   
-     onReturnedChange(): void {
-        const _returnedBy = this.lstUserDetails.find(l => l.UserId === this.selectedOverDue.ReturnByUserId);
-        if (_returnedBy) {
-            this.selectedOverDue.ReturnByUserName = _returnedBy.FullName;
-            this.selectedOverDue.ReturnByUserMailId = _returnedBy.MailId;
-        }
+    //  onReturnedChange(): void {
+    //     const _returnedBy = this.lstUserDetails.find(l => l.UserId === this.selectedOverDue.ReturnByUserId);
+    //     if (_returnedBy) {
+    //         this.selectedOverDue.ReturnByUserName = _returnedBy.FullName;
+    //         this.selectedOverDue.ReturnByUserMailId = _returnedBy.MailId;
+    //     }
 
-        this.validateInput('ReturnByUserName');
-    }
+    //     this.validateInput('ReturnByUserName');
+    // }
 
-    returnByDifferentUser(): void {
-        if (this.isReturnByDifferentUser) {
-            // If typing a manual name, clear out old selected User ID references
-            this.selectedOverDue.ReturnByUserName = null;
-            this.selectedOverDue.ReturnByUserId = null;
-            this.selectedOverDue.ReturnByUserMailId = null;
-        } else {
-            // If switching back to dropdown, clear manual text fields
-            this.selectedOverDue.ReturnByUserName = this.selectedOverDue.IssuedByUserName;
-            this.selectedOverDue.ReturnByUserId = this.selectedOverDue.IssuedByUserId;
-            this.selectedOverDue.ReturnByUserMailId = this.selectedOverDue.IssuedByUserMailId;
-        }
+    // returnByDifferentUser(): void {
+    //     if (this.isReturnByDifferentUser) {
+    //         // If typing a manual name, clear out old selected User ID references
+    //         this.selectedOverDue.ReturnByUserName = null;
+    //         this.selectedOverDue.ReturnByUserId = null;
+    //         this.selectedOverDue.ReturnByUserMailId = null;
+    //     } else {
+    //         // If switching back to dropdown, clear manual text fields
+    //         this.selectedOverDue.ReturnByUserName = this.selectedOverDue.IssuedByUserName;
+    //         this.selectedOverDue.ReturnByUserId = this.selectedOverDue.IssuedByUserId;
+    //         this.selectedOverDue.ReturnByUserMailId = this.selectedOverDue.IssuedByUserMailId;
+    //     }
 
-         this.validateInput('ReturnByUserName');
-    }
+    //      this.validateInput('ReturnByUserName');
+    // }
     
 }

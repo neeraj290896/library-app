@@ -96,6 +96,11 @@ export interface BookCirculationDetails {
     UpdatedByUserMailId?: string | null;  
     PaidAmount?: number | 0;
     PaymentTypeId?: number | 0;
+    PaidOn?: string | null;
+    PaidByUserId?: number | null;
+    PaidByUserName?: string | null;
+    PaidByUserMailId?: string | null;
+    
 }
 
 export interface BuildingDetails {

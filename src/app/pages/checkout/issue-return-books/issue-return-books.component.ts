@@ -152,16 +152,33 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
 
             this.returnByDifferentUser();
 
-            if (this.bc.Status === 'Issued' && (this.bc.BookCirculationId  == null || this.bc.BookCirculationId == 0)) {
-                this.header = 'Issue Book';
-                this.isIssueNewBook = true;
+            if(this.isViewOnly)
+            {
+                if (this.selectedBook.Status === 'Issued') {
+                    this.header = 'View Issued Book Details';
+                }
+                else {
+                    this.header = 'View Returned Book Details';
+                }
             }
-            else if (this.bc.Status === 'Issued' && this.bc.BookCirculationId > 0) {
-                this.header = 'Update Issued Book Details';
+            else
+            {
+                if (this.selectedBook.Status === 'Issued' && (this.selectedBook.BookCirculationId  == null || this.selectedBook.BookCirculationId == 0)) {
+                    this.header = 'Issue Book';
+                    this.isIssueNewBook = true;
+                }
+                else if (this.selectedBook.Status === 'Issued' && this.selectedBook.BookCirculationId > 0) {
+                    this.header = 'Update Issued Book Details';
+                }
+                else if (this.selectedBook.Status === 'Returned' && this.selectedBook.BookCirculationId > 0) {
+                    this.header = 'Return Book Details';
+                }
+                else  {
+                    this.header = 'Update Returned Book Details';
+                }
             }
-            else  {
-                this.header = 'Update Returned Book Details';
-            }
+
+            
 
             console.log('openDialog(if) --> this.isIssueNewBook :', this.isIssueNewBook);
 

@@ -60,42 +60,43 @@ export class UsersBookCirculationComponent {
   public isReturnBook: boolean = true;
   public isOverDue: boolean = false;
   public lstUserDetails: UserDetails[] = [];
-  public selectedBook: BookCirculationDetails = 
-    { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'',
-      IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
-      ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
-      UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
-    UpdatedByUserMailId:'', PaidAmount:0, PaymentTypeId: 0 };
-    public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
-      Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
-        PaymentTypeId:''
-    };
-  public bookOptions: { label: string; value: number; }[] = [];
-  public availableBooks: { label: string; value: number; }[] = [];
-  public userOptions: { label: string; value: number; }[] = [];
-  public overDueStatusOptions: { label: string; value: string; }[] = [
-        { label: 'Pending', value: 'Pending' },
-        { label: 'Paid', value: 'Paid' }
-    ];
-  public statusOptions: { label: string; value: string; }[] = [
-        { label: 'Issued', value: 'Issued' },
-        { label: 'Returned', value: 'Returned' }
-    ];
-    minDate: Date | undefined;
-    maxDate: Date | undefined;
+//   public selectedBook: BookCirculationDetails = 
+//     { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', IssuedByUserId: 0, IssuedByUserName :'',
+//       IssuedDate : '', OverDueId: 0, FineAmount: 0.0, OverDueFrom : '', OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:'',
+//       ReturnByUserId: 0, ReturnByUserName : '', ReturnDate : '',  Comments: '', Status : '', UpdatedByUserId : 0, 
+//       UpdatedByUserName :'', UpdatedDate: '', BorrowerMailId:'', IssuedByUserMailId:'', ReturnByUserMailId:'',
+//     UpdatedByUserMailId:'', PaidAmount:0, PaymentTypeId: 0 };
+//     public errors: { BookName: string, BorrowerName : string, IssuedByUserName :string, ReturnByUserName : string, 
+//       Status : string, PaidAmount : string, PaymentTypeId: string} = { BookName: '', BorrowerName : '', IssuedByUserName :'', ReturnByUserName : '', Status : '', PaidAmount : '',
+//         PaymentTypeId:''
+//     };
+//   public bookOptions: { label: string; value: number; }[] = [];
+//   public availableBooks: { label: string; value: number; }[] = [];
+//   public userOptions: { label: string; value: number; }[] = [];
+//   public overDueStatusOptions: { label: string; value: string; }[] = [
+//         { label: 'Pending', value: 'Pending' },
+//         { label: 'Paid', value: 'Paid' }
+//     ];
+//   public statusOptions: { label: string; value: string; }[] = [
+//         { label: 'Issued', value: 'Issued' },
+//         { label: 'Returned', value: 'Returned' }
+//     ];
+//     minDate: Date | undefined;
+//     maxDate: Date | undefined;
 
-    isReturnByDifferentUser: boolean = false;
-    public lstBookDetails: BookDetails[] = [];
+//     isReturnByDifferentUser: boolean = false;
+//     public lstBookDetails: BookDetails[] = [];
     public isIssueNewBook: boolean = false;
      public bc: BookCirculationDetails | null = null;
     public type: string = '';
-    public transactionTypeOptions: { label: string; value: number; }[] = [];
+    // public transactionTypeOptions: { label: string; value: number; }[] = [];
+    public isViewOnly: boolean = false;
 
     ngOnInit(): void {
 
         const today = new Date();
 
-       this.setMinAndMaxDate(today);
+    //    this.setMinAndMaxDate(today);
     
        
         // 3. Assemble into the exact "yyyy-mm-dd" layout match
@@ -103,23 +104,23 @@ export class UsersBookCirculationComponent {
 
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
 
-        this.loadBooks();
-        this.loadUserDetails();
-        this.loadTransactionDetails();
+        // this.loadBooks();
+        // this.loadUserDetails();
+        // this.loadTransactionDetails();
         this.getUsersBookCirculartion();
     }
 
-    setMinAndMaxDate(dateStr: Date):void{
-         const yesterday = new Date();
-        yesterday.setDate(dateStr.getDate() - 1);
+    // setMinAndMaxDate(dateStr: Date):void{
+    //      const yesterday = new Date();
+    //     yesterday.setDate(dateStr.getDate() - 1);
 
-        this.minDate = yesterday;
-        this.maxDate = new Date();
+    //     this.minDate = yesterday;
+    //     this.maxDate = new Date();
 
-        console.log('this.minDate :', this.minDate);
-        console.log('this.maxDate :', this.maxDate);
+    //     console.log('this.minDate :', this.minDate);
+    //     console.log('this.maxDate :', this.maxDate);
 
-    }
+    // }
 
     getUsersBookCirculartion(): void{
         this._bcService.getBookCirculationDetailsByUserId(this.selectedUserDetails.UserId ?? 0).subscribe({
@@ -144,47 +145,47 @@ export class UsersBookCirculationComponent {
             });
     }
 
-    loadBooks(): void {
-        this._bookService.getAllBookDetails().subscribe({
-            next: (data: BookDetails[]) => {
-                this.lstBookDetails = data;
-                this.bookOptions = data.map(book => {
-                    return { label: book.BookName ?? '', value: book.BookId };
-                });                
-            },
-            error: (err) => {
-                console.error('Error loading books:', err);
-            }
-        });
-    }
+    // loadBooks(): void {
+    //     this._bookService.getAllBookDetails().subscribe({
+    //         next: (data: BookDetails[]) => {
+    //             this.lstBookDetails = data;
+    //             this.bookOptions = data.map(book => {
+    //                 return { label: book.BookName ?? '', value: book.BookId };
+    //             });                
+    //         },
+    //         error: (err) => {
+    //             console.error('Error loading books:', err);
+    //         }
+    //     });
+    // }
 
-    loadUserDetails(): void {
-            this._userService.getAllUserDetails().subscribe({
-                next: (data: UserDetails[]) => {
-                    this.lstUserDetails = data;
-                    this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
-                        return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                    });
-                },
-                error: (err) => {
-                    console.error('Error loading users:', err);
-                }
-            });
-    }
+    // loadUserDetails(): void {
+    //         this._userService.getAllUserDetails().subscribe({
+    //             next: (data: UserDetails[]) => {
+    //                 this.lstUserDetails = data;
+    //                 this.userOptions = data.filter(x => x.FullName?.trim() !='').map(usr => {
+    //                     return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
+    //                 });
+    //             },
+    //             error: (err) => {
+    //                 console.error('Error loading users:', err);
+    //             }
+    //         });
+    // }
 
-    loadTransactionDetails(): void {
-                this._ttService.getTransactionTypeDetails().subscribe({
-                    next: (data: TransactionTypeDetails[]) => {   
+    // loadTransactionDetails(): void {
+    //             this._ttService.getTransactionTypeDetails().subscribe({
+    //                 next: (data: TransactionTypeDetails[]) => {   
                                         
-                        this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
-                            return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
-                        });
-                    },
-                    error: (err) => {
-                        console.error('Error loading transaction type details:', err);
-                    }
-                });
-    }
+    //                     this.transactionTypeOptions = data.filter(x => x.TypeName?.trim() !='').map(usr => {
+    //                         return { label: usr.TypeName ?? '', value: usr.TypeId ?? 0 };
+    //                     });
+    //                 },
+    //                 error: (err) => {
+    //                     console.error('Error loading transaction type details:', err);
+    //                 }
+    //             });
+    // }
 
     onBookSearch(term: string) {
         this.searchBookTerm = term;
@@ -338,6 +339,7 @@ export class UsersBookCirculationComponent {
 
         
         this.type = bcType;
+        this.isViewOnly = false;
         this.bcDialogVisible = true;
     }
 
@@ -779,6 +781,10 @@ export class UsersBookCirculationComponent {
     //      this.validateInput('ReturnByUserName');
     // }
 
-    viewBookCirculationDetails(_bc: BookCirculationDetails): void{
+    viewBookCirculationDetails(_bcd: BookCirculationDetails): void{
+         this.bc = _bcd;
+        this.type = _bcd.Status == "Returned" ? "CheckIn" : "CheckOut";
+        this.isViewOnly = true;
+        this.bcDialogVisible = true;
     }
   }
