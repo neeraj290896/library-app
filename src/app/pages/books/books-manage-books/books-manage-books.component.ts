@@ -61,7 +61,7 @@ export class BooksManageBooksComponent implements OnInit {
     private rackService = inject(RackService);
     private _bcService = inject(BookCirculationService);
     private _authService = inject(AuthService);
-    
+
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
 
@@ -155,6 +155,8 @@ export class BooksManageBooksComponent implements OnInit {
         { label: 'In-Active', value: false }
     ];
 
+    public importIndex: number = -1;
+    public importBookDialogVisible = false;
     public importDialogVisible: boolean = false;
     public importPreview: ImportBookDetails[] = [];
     public importUploadError: string = '';
@@ -178,16 +180,16 @@ export class BooksManageBooksComponent implements OnInit {
 
     public activeTab: number = 0;
 
-    selectedBookDetails: BookDetails[] = [];
-    selectedIds: number[] = [];
-    printBarcodeDialogVisible: boolean = false;
-    isViewOnly: boolean = false;
+    public selectedBookDetails: BookDetails[] = [];
+    public selectedIds: number[] = [];
+    public printBarcodeDialogVisible: boolean = false;
+    public isViewOnly: boolean = false;
 
     public loggedInUserDetails: UserDetails = {};
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
     public bcDialogVisible: boolean = false;
-    public todayDate :string | undefined;
+    public todayDate: string | undefined;
 
     ngOnInit(): void {
         const today = new Date();
@@ -390,9 +392,6 @@ export class BooksManageBooksComponent implements OnInit {
         this.importShowFt = false;
     }
 
-    // getStatusSeverity(isActive: boolean): 'success' | 'danger' {
-    //     return isActive ? 'success' : 'danger';
-    // }
     getStatusSeverity(status: string): 'success' | 'danger' {
         return status == 'Available' ? 'success' : 'danger';
     }
@@ -445,6 +444,7 @@ export class BooksManageBooksComponent implements OnInit {
             this.header = 'Add Book';
             this.publishedDate = null;
         }
+
         this.errors = {
             BookName: '',
             AuthorId: '',
@@ -540,13 +540,12 @@ export class BooksManageBooksComponent implements OnInit {
     }
 
     onPublishedYearChange(): void {
-        
         if (this.publishedDate) {
             this.currentBook.PublishedYear = this.publishedDate.getFullYear();
         }
         else {
             this.currentBook.PublishedYear = null;
-        }       
+        }
 
         this.validateInput('PublishedYear');
     }
@@ -736,15 +735,14 @@ export class BooksManageBooksComponent implements OnInit {
         const isFloorIdValid = this.validateInput('FloorId');
         const isRackIdValid = this.validateInput('RackId');
         // const isBookBarcodeValid = this.validateInput('BookBarcode');
-        const isStatusValid = this.validateInput('IsActive');
+        // const isStatusValid = this.validateInput('IsActive');
         return isBookNameValid && isAuthorIdValid && isPublisherIdValid &&
             isCategoryIdValid && isLanguageIdValid && isPublishedYearValid &&
             isPriceValid && isBuildingIdValid && isFloorIdValid &&
-            isRackIdValid && isStatusValid;
+            isRackIdValid;
     }
 
     saveBook(): void {
-
         console.log('currentBook :', this.currentBook);
 
         if (!this.validateBook()) {
@@ -752,21 +750,15 @@ export class BooksManageBooksComponent implements OnInit {
         }
 
         const payload = [this.currentBook];
-
-        if(this.currentBook.BookId >0)
-        {
+        if (this.currentBook.BookId > 0) {
             this.updateBook(payload);
         }
-        else
-        {
+        else {
             this.addNewBook(payload);
         }
-        
-        
     }
 
-    addNewBook(_bookDetails: BookDetails[]): void
-    {
+    addNewBook(_bookDetails: BookDetails[]): void {
         this.bookService.addBookDetails(_bookDetails).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
@@ -775,7 +767,8 @@ export class BooksManageBooksComponent implements OnInit {
                         summary: 'Manage Book - Failed',
                         detail: res ? res.Message : 'Failed to add new book. Please try again.'
                     });
-                } else {
+                }
+                else {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Manage Book - Success',
@@ -785,8 +778,6 @@ export class BooksManageBooksComponent implements OnInit {
                     this.loadBooks();
                     this.bookDialogVisible = false;
                 }
-
-                
             },
             error: () => {
                 this.messageService.add({
@@ -798,7 +789,7 @@ export class BooksManageBooksComponent implements OnInit {
         });
     }
 
-    updateBook(_bookDetails: BookDetails[]): void{
+    updateBook(_bookDetails: BookDetails[]): void {
         this.bookService.updateBookDetails(_bookDetails).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
@@ -807,18 +798,17 @@ export class BooksManageBooksComponent implements OnInit {
                         summary: 'Manage Book - Failed',
                         detail: res ? res.Message : 'Failed to update book. Please try again.'
                     });
-                } else {
+                }
+                else {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Manage Book - Success',
                         detail: 'Book updated successfully.'
                     });
-                    
+
                     this.loadBooks();
                     this.bookDialogVisible = false;
                 }
-
-               
             },
             error: () => {
                 this.messageService.add({
@@ -840,7 +830,8 @@ export class BooksManageBooksComponent implements OnInit {
                         summary: 'Delete Book - Failed',
                         detail: res ? res.Message : 'Failed to delete book. Please try again.'
                     });
-                } else {
+                }
+                else {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Delete Book - Success',
@@ -1032,16 +1023,6 @@ export class BooksManageBooksComponent implements OnInit {
                 errorTitle: 'Invalid Rack',
                 error: 'Please select a valid rack for the selected floor.'
             };
-
-            // const statusCell = worksheet.getCell(rowIndex, 12);
-            // statusCell.dataValidation = {
-            //     type: 'list',
-            //     allowBlank: false,
-            //     formulae: ['"Active,In-Active"'],
-            //     showErrorMessage: true,
-            //     errorTitle: 'Invalid Status',
-            //     error: 'Please select Active or In-Active.'
-            // };
         }
 
         worksheet.columns.forEach(col => {
@@ -1105,7 +1086,7 @@ export class BooksManageBooksComponent implements OnInit {
 
                 const headerRow = Object.keys(rows[0] || {});
                 const expectedHeaders = ['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR',
-                    'PRICE(₹)', 'BUILDING', 'FLOOR', 'RACK', 'BARCODE', 'STATUS'];
+                    'PRICE(₹)', 'BUILDING', 'FLOOR', 'RACK'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -1161,6 +1142,109 @@ export class BooksManageBooksComponent implements OnInit {
                 this.importUploadError = 'Invalid file data.';
             }
         };
+    }
+
+    editImportBook(book: BookDetails, index: number): void {
+        this.importIndex = index;
+        this.currentBook = { ...book };
+        this.header = 'Edit Book';
+        this.publishedDate = book.PublishedYear ? new Date(book.PublishedYear, 0, 1) : null;
+
+        this.floorOptions = this.floors
+            .filter(floor => floor.BuildingId === this.currentBook.BuildingId)
+            .map(floor => {
+                return { label: floor.FloorName ?? '', value: floor.FloorId };
+            });
+
+        this.rackOptions = this.racks
+            .filter(rack => rack.BuildingId === this.currentBook.BuildingId &&
+                rack.FloorId === this.currentBook.FloorId)
+            .map(rack => {
+                return { label: rack.RackLabel ?? '', value: rack.RackId };
+            });
+
+        this.errors = {
+            BookName: '',
+            AuthorId: '',
+            PublisherId: '',
+            CategoryId: '',
+            LanguageId: '',
+            PublishedYear: '',
+            Price: '',
+            BuildingId: '',
+            FloorId: '',
+            RackId: '',
+            BookBarcode: '',
+            IsActive: ''
+        };
+        this.importBookDialogVisible = true;
+        this.isViewOnly = false;
+    }
+
+    viewImportBook(book: BookDetails): void {
+        this.currentBook = { ...book };
+        this.header = 'View Book';
+        this.publishedDate = book.PublishedYear ? new Date(book.PublishedYear, 0, 1) : null;
+
+        this.floorOptions = this.floors
+            .filter(floor => floor.BuildingId === this.currentBook.BuildingId)
+            .map(floor => {
+                return { label: floor.FloorName ?? '', value: floor.FloorId };
+            });
+
+        this.rackOptions = this.racks
+            .filter(rack => rack.BuildingId === this.currentBook.BuildingId &&
+                rack.FloorId === this.currentBook.FloorId)
+            .map(rack => {
+                return { label: rack.RackLabel ?? '', value: rack.RackId };
+            });
+
+        this.errors = {
+            BookName: '',
+            AuthorId: '',
+            PublisherId: '',
+            CategoryId: '',
+            LanguageId: '',
+            PublishedYear: '',
+            Price: '',
+            BuildingId: '',
+            FloorId: '',
+            RackId: '',
+            BookBarcode: '',
+            IsActive: ''
+        };
+        this.activeTab = 0;
+        this.importBookDialogVisible = true;
+        this.isViewOnly = true;
+    }
+
+    saveImportBook(): void {
+        if (!this.validateBook()) {
+            return;
+        }
+
+        this.importPreview[this.importIndex] = {
+            ...this.importPreview[this.importIndex],
+            ...this.currentBook
+        };
+
+        this.validateImportInput('BookName', this.importIndex);
+        this.validateImportInput('AuthorName', this.importIndex);
+        this.validateImportInput('PublisherName', this.importIndex);
+        this.validateImportInput('CategoryName', this.importIndex);
+        this.validateImportInput('LanguageName', this.importIndex);
+        this.validateImportInput('PublishedYear', this.importIndex);
+        this.validateImportInput('Price', this.importIndex);
+        this.validateImportInput('BuildingName', this.importIndex);
+        this.validateImportInput('FloorName', this.importIndex);
+        this.validateImportInput('RackLabel', this.importIndex);
+
+        this.importIndex = -1;
+        this.importBookDialogVisible = false;
+    }
+
+    deleteImportBook(index: number): void {
+        this.importPreview.splice(index, 1);
     }
 
     validateImportInput(key: string, index: number): boolean {
@@ -1338,15 +1422,15 @@ export class BooksManageBooksComponent implements OnInit {
                 }
                 break;
 
-            // case 'BookBarcode':
-            //     if (!this.importPreview[index].BookBarcode?.trim()) {
-            //         this.importPreview[index].Error = 'Barcode is required.';
-            //         isValid = false;
-            //     }
-            //     else {
-            //         this.importPreview[index].Error = '';
-            //     }
-            //     break;
+            case 'BookBarcode':
+                if (!this.importPreview[index].BookBarcode?.trim()) {
+                    this.importPreview[index].Error = 'Barcode is required.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
 
             case 'IsActive':
                 if (this.importPreview[index].IsActive === null) {
@@ -1376,9 +1460,9 @@ export class BooksManageBooksComponent implements OnInit {
                 this.validateImportInput('Price', index) &&
                 this.validateImportInput('BuildingName', index) &&
                 this.validateImportInput('FloorName', index) &&
-                this.validateImportInput('RackLabel', index) &&
-                // this.validateImportInput('BookBarcode', index) &&
-                this.validateImportInput('IsActive', index);
+                this.validateImportInput('RackLabel', index);
+            // this.validateImportInput('BookBarcode', index) &&
+            // this.validateImportInput('IsActive', index);
         });
     }
 
@@ -1461,32 +1545,30 @@ export class BooksManageBooksComponent implements OnInit {
         }
     }
 
-    checkInBook(_book: BookDetails) : void{
+    checkInBook(_book: BookDetails): void {
         this.getBookCirculartionBookId(_book.BookId);
     }
 
-    checkOutBook(_book: BookDetails) : void{   
-          
-        
-        this.bc  = { BookCirculationId: 0, BookId: _book.BookId,  BookName: _book.BookName, BorrowerId:0, BorrowerName : '', 
-                        IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
-                        IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
-                        OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
-                        ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
-                        UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
-        
+    checkOutBook(_book: BookDetails): void {
+        this.bc = {
+            BookCirculationId: 0, BookId: _book.BookId, BookName: _book.BookName, BorrowerId: 0, BorrowerName: '',
+            IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
+            IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+            OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
+            ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
+            UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0
+        };
+
         this.type = "CheckOut";
         this.bcDialogVisible = true;
-
         // console.log('this.bc :', this.bc);
     }
 
-    getBookCirculartionBookId(_bookId: number): void{
-
+    getBookCirculartionBookId(_bookId: number): void {
         this._bcService.getBookCirculationDetailsById(_bookId).subscribe({
             next: (data: BookCirculationDetails[]) => {
-                
-                this.bc = data.find(x => x.Status ==  "Issued") ?? null;              
+
+                this.bc = data.find(x => x.Status == "Issued") ?? null;
 
                 this.type = "CheckIn";
                 this.bcDialogVisible = true;
@@ -1498,12 +1580,12 @@ export class BooksManageBooksComponent implements OnInit {
     }
 
     parseCustomDateStringForUI(dateStr: Date): string {
-            // 2. Pad single digits with leading zeros
-            const day = String(dateStr.getDate()).padStart(2, '0');
-            const month = String(dateStr.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-            const year = dateStr.getFullYear();      
-    
-            // 3. Assemble into the exact "yyyy-mm-dd" layout match        
-            return  `${year}-${month}-${day}`;
+        // 2. Pad single digits with leading zeros
+        const day = String(dateStr.getDate()).padStart(2, '0');
+        const month = String(dateStr.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = dateStr.getFullYear();
+
+        // 3. Assemble into the exact "yyyy-mm-dd" layout match        
+        return `${year}-${month}-${day}`;
     }
 }

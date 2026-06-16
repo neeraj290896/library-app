@@ -1,9 +1,8 @@
-import { Component, computed, effect, inject, signal, HostListener, ElementRef } from '@angular/core';
+import { Component, computed, inject, signal, HostListener, ElementRef } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from "primeng/tooltip";
-import { OrganizationDetails } from '@app/shared/models/api.models';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -18,10 +17,12 @@ export class LayoutComponent {
     private router = inject(Router);
     private elementRef = inject(ElementRef);
 
-    userRole = this.authService.userRole;
-    userName = this.authService.userName;
-    public organizationDetails = this.authService.organizationDetails ?? environment.OrganizationDetails;
-    sidebarCollapsed = signal(true);
+    public userRole = this.authService.userRole;
+    public userName = this.authService.userName;
+    public organizationDetails = computed(() => {
+        return this.authService.organizationDetails() ?? environment.OrganizationDetails;
+    });
+    public sidebarCollapsed = signal(true);
 
     public readonly menuItems = [
         { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar' },
@@ -47,7 +48,7 @@ export class LayoutComponent {
             const sidebar = this.elementRef.nativeElement.querySelector('.sidebar');
             const toggleBtn = this.elementRef.nativeElement.querySelector('.toggle-btn');
             const target = event.target as HTMLElement;
-            
+
             // If click is not on sidebar and not on toggle button, collapse sidebar
             if (sidebar && !sidebar.contains(target) && toggleBtn && !toggleBtn.contains(target)) {
                 this.sidebarCollapsed.set(true);

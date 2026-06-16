@@ -1,18 +1,18 @@
 <div class="manage-bc-container">
     <div class="row">
         <div class="col-6 position-relative">
-                <span class="pi pi-search search-icon position-absolute text-muted searchIcon"></span>
+            <span class="pi pi-search search-icon position-absolute text-muted searchIcon"></span>
             <input pInputText type="text" placeholder="Search by book" [(ngModel)]="searchBookTerm"
                 (input)="onBookSearch(searchBookTerm)" class="form-control ps-5" />
         </div>
         <div class="col-6 position-relative">
-                <span class="pi pi-search search-icon position-absolute text-muted searchIcon"></span>
+            <span class="pi pi-search search-icon position-absolute text-muted searchIcon"></span>
             <input pInputText type="text" placeholder="Search by user" [(ngModel)]="searchUserTerm"
                 (input)="onUserSearch(searchUserTerm)" class="form-control ps-5" />
         </div>
     </div>
 
-     <div class="table-clear-filter">
+    <div class="table-clear-filter">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
     </div>
@@ -46,7 +46,8 @@
                             Borrower Name
                             <p-sortIcon field="borrowerName"></p-sortIcon>
                         </div>
-                        <span class="pi" [ngClass]="selectedBorrowerNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                        <span class="pi"
+                            [ngClass]="selectedBorrowerNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
                 </th>
@@ -65,7 +66,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="issuedDate">
                             Issued On
                             <p-sortIcon field="issuedDate"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 8%;">
@@ -93,7 +94,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="returnDate">
                             Returned On
                             <p-sortIcon field="returnDate"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
@@ -101,7 +102,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="overDueFrom">
                             Over Due From
                             <p-sortIcon field="overDueFrom"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width:10%;">
@@ -109,7 +110,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
                             Over Due in Days
                             <p-sortIcon field="overDueDays"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width:10%;">
@@ -117,7 +118,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
                             Over Due Status
                             <p-sortIcon field="overDueStatus"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
@@ -202,22 +203,23 @@
                 </td>
                 <td>{{ book.ReturnByUserName }}</td>
                 <td>{{ book.ReturnDate | date:'yyyy-MM-dd'}}</td>
-                
+
                 <td>
-                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'"
+                        [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
 
                 </td>
                 <td>
                     <p-tag [value]="book.OverDueDays  ?? '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
                 </td>
                 <td>
-                    <p-tag [value]="book.OverDueStatus  ?? '-'" [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
+                    <p-tag [value]="book.OverDueStatus  ?? '-'"
+                        [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                            <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
-                            class="p-button-rounded p-button-text p-button-sm"></button> 
-                                              
+                        <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
+                            class="p-button-rounded p-button-text p-button-sm"></button>
                     </div>
                 </td>
             </tr>
@@ -230,8 +232,9 @@
         </ng-template>
     </p-table>
     @if (bcDialogVisible) {
-        <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = null [isViewOnly]="true"
-            (onSuccess)="getAllBookCirculartion()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
+    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower]=null
+        [isViewOnly]="true" (onSuccess)="getAllBookCirculartion()"
+        (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
     }
     <!-- <p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
         <div class="row">

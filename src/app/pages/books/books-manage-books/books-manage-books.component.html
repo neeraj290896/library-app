@@ -1,20 +1,21 @@
 <div class="manage-books-container">
-    <div class="table-clear-filter">
+    <div class="table-clear-filter d-flex align-items-center gap-3">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
-            (onClick)="clear()"></p-button> &nbsp;&nbsp;&nbsp;
-            <p-button [disabled] ="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined" styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print" (onClick)="printBarcode()"></p-button>
+            (onClick)="clear()"></p-button>
+        <p-button [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
+            styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print"
+            (onClick)="printBarcode()"></p-button>
     </div>
-    <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails" 
-    (selectionChange)="onSelectionChange()"
-        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+    <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails"
+        (selectionChange)="onSelectionChange()" [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top"
+        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
         <ng-template pTemplate="header">
             <tr class="border-bottom">
                 <th style="width: 3%">
                     <!-- Header checkbox for selecting/deselecting all items -->
-                    <p-tableHeaderCheckbox>  id="chk-header-all"
-                    [value]="books" </p-tableHeaderCheckbox>
+                    <p-tableHeaderCheckbox> id="chk-header-all"
+                        [value]="books" </p-tableHeaderCheckbox>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
                     <div class="d-flex align-items-center gap-2">
@@ -185,8 +186,7 @@
 
         <ng-template pTemplate="body" let-book let-index="rowIndex">
             <tr class="border-bottom">
-                <td><p-tableCheckbox [index]="index" [value]="book"
-                    id="chk-row-{{book.BookId}}" /></td>
+                <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" /></td>
                 <td>{{ index + 1 }}</td>
                 <td>
                     <span [pTooltip]="book.BookName">
@@ -215,12 +215,12 @@
                 </td>
                 <td>
                     <div class="d-flex align-items-center justify-content-center gap-2">
-                        <button pButton icon="pi pi-sign-in" (click)="checkInBook(book)" *ngIf = "(book.Status == 'Issued')"
-                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckIn"></button> 
-
-                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book)" *ngIf = "!(book.Status == 'Issued')"
-                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckOut"></button> 
-
+                        <button pButton icon="pi pi-sign-in" (click)="checkInBook(book)"
+                            *ngIf="(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
+                            pTooltip="CheckIn"></button>
+                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book)"
+                            *ngIf="!(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
+                            pTooltip="CheckOut"></button>
                         <button pButton icon="pi pi-eye" (click)="viewBook(book)"
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
                         <button pButton icon="pi pi-pencil" (click)="editBook(book)"
@@ -242,12 +242,9 @@
         </ng-template>
     </p-table>
 
-    <p-dialog [showHeader]="true"  [(visible)]="bookDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body" (onHide)="loadBooks()">
-        <ng-template pTemplate="header">
-            <span *ngIf="currentBook.BookId == 0">{{header}}</span>
-            <!-- Empty span prevents layout collapse when text is hidden -->
-            <span *ngIf="currentBook.BookId >0">&nbsp;</span> 
-        </ng-template>
+    <p-dialog [header]="currentBook.BookId == null || currentBook.BookId == 0 ? header : ''"
+        [(visible)]="bookDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body"
+        (onHide)="loadBooks()">
         @if (header === 'Add Book') {
         <div class="row">
             <div class="col-6 mb-3">
@@ -265,9 +262,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="authorId">
                     Author<sup>*</sup>
                 </label>
-                <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}" [editable] = "true"
-                    [options]="authorOptions" optionLabel="label" optionValue="value" placeholder="Select author"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onAuthorChange()"></p-select>
+                <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="authorOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select author" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onAuthorChange()"></p-select>
                 @if (errors.AuthorId) {
                 <div class="text-danger mt-1 small">{{ errors.AuthorId }}</div>
                 }
@@ -276,9 +274,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="publisherId">
                     Publisher<sup>*</sup>
                 </label>
-                <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [ngModelOptions]="{standalone: true}" [editable] = "true"
-                    [options]="publisherOptions" optionLabel="label" optionValue="value" placeholder="Select publisher"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onPublisherChange()"></p-select>
+                <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="publisherOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select publisher" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onPublisherChange()"></p-select>
                 @if (errors.PublisherId) {
                 <div class="text-danger mt-1 small">{{ errors.PublisherId }}</div>
                 }
@@ -287,9 +286,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="categoryId">
                     Category<sup>*</sup>
                 </label>
-                <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [ngModelOptions]="{standalone: true}" [editable] = "true"
-                    [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onCategoryChange()"></p-select>
+                <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="categoryOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select category" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onCategoryChange()"></p-select>
                 @if (errors.CategoryId) {
                 <div class="text-danger mt-1 small">{{ errors.CategoryId }}</div>
                 }
@@ -298,9 +298,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="languageId">
                     Language<sup>*</sup>
                 </label>
-                <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [ngModelOptions]="{standalone: true}" [editable] = "true"
-                    [options]="languageOptions" optionLabel="label" optionValue="value" placeholder="Select language"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onLanguageChange()"></p-select>
+                <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="languageOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select language" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onLanguageChange()"></p-select>
                 @if (errors.LanguageId) {
                 <div class="text-danger mt-1 small">{{ errors.LanguageId }}</div>
                 }
@@ -309,9 +310,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="publishedYear">
                     Published Year<sup>*</sup>
                 </label>
-                <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body" 
-                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy" (ngModelChange)="onPublishedYearChange()"
-                    placeholder="Select published year" styleClass="w-100" inputStyleClass="w-100" />
+                <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy"
+                    (ngModelChange)="onPublishedYearChange()" placeholder="Select published year" styleClass="w-100"
+                    inputStyleClass="w-100" />
                 @if (errors.PublishedYear) {
                 <div class="text-danger mt-1 small">{{ errors.PublishedYear }}</div>
                 }
@@ -331,9 +333,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="buildingId">
                     Building<sup>*</sup>
                 </label>
-                <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [ngModelOptions]="{standalone: true}" [editable] = "true"
-                    [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select building"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onBuildingChange()"></p-select>
+                <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="buildingOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select building" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onBuildingChange()"></p-select>
                 @if (errors.BuildingId) {
                 <div class="text-danger mt-1 small">{{ errors.BuildingId }}</div>
                 }
@@ -342,9 +345,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="floorId">
                     Floor<sup>*</sup>
                 </label>
-                <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}" [editable] = "true"
-                    [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onFloorChange()"></p-select>
+                <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="floorOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select floor" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onFloorChange()"></p-select>
                 @if (errors.FloorId) {
                 <div class="text-danger mt-1 small">{{ errors.FloorId }}</div>
                 }
@@ -353,9 +357,10 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="rackId">
                     Rack<sup>*</sup>
                 </label>
-                <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}" [editable] = "true"
-                    [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack"
-                    styleClass="w-100" appendTo="body" (ngModelChange)="onRackChange()"></p-select>
+                <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="rackOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select rack" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onRackChange()"></p-select>
                 @if (errors.RackId) {
                 <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
                 }
@@ -364,9 +369,8 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
                     Status<sup>*</sup>
                 </label>
-                <input id="bookStatus" type="text" class="form-control" pInputText [disabled] = "true"
-                    [(ngModel)]="currentBook.Status" [ngModelOptions]="{standalone: true}"
-                    placeholder="Enter Status"  /> 
+                <input id="bookStatus" type="text" class="form-control" pInputText [disabled]="true"
+                    [(ngModel)]="currentBook.Status" [ngModelOptions]="{standalone: true}" placeholder="Enter Status" />
             </div>
             <!-- <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookBarcode">
@@ -413,9 +417,9 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="authorId">
                             Author<sup>*</sup>
                         </label>
-                        <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}" [disabled]="isViewOnly"
-                            [options]="authorOptions" optionLabel="label" optionValue="value" [editable] = "true"
-                            placeholder="Select author" styleClass="w-100" appendTo="body"
+                        <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}"
+                            [disabled]="isViewOnly" [options]="authorOptions" optionLabel="label" optionValue="value"
+                            [editable]="true" placeholder="Select author" styleClass="w-100" appendTo="body"
                             (ngModelChange)="onAuthorChange()"></p-select>
                         @if (errors.AuthorId) {
                         <div class="text-danger mt-1 small">{{ errors.AuthorId }}</div>
@@ -425,10 +429,10 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="publisherId">
                             Publisher<sup>*</sup>
                         </label>
-                        <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [disabled]="isViewOnly" [editable] = "true"
-                            [ngModelOptions]="{standalone: true}" [options]="publisherOptions" optionLabel="label"
-                            optionValue="value" placeholder="Select publisher" styleClass="w-100" appendTo="body"
-                            (ngModelChange)="onPublisherChange()"></p-select>
+                        <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [disabled]="isViewOnly"
+                            [editable]="true" [ngModelOptions]="{standalone: true}" [options]="publisherOptions"
+                            optionLabel="label" optionValue="value" placeholder="Select publisher" styleClass="w-100"
+                            appendTo="body" (ngModelChange)="onPublisherChange()"></p-select>
                         @if (errors.PublisherId) {
                         <div class="text-danger mt-1 small">{{ errors.PublisherId }}</div>
                         }
@@ -437,10 +441,10 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="categoryId">
                             Category<sup>*</sup>
                         </label>
-                        <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [disabled]="isViewOnly" [editable] = "true"
-                            [ngModelOptions]="{standalone: true}" [options]="categoryOptions" optionLabel="label"
-                            optionValue="value" placeholder="Select category" styleClass="w-100" appendTo="body"
-                            (ngModelChange)="onCategoryChange()"></p-select>
+                        <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [disabled]="isViewOnly"
+                            [editable]="true" [ngModelOptions]="{standalone: true}" [options]="categoryOptions"
+                            optionLabel="label" optionValue="value" placeholder="Select category" styleClass="w-100"
+                            appendTo="body" (ngModelChange)="onCategoryChange()"></p-select>
                         @if (errors.CategoryId) {
                         <div class="text-danger mt-1 small">{{ errors.CategoryId }}</div>
                         }
@@ -449,10 +453,10 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="languageId">
                             Language<sup>*</sup>
                         </label>
-                        <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [disabled]="isViewOnly" [editable] = "true"
-                            [ngModelOptions]="{standalone: true}" [options]="languageOptions" optionLabel="label"
-                            optionValue="value" placeholder="Select language" styleClass="w-100" appendTo="body"
-                            (ngModelChange)="onLanguageChange()"></p-select>
+                        <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [disabled]="isViewOnly"
+                            [editable]="true" [ngModelOptions]="{standalone: true}" [options]="languageOptions"
+                            optionLabel="label" optionValue="value" placeholder="Select language" styleClass="w-100"
+                            appendTo="body" (ngModelChange)="onLanguageChange()"></p-select>
                         @if (errors.LanguageId) {
                         <div class="text-danger mt-1 small">{{ errors.LanguageId }}</div>
                         }
@@ -461,8 +465,9 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="publishedYear">
                             Published Year<sup>*</sup>
                         </label>
-                        <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body" [disabled]="isViewOnly"
-                            [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy" (ngModelChange)="onPublishedYearChange()"
+                        <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                            [disabled]="isViewOnly" [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true"
+                            view="year" dateFormat="yy" (ngModelChange)="onPublishedYearChange()"
                             placeholder="Select published year" styleClass="w-100" inputStyleClass="w-100" />
                         @if (errors.PublishedYear) {
                         <div class="text-danger mt-1 small">{{ errors.PublishedYear }}</div>
@@ -472,8 +477,8 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="price">
                             Price(₹)<sup>*</sup>
                         </label>
-                        <input id="price" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Price" [disabled]="isViewOnly"
-                            [ngModelOptions]="{standalone: true}" placeholder="Enter price"
+                        <input id="price" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Price"
+                            [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter price"
                             (ngModelChange)="validateInput('Price')" />
                         @if (errors.Price) {
                         <div class="text-danger mt-1 small">{{ errors.Price }}</div>
@@ -483,10 +488,10 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="buildingId">
                             Building<sup>*</sup>
                         </label>
-                        <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [disabled]="isViewOnly" [editable] = "true"
-                            [ngModelOptions]="{standalone: true}" [options]="buildingOptions" optionLabel="label"
-                            optionValue="value" placeholder="Select building" styleClass="w-100" appendTo="body"
-                            (ngModelChange)="onBuildingChange()"></p-select>
+                        <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [disabled]="isViewOnly"
+                            [editable]="true" [ngModelOptions]="{standalone: true}" [options]="buildingOptions"
+                            optionLabel="label" optionValue="value" placeholder="Select building" styleClass="w-100"
+                            appendTo="body" (ngModelChange)="onBuildingChange()"></p-select>
                         @if (errors.BuildingId) {
                         <div class="text-danger mt-1 small">{{ errors.BuildingId }}</div>
                         }
@@ -495,9 +500,10 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="floorId">
                             Floor<sup>*</sup>
                         </label>
-                        <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}" [disabled]="isViewOnly"
-                            [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor" [editable] = "true"
-                            styleClass="w-100" appendTo="body" (ngModelChange)="onFloorChange()"></p-select>
+                        <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}"
+                            [disabled]="isViewOnly" [options]="floorOptions" optionLabel="label" optionValue="value"
+                            placeholder="Select floor" [editable]="true" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onFloorChange()"></p-select>
                         @if (errors.FloorId) {
                         <div class="text-danger mt-1 small">{{ errors.FloorId }}</div>
                         }
@@ -506,9 +512,10 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="rackId">
                             Rack<sup>*</sup>
                         </label>
-                        <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}" [disabled]="isViewOnly"
-                            [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack" [editable] = "true"
-                            styleClass="w-100" appendTo="body" (ngModelChange)="onRackChange()"></p-select>
+                        <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}"
+                            [disabled]="isViewOnly" [options]="rackOptions" optionLabel="label" optionValue="value"
+                            placeholder="Select rack" [editable]="true" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onRackChange()"></p-select>
                         @if (errors.RackId) {
                         <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
                         }
@@ -517,9 +524,9 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
                             Status<sup>*</sup>
                         </label>
-                        <input id="bookStatus" type="text" class="form-control" pInputText [disabled] = "true"
+                        <input id="bookStatus" type="text" class="form-control" pInputText [disabled]="true"
                             [(ngModel)]="currentBook.Status" [ngModelOptions]="{standalone: true}"
-                            placeholder="Enter Status"  /> 
+                            placeholder="Enter Status" />
                     </div>
                     <!-- <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="bookBarcode">
@@ -556,25 +563,26 @@
         }
 
         <ng-template pTemplate="footer">
-            @if (header === 'Add Book' || (header === 'Edit Book' && activeTab === 0)|| (header === 'View Book' && activeTab === 0)) {
+            @if (header === 'Add Book' || (header === 'Edit Book' && activeTab === 0)|| (header === 'View Book' &&
+            activeTab === 0)) {
             <div class="d-flex justify-content-end align-items-center gap-3">
-
-                <p-button pButton icon="pi pi-sign-in" type="button" label="CheckIn" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Issued'"
+                <p-button icon="pi pi-sign-in" type="button" label="CheckIn" [style]="{ width: '7rem' }"
+                    styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Issued'"
                     (click)="checkInBook(currentBook)" pTooltip="CheckIn"></p-button>
-
-                <p-button pButton icon="pi pi-sign-out" type="button" label="CheckOut" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Available'"
+                <p-button icon="pi pi-sign-out" type="button" label="CheckOut" [style]="{ width: '7rem' }"
+                    styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Available'"
                     (click)="checkOutBook(currentBook)" pTooltip="CheckOut"></p-button>
-
-                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined" *ngIf="!isViewOnly"
-                    styleClass="btn-main-outlined" (click)="bookDialogVisible = false"></p-button>
-                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main" *ngIf="!isViewOnly"
-                    (click)="saveBook()"></p-button>
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    *ngIf="!isViewOnly" styleClass="btn-main-outlined" (click)="bookDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    *ngIf="!isViewOnly" (click)="saveBook()"></p-button>
             </div>
             }
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Import Books" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }" appendTo="body">
+    <p-dialog header="Import Books" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }"
+        appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">
@@ -698,6 +706,11 @@
                                 (click)="showImportFilter()"></span>
                         </div>
                     </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            Actions
+                        </div>
+                    </th>
                 </tr>
                 @if (importShowFt) {
                 <tr>
@@ -792,6 +805,7 @@
                             </ng-template>
                         </p-columnFilter>
                     </th>
+                    <th></th>
                 </tr>
                 }
             </ng-template>
@@ -830,12 +844,23 @@
                             {{ book.Error }}
                         </span>
                     </td>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <button pButton icon="pi pi-eye" (click)="viewImportBook(book)"
+                                class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
+                            <button pButton icon="pi pi-pencil" (click)="editImportBook(book, index)"
+                                class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Book"></button>
+                            <button pButton icon="pi pi-trash" (click)="deleteImportBook(index)"
+                                class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                                pTooltip="Delete Book"></button>
+                        </div>
+                    </td>
                 </tr>
             </ng-template>
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="8" class="text-center">
+                    <td colspan="9" class="text-center">
                         No books found.
                     </td>
                 </tr>
@@ -852,61 +877,229 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Print Books Barcode" [(visible)] ="printBarcodeDialogVisible" [modal] ="true" [style]="{ width: '25vw' }" appendTo="body">
+    <p-dialog [header]="header" [(visible)]="importBookDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+        appendTo="body">
+        <div class="row">
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
+                    Book<sup>*</sup>
+                </label>
+                <input id="bookName" type="text" class="form-control" pInputText [disabled]="isViewOnly"
+                    [(ngModel)]="currentBook.BookName" [ngModelOptions]="{standalone: true}" placeholder="Enter book"
+                    (ngModelChange)="validateInput('BookName')" />
+                @if (errors.BookName) {
+                <div class="text-danger mt-1 small">{{ errors.BookName }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="authorId">
+                    Author<sup>*</sup>
+                </label>
+                <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}"
+                    [disabled]="isViewOnly" [options]="authorOptions" optionLabel="label" optionValue="value"
+                    [editable]="true" placeholder="Select author" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onAuthorChange()"></p-select>
+                @if (errors.AuthorId) {
+                <div class="text-danger mt-1 small">{{ errors.AuthorId }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="publisherId">
+                    Publisher<sup>*</sup>
+                </label>
+                <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [disabled]="isViewOnly"
+                    [editable]="true" [ngModelOptions]="{standalone: true}" [options]="publisherOptions"
+                    optionLabel="label" optionValue="value" placeholder="Select publisher" styleClass="w-100"
+                    appendTo="body" (ngModelChange)="onPublisherChange()"></p-select>
+                @if (errors.PublisherId) {
+                <div class="text-danger mt-1 small">{{ errors.PublisherId }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="categoryId">
+                    Category<sup>*</sup>
+                </label>
+                <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [disabled]="isViewOnly" [editable]="true"
+                    [ngModelOptions]="{standalone: true}" [options]="categoryOptions" optionLabel="label"
+                    optionValue="value" placeholder="Select category" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onCategoryChange()"></p-select>
+                @if (errors.CategoryId) {
+                <div class="text-danger mt-1 small">{{ errors.CategoryId }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="languageId">
+                    Language<sup>*</sup>
+                </label>
+                <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [disabled]="isViewOnly" [editable]="true"
+                    [ngModelOptions]="{standalone: true}" [options]="languageOptions" optionLabel="label"
+                    optionValue="value" placeholder="Select language" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onLanguageChange()"></p-select>
+                @if (errors.LanguageId) {
+                <div class="text-danger mt-1 small">{{ errors.LanguageId }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="publishedYear">
+                    Published Year<sup>*</sup>
+                </label>
+                <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [disabled]="isViewOnly" [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year"
+                    dateFormat="yy" (ngModelChange)="onPublishedYearChange()" placeholder="Select published year"
+                    styleClass="w-100" inputStyleClass="w-100" />
+                @if (errors.PublishedYear) {
+                <div class="text-danger mt-1 small">{{ errors.PublishedYear }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="price">
+                    Price(₹)<sup>*</sup>
+                </label>
+                <input id="price" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Price"
+                    [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter price"
+                    (ngModelChange)="validateInput('Price')" />
+                @if (errors.Price) {
+                <div class="text-danger mt-1 small">{{ errors.Price }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="buildingId">
+                    Building<sup>*</sup>
+                </label>
+                <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [disabled]="isViewOnly" [editable]="true"
+                    [ngModelOptions]="{standalone: true}" [options]="buildingOptions" optionLabel="label"
+                    optionValue="value" placeholder="Select building" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onBuildingChange()"></p-select>
+                @if (errors.BuildingId) {
+                <div class="text-danger mt-1 small">{{ errors.BuildingId }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="floorId">
+                    Floor<sup>*</sup>
+                </label>
+                <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}"
+                    [disabled]="isViewOnly" [options]="floorOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select floor" [editable]="true" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onFloorChange()"></p-select>
+                @if (errors.FloorId) {
+                <div class="text-danger mt-1 small">{{ errors.FloorId }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="rackId">
+                    Rack<sup>*</sup>
+                </label>
+                <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}"
+                    [disabled]="isViewOnly" [options]="rackOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select rack" [editable]="true" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onRackChange()"></p-select>
+                @if (errors.RackId) {
+                <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
+                }
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
+                    Status<sup>*</sup>
+                </label>
+                <input id="bookStatus" type="text" class="form-control" pInputText [disabled]="true"
+                    [(ngModel)]="currentBook.Status" [ngModelOptions]="{standalone: true}" placeholder="Enter Status" />
+            </div>
+            <!-- <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="bookBarcode">
+                    Barcode<sup>*</sup>
+                </label>
+                <input id="bookBarcode" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentBook.BookBarcode" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter barcode" (ngModelChange)="validateInput('BookBarcode')" />
+                @if (errors.BookBarcode) {
+                <div class="text-danger mt-1 small">{{ errors.BookBarcode }}</div>
+                }
+            </div> -->
+            <!-- <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="isActive" [(ngModel)]="currentBook.IsActive" [ngModelOptions]="{standalone: true}"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select status"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')"></p-select>
+                @if (errors.IsActive) {
+                <div class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+                }
+            </div> -->
+        </div>
+
+        <ng-template pTemplate="footer">
+            @if (header === 'Edit Book') {
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="importBookDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveImportBook()"></p-button>
+            </div>
+            }
+        </ng-template>
+    </p-dialog>
+
+    <p-dialog header="Print Books Barcode" [(visible)]="printBarcodeDialogVisible" [modal]="true"
+        [style]="{ width: '25vw' }" appendTo="body">
         <p-table [value]="selectedBookDetails" [autoLayout]="false">
 
-        <ng-template pTemplate="header">
-            <tr class="border-bottom">
-                <th class="text-start text-muted fw-medium" style="width: 20%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
-                            S.No
-                            <p-sortIcon field="sno"></p-sortIcon>
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th class="text-start text-muted fw-medium" style="width: 20%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
+                                S.No
+                                <p-sortIcon field="sno"></p-sortIcon>
+                            </div>
                         </div>
-                    </div>
-                </th>
-                <!-- <th class="text-start text-muted fw-medium" style="width: 40%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
-                            Book Name
-                            <p-sortIcon field="bookName"></p-sortIcon>
-                        </div>                        
-                    </div>
-                </th> -->
-                <th class="text-start text-muted fw-medium" style="width: 40%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
-                            Barcode                           
-                        </div>                        
-                    </div>
-                </th>
-            </tr>           
-        </ng-template>
+                    </th>
+                    <!-- <th class="text-start text-muted fw-medium" style="width: 40%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                Book Name
+                                <p-sortIcon field="bookName"></p-sortIcon>
+                            </div>                        
+                        </div>
+                    </th> -->
+                    <th class="text-start text-muted fw-medium" style="width: 40%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                Barcode
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </ng-template>
 
-        <ng-template pTemplate="body" let-book let-index="rowIndex">
-            <tr class="border-bottom">
-                <td>{{ index + 1 }}</td>
-                <!-- <td>{{ book.BookName }}</td> -->
-                <td>
-                    <ngx-barcode6 [bc-value]="book.BookBarcode"  [bc-format]="'CODE128'" [bc-display-value]="false" [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
-                    <div class="barcode-label" style="font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; margin-top: -1rem;margin-left: 3rem;">
-                        {{ book.BookName }}
-                    </div>
-                </td>                
-            </tr>
-        </ng-template>
+            <ng-template pTemplate="body" let-book let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td>{{ index + 1 }}</td>
+                    <!-- <td>{{ book.BookName }}</td> -->
+                    <td>
+                        <ngx-barcode6 [bc-value]="book.BookBarcode" [bc-format]="'CODE128'" [bc-display-value]="false"
+                            [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
+                        <div class="barcode-label"
+                            style="font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; margin-top: -1rem;margin-left: 3rem;">
+                            {{ book.BookName }}
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
 
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td colspan="3" class="text-center">No book barcode found.</td>
-            </tr>
-        </ng-template>
-    </p-table>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="3" class="text-center">No book barcode found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
     </p-dialog>
 
     @if (bcDialogVisible) {
-    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = null [isViewOnly]="false"
-        (onSuccess)="loadBooks()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
+    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower]=null
+        [isViewOnly]="false" (onSuccess)="loadBooks()"
+        (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
     }
 
 </div>

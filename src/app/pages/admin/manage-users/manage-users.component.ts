@@ -33,7 +33,7 @@ type ImportUserDetails = UserDetails & {
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule,
-        SelectModule, FormsModule, TooltipModule, QRCodeComponent , UsersBookCirculationComponent, IssueReturnBooksComponent],
+        SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent, IssueReturnBooksComponent],
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.scss'
 })
@@ -49,8 +49,8 @@ export class ManageUsersComponent {
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
 
-    minDate: Date | undefined;
-    maxDate: Date | undefined;
+    public minDate: Date | undefined;
+    public maxDate: Date | undefined;
 
     public users: UserDetails[] = [];
     public roles: RoleDetails[] = [];
@@ -70,7 +70,7 @@ export class ManageUsersComponent {
     public userDialogVisible = false;
     public header: string = '';
     public activeTab: number = 0;
-
+    public dobDate: Date | null = null;
     public currentUser: UserDetails = {
         UserId: 0,
         FullName: '',
@@ -121,6 +121,8 @@ export class ManageUsersComponent {
         { label: 'Pending', value: 'Pending' }
     ];
 
+    public importIndex: number = -1;
+    public importUserDialogVisible = false;
     public importDialogVisible: boolean = false;
     public importPreview: ImportUserDetails[] = [];
     public importUploadError: string = '';
@@ -140,16 +142,16 @@ export class ManageUsersComponent {
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
 
-    selectedUserDetails: UserDetails[] = [];
-    selectedIds: number[] = [];
-    printUserDialogVisible: boolean = false;
-    isViewOnly: boolean = false;
-    bcDialogVisible: boolean = false;
-    checkInDialogVisible: boolean = false;
+    public selectedUserDetails: UserDetails[] = [];
+    public selectedIds: number[] = [];
+    public printUserDialogVisible: boolean = false;
+    public isViewOnly: boolean = false;
+    public bcDialogVisible: boolean = false;
+    public checkInDialogVisible: boolean = false;
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
     public loggedInUserDetails: UserDetails = {};
-    public todayDate :string | undefined;
+    public todayDate: string | undefined;
 
     ngOnInit(): void {
         const today = new Date();
@@ -283,6 +285,7 @@ export class ManageUsersComponent {
         if (_user) {
             this.currentUser = { ..._user };
             this.header = 'Edit User';
+            this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
         }
         else {
             this.currentUser = {
@@ -290,7 +293,9 @@ export class ManageUsersComponent {
                 RoleId: 0, RoleName: '', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending'
             };
             this.header = 'Add User';
+            this.dobDate = null;
         }
+
         this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
         this.userDialogVisible = true;
         this.isViewOnly = false;
@@ -300,7 +305,10 @@ export class ManageUsersComponent {
         if (_user) {
             this.currentUser = { ..._user };
             this.header = 'View User';
+            this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
         }
+
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
         this.userDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -312,6 +320,17 @@ export class ManageUsersComponent {
         }
 
         this.validateInput('RoleId');
+    }
+
+    onDOBChange(): void {
+        if (this.dobDate) {
+            this.currentUser.DOB = this.dobDate.toISOString();
+        }
+        else {
+            this.currentUser.DOB = null;
+        }
+
+        this.validateInput('DOB');
     }
 
     // onGenderChange(): void {
@@ -422,11 +441,10 @@ export class ManageUsersComponent {
         const isMailIdValid = this.validateInput('MailId');
         const isMobileNoValid = this.validateInput('MobileNo');
         const isDOBValid = this.validateInput('DOB');
-        const isAccessRequestValid = this.validateInput('Status');
-        const isStatusValid = this.validateInput('IsActive');
+        // const isAccessRequestValid = this.validateInput('Status');
+        // const isStatusValid = this.validateInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid &&
-            isAccessRequestValid && isStatusValid;
+            isMailIdValid && isMobileNoValid && isDOBValid;
     }
 
     saveUser(): void {
@@ -716,6 +734,52 @@ export class ManageUsersComponent {
         };
     }
 
+    editImportUser(_user: UserDetails, index: number): void {
+        this.importIndex = index;
+        this.currentUser = { ..._user };
+        this.header = 'Edit User';
+        this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
+
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
+        this.importUserDialogVisible = true;
+        this.isViewOnly = false;
+    }
+
+    viewImportUser(_user: UserDetails): void {
+        this.currentUser = { ..._user };
+        this.header = 'View User';
+        this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
+
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
+        this.importUserDialogVisible = true;
+        this.isViewOnly = true;
+    }
+
+    saveImportUser(): void {
+        if (!this.validateUser()) {
+            return;
+        }
+
+        this.importPreview[this.importIndex] = {
+            ...this.importPreview[this.importIndex],
+            ...this.currentUser
+        };
+
+        this.validateImportInput('FullName', this.importIndex);
+        this.validateImportInput('RoleName', this.importIndex);
+        this.validateImportInput('Gender', this.importIndex);
+        this.validateImportInput('MobileNo', this.importIndex);
+        this.validateImportInput('MailId', this.importIndex);
+        this.validateImportInput('DOB', this.importIndex);
+
+        this.importIndex = -1;
+        this.importUserDialogVisible = false;
+    }
+
+    deleteImportUser(index: number): void {
+        this.importPreview.splice(index, 1);
+    }
+
     validateImportInput(key: string, index: number): boolean {
         let isValid = true;
 
@@ -857,9 +921,9 @@ export class ManageUsersComponent {
                 this.validateImportInput('Gender', index) &&
                 this.validateImportInput('MobileNo', index) &&
                 this.validateImportInput('MailId', index) &&
-                this.validateImportInput('DOB', index) &&
-                this.validateImportInput('Status', index) &&
-                this.validateImportInput('IsActive', index);
+                this.validateImportInput('DOB', index);
+            // this.validateImportInput('Status', index) &&
+            // this.validateImportInput('IsActive', index);
         });
     }
 
@@ -920,11 +984,9 @@ export class ManageUsersComponent {
     }
 
     onSelectionChange() {
-
         this.selectedIds = this.selectedUserDetails
             .map(x => x.UserId)
             .filter((id): id is number => id !== null && id !== undefined);
-
 
         console.log('Selected IDs:', this.selectedIds);
     }
@@ -935,10 +997,9 @@ export class ManageUsersComponent {
         }
     }
 
-    checkInBook(_user:UserDetails):void{
-        if(_user.BorrowedBooksCount == 1)
-        {
-            this.getBookCirculartionByUserId(_user.UserId  ?? 0 );
+    checkInBook(_user: UserDetails): void {
+        if (_user.BorrowedBooksCount == 1) {
+            this.getBookCirculartionByUserId(_user.UserId ?? 0);
         }
         else {
             this.currentUser = { ..._user };
@@ -946,27 +1007,24 @@ export class ManageUsersComponent {
         }
     }
 
-    checkOutBook(_user:UserDetails):void{
+    checkOutBook(_user: UserDetails): void {
+        this.bc = {
+            BookCirculationId: 0, BookId: 0, BookName: '', BorrowerId: _user.UserId, BorrowerName: _user.FullName,
+            IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
+            IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+            OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
+            ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
+            UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0
+        };
 
-        this.bc  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId: _user.UserId, BorrowerName : _user.FullName, 
-                        IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
-                        IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
-                        OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
-                        ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
-                        UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };
-        
         this.type = "CheckOut";
-
         this.bcDialogVisible = true;
-        
     }
 
-    getBookCirculartionByUserId(_userId: number): void{
-
+    getBookCirculartionByUserId(_userId: number): void {
         this._bcService.getBookCirculationDetailsByUserId(_userId).subscribe({
             next: (data: BookCirculationDetails[]) => {
-                
-                this.bc = data.find(x => x.Status ==  "Issued" && x.BorrowerId == _userId) ?? null;              
+                this.bc = data.find(x => x.Status == "Issued" && x.BorrowerId == _userId) ?? null;
 
                 this.type = "CheckIn";
                 this.bcDialogVisible = true;
@@ -978,12 +1036,12 @@ export class ManageUsersComponent {
     }
 
     parseCustomDateStringForUI(dateStr: Date): string {
-            // 2. Pad single digits with leading zeros
-            const day = String(dateStr.getDate()).padStart(2, '0');
-            const month = String(dateStr.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-            const year = dateStr.getFullYear();      
-    
-            // 3. Assemble into the exact "yyyy-mm-dd" layout match        
-            return  `${year}-${month}-${day}`;
+        // 2. Pad single digits with leading zeros
+        const day = String(dateStr.getDate()).padStart(2, '0');
+        const month = String(dateStr.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = dateStr.getFullYear();
+
+        // 3. Assemble into the exact "yyyy-mm-dd" layout match        
+        return `${year}-${month}-${day}`;
     }
 }

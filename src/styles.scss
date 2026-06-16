@@ -52,73 +52,82 @@ body {
 
 // PrimeNG Table Styles - Reduce whitespace and gaps
 .p-datatable {
-    .p-datatable-thead>tr {
-        &>th {
-            background-color: $color-primary !important;
-            color: $color-white !important;
-            border-color: $color-primary !important;
-            text-transform: uppercase !important;
-            font-weight: bold !important;
-            font-size: 0.875rem !important;
-            line-height: 2 !important;
+    .p-datatable-table {
+        table-layout: fixed !important;
 
-            .p-datatable-sortable-column {
-                background-color: #22c55e !important;
-                color: white !important;
-
-                .p-iconwrapper {
-                    display: flex;
-
-                    .p-icon {
-                        height: 0.875rem !important;
-                        width: 0.875rem !important;
-                    }
-                }
-            }
-
-            .p-datatable-filter {
-                .p-fluid {
-                    width: 100%;
-
-                    .p-multiselect {
-                        width: 100%;
-                    }
-                }
-            }
-
-            .pi {
+        .p-datatable-thead>tr {
+            &>th {
+                background-color: $color-primary !important;
+                color: $color-white !important;
+                border-color: $color-primary !important;
+                text-transform: uppercase !important;
+                font-weight: bold !important;
                 font-size: 0.875rem !important;
-                cursor: pointer !important;
+                line-height: 2 !important;
+                padding: 0.35rem 1rem !important;
 
-                &.pi-plus-circle {
-                    font-size: 1.25rem !important;
+                .p-datatable-sortable-column {
+                    background-color: #22c55e !important;
+                    color: white !important;
+
+                    .p-iconwrapper {
+                        display: flex;
+
+                        .p-icon {
+                            height: 0.875rem !important;
+                            width: 0.875rem !important;
+                        }
+                    }
                 }
 
-                &.pi-upload {
-                    font-size: 1rem !important;
+                .p-datatable-filter {
+                    .p-fluid {
+                        width: 100%;
+
+                        .p-multiselect {
+                            width: 100%;
+                        }
+                    }
                 }
 
-                &.pi-check-circle {
-                    font-size: 1.25rem !important;
-                }
+                .pi {
+                    font-size: 0.875rem !important;
+                    cursor: pointer !important;
 
-                &.pi-times-circle {
-                    font-size: 1.25rem !important;
+                    &.pi-plus-circle {
+                        font-size: 1.25rem !important;
+                    }
+
+                    &.pi-upload {
+                        font-size: 1rem !important;
+                    }
+
+                    &.pi-check-circle {
+                        font-size: 1.25rem !important;
+                    }
+
+                    &.pi-times-circle {
+                        font-size: 1.25rem !important;
+                    }
                 }
             }
         }
-    }
 
-    .p-datatable-tbody>tr {
-        transition: background-color 0.2s ease;
+        .p-datatable-tbody>tr {
+            transition: background-color 0.2s ease;
 
-        &>td {
-            line-height: 2;
-            font-size: 0.875rem;
-        }
+            &>td {
+                line-height: 2;
+                font-size: 0.875rem;
+                padding: 0.25rem 1rem !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+            }
 
-        &:hover {
-            background-color: #f3f4f6 !important;
+            &:hover {
+                background-color: #f3f4f6 !important;
+            }
         }
     }
 
@@ -255,6 +264,7 @@ body {
 
 .p-checkbox {
     vertical-align: text-top !important;
+    transform: scale(0.85) !important;
 }
 
 .p-button {
@@ -280,6 +290,12 @@ body {
         background-color: $color-primary !important;
         color: white !important;
     }
+}
+
+.table-clear-filter {
+    position: absolute !important;
+    margin-top: 0.5rem !important;
+    z-index: 1 !important;
 }
 
 label {
@@ -323,6 +339,10 @@ label {
     font-size: 0.875rem !important;
     max-width: 80rem;
     word-wrap: break-word
+}
+
+.p-tag {
+    padding: 0rem 0.5rem !important;
 }
 
 // Tailwind-like utilities for styling
@@ -545,10 +565,10 @@ select {
 }
 
 hr {
-    border: none;
-    height: 2px;
-    background-color: #333;
-    width: 100%;
+    border: none !important;
+    height: 2px !important;
+    background-color: #333 !important;
+    width: 100% !important;
 }
 
 // Gradient background
