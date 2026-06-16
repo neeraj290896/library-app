@@ -737,6 +737,17 @@ export class ManageUsersComponent {
     editImportUser(_user: UserDetails, index: number): void {
         this.importIndex = index;
         this.currentUser = { ..._user };
+
+        if(_user.RoleName !="")
+        {
+            var _roleDetails = this.roleOptions.find(x => x.label == _user.RoleName);
+            if(_roleDetails?.label !=null && _roleDetails.label !="")
+            {
+                this.currentUser.RoleId = _roleDetails.value;
+            }
+        }
+        
+
         this.header = 'Edit User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
@@ -747,6 +758,16 @@ export class ManageUsersComponent {
 
     viewImportUser(_user: UserDetails): void {
         this.currentUser = { ..._user };
+
+        if(_user.RoleName !="")
+        {
+            var _roleDetails = this.roleOptions.find(x => x.label == _user.RoleName);
+            if(_roleDetails?.label !=null && _roleDetails.label !="")
+            {
+                this.currentUser.RoleId = _roleDetails.value;
+            }
+        }
+
         this.header = 'View User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
@@ -832,8 +853,18 @@ export class ManageUsersComponent {
                     this.importPreview[index].Error = 'Mobile number is required.';
                     isValid = false;
                 }
-                else if (!/^\d{10}$/.test(this.importPreview[index].MobileNo?.trim())) {
+                else if (!/^[6-9]\d{9}$/.test(this.importPreview[index].MobileNo?.trim())) {
                     this.importPreview[index].Error = 'Invalid mobile number.';
+                    isValid = false;
+                }
+                else if(this.users.find(x => x.MobileNo == this.importPreview[index].MobileNo?.trim()))
+                {
+                    this.importPreview[index].Error = 'Mobile number already exists.';
+                    isValid = false;
+                }
+                else if (this.importPreview.find((x, idx) => x.MobileNo?.trim() === this.importPreview[index].MobileNo?.trim() && idx !== index)) 
+                {
+                    this.importPreview[index].Error = 'Duplicate Mobile number exists.';
                     isValid = false;
                 }
                 else {
@@ -848,6 +879,16 @@ export class ManageUsersComponent {
                 }
                 else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.importPreview[index].MailId?.trim())) {
                     this.importPreview[index].Error = 'Invalid email.';
+                    isValid = false;
+                }
+                else if(this.users.find(x => x.MailId == this.importPreview[index].MailId?.trim()))
+                {
+                    this.importPreview[index].Error = 'Email already exists.';
+                    isValid = false;
+                }
+                else if (this.importPreview.find((x, idx) => x.MailId?.trim() === this.importPreview[index].MailId?.trim() && idx !== index)) 
+                {
+                    this.importPreview[index].Error = 'Duplicate Email exists.';
                     isValid = false;
                 }
                 else {
@@ -955,21 +996,53 @@ export class ManageUsersComponent {
             };
         });
         this.userService.addMultipleUserDetails(payload).subscribe({
-            next: (res: any) => {
-                if (!res || !res.Status) {
+            next: (res: any[]) => {
+                // 1. Ensure the response is a valid array, otherwise default to empty
+                const responseArray = Array.isArray(res) ? res : [];
+
+                // 2. Filter successes and failures from the array
+                const successes = responseArray.filter(item => item && item.Status);
+                const failures = responseArray.filter(item => !item || !item.Status);
+
+                // 3. Handle the toast messages based on the array results
+                if (responseArray.length === 0) {
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Manage Users - Failed',
-                        detail: res ? res.Message : 'Failed to import users. Please try again.'
+                        detail: 'No response data received from the server.'
                     });
-                } else {
+                }
+                else if (responseArray.length === failures.length) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage Users - Failed',
+                        detail: 'No response data received from the server.'
+                    });
+                }
+                else if (failures.length > 0) {
+                    // Get error messages, skipping empty ones
+                    const errorMessages = failures
+                        .map(f => f?.Message)
+                        .filter(msg => msg)
+                        .join(', ');
+
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: `Import Partially Failed (${failures.length} failed)`,
+                        detail: errorMessages || 'Some users failed to import. Please try again.'
+                    });
+                }
+                else if (successes.length > 0) {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Manage Users - Success',
-                        detail: 'Users imported successfully.'
+                        detail: `${successes.length} user(s) imported successfully.`
                     });
                 }
+                 
+                
 
+                // 5. Refresh view and close dialog
                 this.loadUserDetails();
                 this.importDialogVisible = false;
             },
@@ -981,6 +1054,7 @@ export class ManageUsersComponent {
                 });
             }
         });
+
     }
 
     onSelectionChange() {

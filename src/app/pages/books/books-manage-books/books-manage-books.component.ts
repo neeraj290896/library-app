@@ -1093,6 +1093,9 @@ export class BooksManageBooksComponent implements OnInit {
                 }
 
                 rows.forEach((row: any) => {
+
+                    // console.log('rows :', rows);
+
                     const bookName = row['BOOK']?.toString().trim();
                     const authorName = row['AUTHOR']?.toString().trim();
                     const publisherName = row['PUBLISHER']?.toString().trim();
@@ -1105,6 +1108,8 @@ export class BooksManageBooksComponent implements OnInit {
                     const rackLabel = row['RACK']?.toString().trim();
                     // const bookBarcode = row['BARCODE']?.toString().trim();
                     // const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
+
+                    // console.log('publishedYear :', publishedYear, '. price:', price);
 
                     const importItem: ImportBookDetails = {
                         BookId: 0,
@@ -1253,7 +1258,17 @@ export class BooksManageBooksComponent implements OnInit {
         switch (key) {
             case 'BookName':
                 if (!this.importPreview[index].BookName?.trim()) {
-                    this.importPreview[index].Error = 'Book is required.';
+                    this.importPreview[index].Error = 'Book Name is required.';
+                    isValid = false;
+                }
+                else if(this.books.find(x => x.BookName == this.importPreview[index].BookName?.trim() && (x.AuthorName == this.importPreview[index].AuthorName?.trim() || x.PublisherName == this.importPreview[index].PublisherName?.trim())))
+                {
+                    this.importPreview[index].Error = 'Book already exists.';
+                    isValid = false;
+                }
+                else if (this.importPreview.find((x, idx) => x.BookName?.trim() === this.importPreview[index].BookName?.trim() && idx !== index)) 
+                {
+                    this.importPreview[index].Error = 'Duplicate BookName exists.';
                     isValid = false;
                 }
                 else {
@@ -1422,25 +1437,25 @@ export class BooksManageBooksComponent implements OnInit {
                 }
                 break;
 
-            case 'BookBarcode':
-                if (!this.importPreview[index].BookBarcode?.trim()) {
-                    this.importPreview[index].Error = 'Barcode is required.';
-                    isValid = false;
-                }
-                else {
-                    this.importPreview[index].Error = '';
-                }
-                break;
+            // case 'BookBarcode':
+            //     if (!this.importPreview[index].BookBarcode?.trim()) {
+            //         this.importPreview[index].Error = 'Barcode is required.';
+            //         isValid = false;
+            //     }
+            //     else {
+            //         this.importPreview[index].Error = '';
+            //     }
+            //     break;
 
-            case 'IsActive':
-                if (this.importPreview[index].IsActive === null) {
-                    this.importPreview[index].Error = 'Status is required.';
-                    isValid = false;
-                }
-                else {
-                    this.importPreview[index].Error = '';
-                }
-                break;
+            // case 'IsActive':
+            //     if (this.importPreview[index].IsActive === null) {
+            //         this.importPreview[index].Error = 'Status is required.';
+            //         isValid = false;
+            //     }
+            //     else {
+            //         this.importPreview[index].Error = '';
+            //     }
+            //     break;
 
             default:
                 break;
