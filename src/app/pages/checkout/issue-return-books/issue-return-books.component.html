@@ -13,7 +13,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="book">
                 Book Name<sup>*</sup>
             </label>
-            <p-select id="book" [disabled]="!isIssueNewBook" [(ngModel)]="selectedBook.BookId"
+            <p-select id="book" [disabled]="!isIssueNewBook || isViewOnly" [(ngModel)]="selectedBook.BookId"
                 [ngModelOptions]="{standalone: true}" [options]="bookOptions" optionLabel="label" optionValue="value"
                 placeholder="Select Book" [editable]="true" styleClass="w-100" appendTo="body"
                 (ngModelChange)="onBookChange()" />
@@ -24,7 +24,7 @@
                 Borrower Name<sup>*</sup>
             </label>
             <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
-                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [disabled]="!isIssueNewBook"
+                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower" [disabled]="!isIssueNewBook || isViewOnly"
                 [editable]="true" styleClass="w-100" appendTo="body" (ngModelChange)="onBorrowerChange()" />
             <div *ngIf="errors.BorrowerName" class="text-danger mt-1 small">{{ errors.BorrowerName }}</div>
         </div>
@@ -52,14 +52,14 @@
                 Comments
                 <!-- <sup>*</sup> -->
             </label>
-            <input id="comments" type="text" class="form-control" pInputText [(ngModel)]="selectedBook.Comments"
+            <input id="comments" type="text" class="form-control" pInputText [(ngModel)]="selectedBook.Comments" [disabled] =  "isViewOnly"
                 [ngModelOptions]="{standalone: true}" placeholder="Enter Comments" />
         </div>
         <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="status">
                 Status<sup>*</sup>
             </label>
-            <p-select id="status" [disabled]="selectedBook.BookCirculationId === 0" [(ngModel)]="selectedBook.Status"
+            <p-select id="status" [disabled]="selectedBook.BookCirculationId === 0 || isViewOnly" [(ngModel)]="selectedBook.Status"
                 [ngModelOptions]="{standalone: true}" [options]="statusOptions" optionLabel="label" optionValue="value"
                 placeholder="Select Status" (ngModelChange)="onStatusChange()" styleClass="w-100" appendTo="body" />
         </div>
@@ -79,7 +79,7 @@
                 Returned Date<sup>*</sup>
             </label>
             <p-datepicker [(ngModel)]="selectedBook.ReturnDate" [ngModelOptions]="{standalone: true}" appendTo="body" dataType="string"
-                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [maxDate]="maxDate"
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [maxDate]="maxReturnDate" [minDate]="minReturnDate" [disabled] = "isViewOnly"
                 placeholder="Select Return Date" styleClass="w-100" inputStyleClass="w-100" />
         </div>
         <hr *ngIf="this.isOverDue">
@@ -112,7 +112,7 @@
                 OverDue Status<sup>*</sup>
             </label>
             <p-select id="overDueStatus" [(ngModel)]="selectedBook.OverDueStatus" [ngModelOptions]="{standalone: true}"
-                [disabled]="!(selectedBook.Status == 'Returned')" [options]="overDueStatusOptions" optionLabel="label"
+                [disabled]="!(selectedBook.Status == 'Returned')  || isViewOnly" [options]="overDueStatusOptions" optionLabel="label"
                 optionValue="value" placeholder="Select OverDue Status" styleClass="w-100" appendTo="body" />
         </div>
         <div class="col-6 mb-3" *ngIf="this.isOverDue">
@@ -120,7 +120,7 @@
                 Paid Amount<sup>*</sup>
             </label>
             <input id="paidAmount" type="text" class="form-control" pInputText [disabled]="false"
-                [disabled]="!(selectedBook.Status == 'Returned')" [(ngModel)]="selectedBook.PaidAmount"
+                [disabled]="!(selectedBook.Status == 'Returned')  || isViewOnly" [(ngModel)]="selectedBook.PaidAmount"
                 [ngModelOptions]="{standalone: true}" (ngModelChange)="validateInput('PaidAmount')"
                 placeholder="Enter Paid amount" />
             <div *ngIf="errors.PaidAmount" class="text-danger mt-1 small">{{ errors.PaidAmount }}</div>
@@ -129,8 +129,8 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="paymentTypeId">
                 Payment Type<sup>*</sup>
             </label>
-            <p-select id="paymentTypeId" [disabled]="false" [(ngModel)]="selectedBook.PaymentTypeId"
-                [ngModelOptions]="{standalone: true}" [disabled]="!(selectedBook.Status == 'Returned')"
+            <p-select id="paymentTypeId" [(ngModel)]="selectedBook.PaymentTypeId"
+                [ngModelOptions]="{standalone: true}" [disabled]="!(selectedBook.Status == 'Returned')  || isViewOnly"
                 [options]="transactionTypeOptions" optionLabel="label" optionValue="value"
                 placeholder="Select Payment Type" (ngModelChange)="validateInput('PaymentType')" styleClass="w-100"
                 appendTo="body" />
