@@ -16,6 +16,7 @@ export interface SettingDetails {
     SettingId: number;
     CutOffDays: number;
     FinePercentage: number;
+    EnableFineRule: boolean;
     EnableEmailNotification: boolean;
     EnableWishlistNotification: boolean;
     EnableMobileNotification: boolean;
