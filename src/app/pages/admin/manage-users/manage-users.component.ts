@@ -24,6 +24,7 @@ import { UsersBookCirculationComponent } from '@app/pages/checkout/users-book-ci
 import { BookCirculationService } from '@app/shared/services/book-circulation.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
+import { environment } from '../../../../environments/environment';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -152,6 +153,7 @@ export class ManageUsersComponent {
     public type: string = '';
     public loggedInUserDetails: UserDetails = {};
     public todayDate: string | undefined;
+    calendarFocusDate!: Date; 
 
     ngOnInit(): void {
         const today = new Date();
@@ -159,17 +161,22 @@ export class ManageUsersComponent {
 
         let year = today.getFullYear();
         let minYear = year - 100;
-        let maxYear = year - 15;
+        let maxYear = year - environment.studentsMinimumAge;
 
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
 
         this.minDate = new Date();
-        this.minDate.setMonth(1);
+        this.minDate.setDate(1);
+        this.minDate.setMonth(0);
         this.minDate.setFullYear(minYear);
 
-        this.maxDate = new Date();
-        this.maxDate.setMonth(12);
+        this.maxDate = new Date();        
+        this.maxDate.setMonth(11);
+        this.maxDate.setDate(31);
         this.maxDate.setFullYear(maxYear);
+
+         this.calendarFocusDate = new Date(this.maxDate.getFullYear(),  today.getMonth(), today.getDate());
+
 
         this.loadRoleDetails();
         this.loadUserDetails();
@@ -324,7 +331,12 @@ export class ManageUsersComponent {
 
     onDOBChange(): void {
         if (this.dobDate) {
-            this.currentUser.DOB = this.dobDate.toISOString();
+            // this.dobDate.setHours(0, 0, 0, 0);
+             // Reverse the 5 hour 30 min shift (in minutes: 5 * 60 + 30 = 330)
+            const userTimezoneOffset = this.dobDate.getTimezoneOffset(); // Will be -330 for India    
+            const correctedDate = new Date(this.dobDate.getTime() - (userTimezoneOffset * 60 * 1000));    
+
+            this.currentUser.DOB = correctedDate.toISOString().split('T')[0] + 'T00:00:00.000Z';
         }
         else {
             this.currentUser.DOB = null;
@@ -538,8 +550,7 @@ export class ManageUsersComponent {
         };
 
         const worksheet = workbook.addWorksheet('Users');
-        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID',
-            'DOB']);
+        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -547,7 +558,7 @@ export class ManageUsersComponent {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'F1'
+            to: 'E1'
         };
 
         const rolesSheet = workbook.addWorksheet('RoleList');
@@ -597,16 +608,16 @@ export class ManageUsersComponent {
                 error: 'Please enter a valid email address.'
             };
 
-            const dobCell = worksheet.getCell(rowIndex, 6);
-            dobCell.dataValidation = {
-                type: 'date',
-                operator: 'between',
-                formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)],
-                allowBlank: true,
-                showErrorMessage: true,
-                errorTitle: 'Invalid Date of Birth',
-                error: 'Please enter a valid date of birth.'
-            };
+            // const dobCell = worksheet.getCell(rowIndex, 6);
+            // dobCell.dataValidation = {
+            //     type: 'date',
+            //     operator: 'between',
+            //     formulae: [new Date(1900, 0, 1), new Date(2100, 11, 31)],
+            //     allowBlank: true,
+            //     showErrorMessage: true,
+            //     errorTitle: 'Invalid Date of Birth',
+            //     error: 'Please enter a valid date of birth.'
+            // };
 
             // const accessStatusCell = worksheet.getCell(rowIndex, 7);
             // accessStatusCell.dataValidation = {
@@ -689,8 +700,7 @@ export class ManageUsersComponent {
                 }
 
                 const headerRow = Object.keys(rows[0] || {});
-                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID',
-                    'DOB'];
+                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -702,7 +712,7 @@ export class ManageUsersComponent {
                     const gender = row['GENDER']?.toString().trim();
                     const mobileNo = row['MOBILE NO']?.toString().trim();
                     const mailId = row['MAIL ID']?.toString().trim();
-                    const dob = row['DOB']?.toString().trim();
+                    // const dob = row['DOB']?.toString().trim();
                     // const status = row['ACCESS STATUS']?.toString().trim();
                     // const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
 
@@ -710,7 +720,7 @@ export class ManageUsersComponent {
                         UserId: 0,
                         FullName: fullName,
                         Gender: gender,
-                        DOB: dob,
+                        DOB: null,
                         MailId: mailId,
                         MobileNo: mobileNo,
                         ProfilePhoto: '',
@@ -791,7 +801,7 @@ export class ManageUsersComponent {
         this.validateImportInput('Gender', this.importIndex);
         this.validateImportInput('MobileNo', this.importIndex);
         this.validateImportInput('MailId', this.importIndex);
-        this.validateImportInput('DOB', this.importIndex);
+        // this.validateImportInput('DOB', this.importIndex);
 
         this.importIndex = -1;
         this.importUserDialogVisible = false;
@@ -961,10 +971,10 @@ export class ManageUsersComponent {
                 this.validateImportInput('RoleName', index) &&
                 this.validateImportInput('Gender', index) &&
                 this.validateImportInput('MobileNo', index) &&
-                this.validateImportInput('MailId', index) &&
-                this.validateImportInput('DOB', index);
-            // this.validateImportInput('Status', index) &&
-            // this.validateImportInput('IsActive', index);
+                this.validateImportInput('MailId', index);
+                // this.validateImportInput('DOB', index) &&
+                // this.validateImportInput('Status', index) &&
+                // this.validateImportInput('IsActive', index);
         });
     }
 
@@ -983,7 +993,7 @@ export class ManageUsersComponent {
                 UserId: item.UserId,
                 FullName: item.FullName,
                 Gender: item.Gender,
-                DOB: item.DOB,
+                DOB: null,
                 MailId: item.MailId,
                 MobileNo: item.MobileNo,
                 ProfilePhoto: item.ProfilePhoto,
@@ -1117,5 +1127,18 @@ export class ManageUsersComponent {
 
         // 3. Assemble into the exact "yyyy-mm-dd" layout match        
         return `${year}-${month}-${day}`;
+    }
+
+    validateNumberInput(event: KeyboardEvent, allowedKeys : string[]): void {    
+    const isNumber = event.key >= '0' && event.key <= '9';
+
+    // If it's not a number and not in our allowed keys list, block the input
+    if (!isNumber && !allowedKeys.includes(event.key)) {
+      event.preventDefault();
+    }
+    }
+
+    printTable(): void {
+    window.print();
     }
 }

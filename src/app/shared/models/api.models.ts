@@ -16,6 +16,7 @@ export interface SettingDetails {
     SettingId: number;
     CutOffDays: number;
     FinePercentage: number;
+    EnableFineRule: boolean;
     EnableEmailNotification: boolean;
     EnableWishlistNotification: boolean;
     EnableMobileNotification: boolean;
@@ -191,6 +192,7 @@ export interface OrganizationDetails {
     OrganizationName: string | null;
     LogoPath?: string | null;
     ImagePath?: string | null;
+    ValidUpto?: string | null;
     IsActive: boolean;
 }
 

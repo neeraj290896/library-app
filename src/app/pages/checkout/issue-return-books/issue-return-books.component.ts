@@ -45,6 +45,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     public todayDate: string | undefined;
     public minDate: Date | undefined;
     public maxDate: Date | undefined;
+    public minReturnDate: Date | undefined;
+    public maxReturnDate: Date | undefined;
 
     public bcDialogVisible = false;
     public isReturnByDifferentUser: boolean = false;
@@ -149,6 +151,13 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
                 this.selectedBook.Status = 'Returned';
                 this.selectedBook.ReturnDate = this.todayDate;
             }
+
+            if(this.selectedBook.ReturnDate !=null && this.selectedBook.ReturnDate !='')
+            {
+                const predate = new Date(this.selectedBook.ReturnDate);
+                this.setReturnMinAndMaxDate(predate);
+            }
+            
 
             this.returnByDifferentUser();
 
@@ -258,11 +267,19 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     }
 
     setMinAndMaxDate(dateStr: Date): void {
-        const yesterday = new Date();
-        yesterday.setDate(dateStr.getDate() - 1);
+        const previousDay = new Date();
+        previousDay.setDate(dateStr.getDate() - 1);
 
-        this.minDate = yesterday;
+        this.minDate = previousDay;
         this.maxDate = new Date();
+    }
+
+    setReturnMinAndMaxDate(dateStr: Date): void {
+        const previousDay = new Date();
+        previousDay.setDate(dateStr.getDate() - 1);
+
+        this.minReturnDate = previousDay;
+        this.maxReturnDate = dateStr;
     }
 
     parseCustomDateStringForAPI(dateStr: string): string | null {

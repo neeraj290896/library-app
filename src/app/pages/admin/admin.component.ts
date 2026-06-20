@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TabViewModule } from 'primeng/tabview';
 import { ManageUsersComponent } from './manage-users/manage-users.component';
@@ -8,6 +8,8 @@ import { ManageDepartmentComponent } from './manage-department/manage-department
 import { ManageTransactiontypeComponent } from './manage-transactiontype/manage-transactiontype.component';
 import { ManageAccessrequestComponent } from './manage-accessrequest/manage-accessrequest.component';
 import { SearchComponent } from '@app/shared/components/search/search.component';
+import { AuthService } from '@app/shared/services/auth.service';
+import { UserDetails } from '@app/shared/models/api.models';
 
 @Component({
     selector: 'app-admin',
@@ -20,4 +22,13 @@ import { SearchComponent } from '@app/shared/components/search/search.component'
 })
 export class AdminComponent {
     public activeTab: number = 0;
+    private _authService = inject(AuthService);
+    public loggedInUserDetails: UserDetails = {};
+
+    ngOnInit(): void {
+
+        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+    }
+
+    
 }

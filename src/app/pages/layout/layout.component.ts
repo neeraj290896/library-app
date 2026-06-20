@@ -35,7 +35,11 @@ export class LayoutComponent {
 
     logout(): void {
         this.authService.logout();
-        this.router.navigate(['/login']);
+
+        localStorage.clear(); 
+        sessionStorage.clear();
+
+        this.router.navigate(['/login'], { replaceUrl: true });
     }
 
     toggleSidebar(): void {

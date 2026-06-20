@@ -35,7 +35,7 @@
         </nav>
 
         <nav class="flex-shrink-0 p-3 overflow-auto">
-            <a class="nav-link logout-link" [class.collapsed]="sidebarCollapsed()"
+            <a class="nav-link logout-link" [class.collapsed]="sidebarCollapsed()" (click) = "logout()"
                 [pTooltip]="sidebarCollapsed() ? 'Logout' : ''">
                 <span class="nav-icon flex-shrink-0">
                     <i class="pi pi-sign-out"></i>

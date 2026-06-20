@@ -19,15 +19,15 @@
             </p-tabPanel>
             <p-tabPanel header="Manage Role">
                 <app-manage-role *ngIf="activeTab === 2"></app-manage-role>
-            </p-tabPanel>
-            <p-tabPanel header="Manage Organization">
-                <app-manage-organization *ngIf="activeTab === 3"></app-manage-organization>
-            </p-tabPanel>
+            </p-tabPanel>           
             <p-tabPanel header="Manage Department">
-                <app-manage-department *ngIf="activeTab === 4"></app-manage-department>
+                <app-manage-department *ngIf="activeTab === 3"></app-manage-department>
             </p-tabPanel>
             <p-tabPanel header="Manage Transaction Type">
-                <app-manage-transactiontype *ngIf="activeTab === 5"></app-manage-transactiontype>
+                <app-manage-transactiontype *ngIf="activeTab === 4"></app-manage-transactiontype>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Organization" *ngIf="loggedInUserDetails.RoleId == 1">
+                <app-manage-organization *ngIf="activeTab === 5"></app-manage-organization>
             </p-tabPanel>
         </p-tabView>
     </div>
