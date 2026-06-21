@@ -55,9 +55,9 @@
             <div class="d-flex align-items-center justify-content-between py-1 px-4">
                 <div class="col-4"></div>
                 <div class="col-4 d-flex align-items-center justify-content-center">
-                    @if (organizationDetails()) {
-                    <img src="{{organizationDetails().LogoPath}}" alt="Logo" class="header-logo me-3" />
-                    <h2 class="fs-5 fw-semibold mb-0">{{ organizationDetails().OrganizationName}}</h2>
+                    @if (authService.organizationDetails()) {
+                    <img src="assets/images/logo.png" alt="Logo" class="header-logo me-3" />
+                    <h2 class="fs-5 fw-semibold mb-0">{{ authService.organizationDetails()?.OrganizationName}}</h2>
                     }
                 </div>
                 <div class="col-4 d-flex align-items-center justify-content-end gap-3 fs-5">

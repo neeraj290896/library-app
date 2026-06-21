@@ -12,7 +12,7 @@
 
         <ng-template pTemplate="header">
             <tr class="border-bottom">
-                <th style="width: 3%">
+                <th style="width: 4%">
                     <!-- Header checkbox for selecting/deselecting all items -->
                     <p-tableHeaderCheckbox> id="chk-header-all"
                         [value]="books" </p-tableHeaderCheckbox>
@@ -24,7 +24,7 @@
                         </div>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 12%;">
+                <th class="text-start text-muted fw-medium">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
                             Book
@@ -34,7 +34,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                <th class="text-start text-muted fw-medium" style="width: 11%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="AuthorName">
                             Author
@@ -44,7 +44,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                <th class="text-start text-muted fw-medium" style="width: 11%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="PublisherName">
                             Publisher
@@ -55,7 +55,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 9%;">
+                <th class="text-start text-muted fw-medium" style="width: 11%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="CategoryName">
                             Category
@@ -66,7 +66,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 9%;">
+                <th class="text-start text-muted fw-medium" style="width: 11%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="LanguageName">
                             Language
@@ -88,7 +88,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 7%;">
+                <th class="text-start text-muted fw-medium" style="width: 9%;">
                     <div class="d-flex align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
                             Status
@@ -98,7 +98,7 @@
                             (click)="showFilter()"></span>
                     </div>
                 </th>
-                <th class="text-start text-muted fw-medium" style="width: 6%;">
+                <th class="text-start text-muted fw-medium" style="width: 11%;">
                     <div class="d-flex align-items-center justify-content-center gap-3">
                         <span class="pi pi-plus-circle" (click)="editBook()" pTooltip="Add Book"></span>
                         <span class="pi pi-upload" (click)="importBook()" pTooltip="Import Books"></span>
@@ -556,7 +556,8 @@
 
             <p-tabPanel header="View Book Circulation">
                 @if (activeTab === 1) {
-                <app-books-view-circulation [selectedMainBook]="currentBook"></app-books-view-circulation>
+                <app-books-view-circulation [selectedMainBook]="currentBook"
+                    (onSuccess)="loadBooks(true)"></app-books-view-circulation>
                 }
             </p-tabPanel>
         </p-tabView>

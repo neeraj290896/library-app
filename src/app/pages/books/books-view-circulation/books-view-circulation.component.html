@@ -46,7 +46,8 @@
                             Borrower Name
                             <p-sortIcon field="borrowerName"></p-sortIcon>
                         </div>
-                        <span class="pi" [ngClass]="selectedBorrowerNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                        <span class="pi"
+                            [ngClass]="selectedBorrowerNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                             (click)="showFilter()"></span>
                     </div>
                 </th>
@@ -65,7 +66,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="issuedDate">
                             Issued On
                             <p-sortIcon field="issuedDate"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
@@ -93,7 +94,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="returnDate">
                             Returned On
                             <p-sortIcon field="returnDate"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 10%;">
@@ -101,7 +102,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="overDueFrom">
                             Over Due From
                             <p-sortIcon field="overDueFrom"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width:10%;">
@@ -109,7 +110,7 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
                             Over Due in Days
                             <p-sortIcon field="overDueDays"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width:10%;">
@@ -117,11 +118,12 @@
                         <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
                             Over Due Status
                             <p-sortIcon field="overDueStatus"></p-sortIcon>
-                        </div>                       
+                        </div>
                     </div>
                 </th>
                 <th class="text-start text-muted fw-medium" style="width: 5%;">
-                    <span class="pi pi-plus-circle" (click)="editBook()" pTooltip="Issue Book" *ngIf="(selectedMainBook.Status =='Available')"></span>
+                    <span class="pi pi-plus-circle" (click)="editBook()" pTooltip="Issue Book"
+                        *ngIf="(selectedMainBook.Status =='Available')"></span>
                 </th>
             </tr>
             @if (showFt) {
@@ -202,24 +204,27 @@
                 </td>
                 <td>{{ book.ReturnByUserName || '-' }}</td>
                 <td>{{ (book.ReturnDate | date:'yyyy-MM-dd') || '-'}}</td>
-                
+
                 <td>
-                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'"
+                        [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
 
                 </td>
                 <td>
                     <p-tag [value]="book.OverDueDays  ?? '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
                 </td>
                 <td>
-                    <p-tag [value]="book.OverDueStatus  ?? '-'" [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
+                    <p-tag [value]="book.OverDueStatus  ?? '-'"
+                        [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
                 </td>
                 <td>
                     <div class="d-flex align-items-center gap-2">
-                        <button pButton icon="pi pi-sign-in" (click)="editBook(book)" *ngIf = "!(book.Status == 'Returned')"
-                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckIn"></button> 
+                        <button pButton icon="pi pi-sign-in" (click)="editBook(book)"
+                            *ngIf="!(book.Status == 'Returned')" class="p-button-rounded p-button-text p-button-sm"
+                            pTooltip="CheckIn"></button>
 
                         <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
-                            class="p-button-rounded p-button-text p-button-sm"></button>                                               
+                            class="p-button-rounded p-button-text p-button-sm"></button>
                     </div>
                 </td>
             </tr>
@@ -376,9 +381,9 @@
         </ng-template>
     </p-dialog> -->
 
-     @if (bcDialogVisible) {
-    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower] = null [isViewOnly]="isViewOnly"
-        (onSuccess)="getAllBookCirculartion()" (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
+    @if (bcDialogVisible) {
+    <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower]="null"
+        [isViewOnly]="isViewOnly" (onSuccess)="onSuccessEvent()"
+        (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
     }
-
 </div>

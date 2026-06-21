@@ -10,30 +10,32 @@ import { MessageService } from 'primeng/api';
 import { RoleService } from '../../shared/services/role.service';
 import { UserService } from '../../shared/services/user.service';
 import { RoleDetails, UserDetails } from '../../shared/models/api.models';
+import { AuthService } from '@app/shared/services/auth.service';
 
 @Component({
     selector: 'app-signup',
     standalone: true,
-    imports: [FormsModule, ButtonModule, InputTextModule, SelectModule, DatePickerModule, DialogModule, RouterLink],
+    imports: [FormsModule, ButtonModule, InputTextModule, SelectModule, DatePickerModule, DialogModule,
+        RouterLink],
     templateUrl: './signup.component.html',
     styleUrl: './signup.component.scss'
 })
 export class SignupComponent implements OnInit {
+    public authService = inject(AuthService);
     private roleService = inject(RoleService);
     private userService = inject(UserService);
-    private router = inject(Router);
     private messageService = inject(MessageService);
 
-    fullName = signal('');
-    mailId = signal('');
-    mobileNo = signal('');
-    gender = signal<string>('');
-    dob = signal<Date | null>(null);
-    selectedRoleId = signal<number | null>(null);
-    roles = signal<RoleDetails[]>([]);
-    validationError = signal('');
-    loading = signal(false);
-    readonly genderOptions = [
+    public fullName = signal('');
+    public mailId = signal('');
+    public mobileNo = signal('');
+    public gender = signal<string>('');
+    public dob = signal<Date | null>(null);
+    public selectedRoleId = signal<number | null>(null);
+    public roles = signal<RoleDetails[]>([]);
+    public validationError = signal('');
+    public loading = signal(false);
+    public readonly genderOptions = [
         { label: 'Male', value: 'M' },
         { label: 'Female', value: 'F' }
     ];
@@ -42,7 +44,7 @@ export class SignupComponent implements OnInit {
         this.roleService.getRoleDetails().subscribe({
             next: (data: RoleDetails[] | { data?: RoleDetails[] }) => {
                 const roleList = Array.isArray(data) ? data : (data.data ?? []);
-                const active = roleList.filter(r => r.IsActive && r.UserCanLogin && r.RoleId >2);
+                const active = roleList.filter(r => r.IsActive && r.UserCanLogin && r.RoleId > 2);
                 this.roles.set(active);
                 if (active.length > 0) {
                     this.selectedRoleId.set(active[0].RoleId);

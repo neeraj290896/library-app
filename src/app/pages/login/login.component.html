@@ -1,56 +1,43 @@
-<div class="login-wrapper min-vh-100 d-flex">
-    <!-- Left Half - Logo Display -->
-    <div class="logo-section d-flex align-items-center justify-content-center">
-        <div class="logo-display text-center">
-            <img src="assets/images/logo.png" alt="School Logo" class="school-logo mb-5">
-            <h1 class="fs-1 fw-bold text-white mb-3">{{_org.OrganizationName || "Vimalalaya College of Nursing"}}</h1>
-            <p class="text-white-50 fs-5">Library Management</p>
-        </div>
-    </div>
+<div class="form-section d-flex justify-content-center align-items-center p-4">
+    <div class="login-form-container my-4">
+        <h2 class="fs-4 fw-semibold mb-4 text-center text-dark">Sign In</h2>
 
-    <!-- Right Half - Login Form -->
-    <div class="form-section d-flex justify-content-center align-items-center p-4">
-        <div class="login-form-container my-4">
-            <h2 class="fs-4 fw-semibold mb-4 text-center text-dark">Sign In</h2>
-
-            <form (ngSubmit)="handleLogin($event)" class="d-flex flex-column gap-3">
-                <div class="mb-3">
-                    <label class="d-block small fw-medium text-secondary mb-1">
-                        Email or Mobile
-                    </label>
-                    <div class="position-relative">
-                        <span class="input-icon">👤</span>
-                        <input pInputText type="text" [(ngModel)]="username" name="username" autocomplete="off"
-                            placeholder="Enter email or mobile" class="form-control ps-5" required />
-                    </div>
+        <form (ngSubmit)="handleLogin($event)" class="d-flex flex-column gap-3">
+            <div class="mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1">
+                    Email or Mobile
+                </label>
+                <div class="position-relative">
+                    <span class="input-icon">👤</span>
+                    <input pInputText type="text" [(ngModel)]="username" name="username" autocomplete="off"
+                        placeholder="Enter email or mobile" class="form-control ps-5" required />
                 </div>
-
-                <div class="mb-3">
-                    <label class="d-block small fw-medium text-secondary mb-1">
-                        Password
-                    </label>
-                    <p-password [(ngModel)]="password" name="password" [feedback]="false" [toggleMask]="true"
-                        styleClass="w-100" inputStyleClass="w-100" placeholder="Enter your password"
-                        required />
-                </div>
-
-                <button pButton type="submit" [disabled]="loading()"
-                    class="btn btn-primary btn-signin w-100 py-2 fw-medium">
-                    {{ loading() ? 'Signing In...' : 'Sign In' }}
-                </button>
-
-                @if (validationError()) {
-                <div class="text-danger small text-center mt-2">
-                    {{ validationError() }}
-                </div>
-                }
-            </form>
-            <div class="mt-4 pt-4 border-top text-center">
-                <p class="small text-muted mb-0">
-                    Don't have an account?
-                    <a routerLink="/signup" class="text-primary fw-medium text-decoration-none">Register Now</a>
-                </p>
             </div>
+
+            <div class="mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1">
+                    Password
+                </label>
+                <p-password [(ngModel)]="password" name="password" [feedback]="false" [toggleMask]="true"
+                    styleClass="w-100" inputStyleClass="w-100" placeholder="Enter your password" required />
+            </div>
+
+            <button pButton type="submit" [disabled]="loading()"
+                class="btn btn-primary btn-signin w-100 py-2 fw-medium">
+                {{ loading() ? 'Signing In...' : 'Sign In' }}
+            </button>
+
+            @if (validationError()) {
+            <div class="text-danger small text-center mt-2">
+                {{ validationError() }}
+            </div>
+            }
+        </form>
+        <div class="mt-4 pt-4 border-top text-center">
+            <p class="small text-muted mb-0">
+                Don't have an account?
+                <a routerLink="/signup" class="text-primary fw-medium text-decoration-none">Register Now</a>
+            </p>
         </div>
     </div>
 </div>

@@ -1,0 +1,35 @@
+.form-section {
+    background-color: #f9fafb;
+    padding: 2rem !important;
+    align-items: center !important;
+    min-height: 100vh;
+}
+
+.logo-section {
+    flex: 1;
+    padding: 3rem;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+        pointer-events: none;
+    }
+}
+
+.logo-display {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+}
+
+.school-logo {
+    max-width: 235px;
+    height: auto;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}

@@ -1,0 +1,46 @@
+/* Login component styles */
+
+$color-primary: #22c55e;
+$color-primary-dark: #16a34a;
+
+.login-wrapper {
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+// Left Half - Logo Section
+.logo-section {
+    flex: 1;
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+    padding: 3rem;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+        pointer-events: none;
+    }
+}
+
+.logo-display {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+}
+
+.school-logo {
+    max-width: 200px;
+    height: auto;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.form-section {
+    flex: 1 !important;
+    overflow-y: auto;
+}

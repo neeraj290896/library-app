@@ -1,9 +1,8 @@
-import { Component, computed, inject, signal, HostListener, ElementRef } from '@angular/core';
+import { Component, inject, signal, HostListener, ElementRef } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from "primeng/tooltip";
-import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-layout',
@@ -13,15 +12,12 @@ import { environment } from '../../../environments/environment';
     styleUrl: './layout.component.scss'
 })
 export class LayoutComponent {
-    private authService = inject(AuthService);
+    public authService = inject(AuthService);
     private router = inject(Router);
     private elementRef = inject(ElementRef);
 
     public userRole = this.authService.userRole;
     public userName = this.authService.userName;
-    public organizationDetails = computed(() => {
-        return this.authService.organizationDetails() ?? environment.OrganizationDetails;
-    });
     public sidebarCollapsed = signal(true);
 
     public readonly menuItems = [

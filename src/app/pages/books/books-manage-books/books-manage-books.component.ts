@@ -206,12 +206,26 @@ export class BooksManageBooksComponent implements OnInit {
         this.loadRacks();
     }
 
-    loadBooks(): void {
+    loadBooks(updateCurrentBook: boolean = false): void {
         if (this.searchTerm) {
             this.bookService.searchBookDetails(this.searchTerm).subscribe({
                 next: (data: BookDetails[]) => {
                     this.books = data;
                     this.initializeFilterLists();
+
+                    if (updateCurrentBook) {
+                        if (this.currentBook.BookId) {
+                            const index = this.books.findIndex(e => e.BookId === this.currentBook.BookId);
+                            if (index >= 0) {
+                                if (this.isViewOnly) {
+                                    this.viewBook(this.books[index]);
+                                }
+                                else {
+                                    this.editBook(this.books[index]);
+                                }
+                            }
+                        }
+                    }
                 },
                 error: (err) => {
                     console.error('Error loading books:', err);
@@ -223,6 +237,20 @@ export class BooksManageBooksComponent implements OnInit {
                 next: (data: BookDetails[]) => {
                     this.books = data;
                     this.initializeFilterLists();
+
+                    if (updateCurrentBook) {
+                        if (this.currentBook.BookId) {
+                            const index = this.books.findIndex(e => e.BookId === this.currentBook.BookId);
+                            if (index >= 0) {
+                                if (this.isViewOnly) {
+                                    this.viewBook(this.books[index]);
+                                }
+                                else {
+                                    this.editBook(this.books[index]);
+                                }
+                            }
+                        }
+                    }
                 },
                 error: (err) => {
                     console.error('Error loading books:', err);
@@ -1261,13 +1289,11 @@ export class BooksManageBooksComponent implements OnInit {
                     this.importPreview[index].Error = 'Book Name is required.';
                     isValid = false;
                 }
-                else if(this.books.find(x => x.BookName == this.importPreview[index].BookName?.trim() && (x.AuthorName == this.importPreview[index].AuthorName?.trim() || x.PublisherName == this.importPreview[index].PublisherName?.trim())))
-                {
+                else if (this.books.find(x => x.BookName == this.importPreview[index].BookName?.trim() && (x.AuthorName == this.importPreview[index].AuthorName?.trim() || x.PublisherName == this.importPreview[index].PublisherName?.trim()))) {
                     this.importPreview[index].Error = 'Book already exists.';
                     isValid = false;
                 }
-                else if (this.importPreview.find((x, idx) => x.BookName?.trim() === this.importPreview[index].BookName?.trim() && idx !== index)) 
-                {
+                else if (this.importPreview.find((x, idx) => x.BookName?.trim() === this.importPreview[index].BookName?.trim() && idx !== index)) {
                     this.importPreview[index].Error = 'Duplicate BookName exists.';
                     isValid = false;
                 }

@@ -1,48 +1,11 @@
 $color-primary: #22c55e;
 $color-primary-dark: #16a34a;
 
-.login-wrapper {
-    height: 100vh;
-    width: 100%;
-    overflow: hidden;
-}
-
-.logo-section {
-    flex: 1;
-    background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
-    padding: 3rem;
-    position: relative;
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-        pointer-events: none;
-    }
-}
-
-.logo-display {
-    position: relative;
-    z-index: 1;
-    max-width: 400px;
-}
-
-.school-logo {
-    max-width: 200px;
-    height: auto;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
-}
-
 .form-section {
-    flex: 1;
     background-color: #f9fafb;
-    padding: 2rem;
-    overflow-y: auto;
-    align-items: flex-start;
+    padding: 2rem !important;
+    align-items: center !important;
+    min-height: 100vh;
 }
 
 .login-form-container {
@@ -94,30 +57,5 @@ $color-primary-dark: #16a34a;
         font-weight: 600;
         width: 1rem;
         text-align: center;
-    }
-}
-
-@media (max-width: 768px) {
-    .login-wrapper {
-        flex-direction: column;
-    }
-
-    .logo-section {
-        flex: 0 0 auto;
-        min-height: 40vh;
-        padding: 2rem;
-    }
-
-    .form-section {
-        flex: 1;
-        min-height: 60vh;
-    }
-
-    .logo-display {
-        padding: 1rem;
-    }
-
-    .school-logo {
-        max-width: 140px;
     }
 }

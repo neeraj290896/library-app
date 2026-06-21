@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BookCirculationDetails, BookDetails, TransactionTypeDetails, UserDetails } from '@app/shared/models/api.models';
 import { AuthService } from '@app/shared/services/auth.service';
@@ -25,7 +25,7 @@ import { SelectModule } from 'primeng/select';
     templateUrl: './issue-return-books.component.html',
     styleUrl: './issue-return-books.component.scss'
 })
-export class IssueReturnBooksComponent implements OnInit, OnChanges {
+export class IssueReturnBooksComponent implements OnChanges {
     @Input() public bc: BookCirculationDetails | null = null;
     @Input() public type: string = "";
     @Input() public showDialog: boolean = false;
@@ -45,8 +45,9 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     public todayDate: string | undefined;
     public minDate: Date | undefined;
     public maxDate: Date | undefined;
-    public minReturnDate: Date | undefined;
-    public maxReturnDate: Date | undefined;
+    public issueDate: Date | null = null;
+    public returnDate: Date | null = null;
+    public overdueFrom: Date | null = null;
 
     public bcDialogVisible = false;
     public isReturnByDifferentUser: boolean = false;
@@ -91,11 +92,11 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
             PaymentTypeId: ''
         };
 
-    ngOnInit(): void {
+    constructor() {
         const today = new Date();
-        this.todayDate = this.parseCustomDateStringForUI(today);
+        today.setHours(0, 0, 0, 0);
         this.setMinAndMaxDate(today);
-        this.todayDate = this.parseCustomDateStringForUI(today);
+        this.todayDate = today.toISOString();
         this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
 
         this.loadBooks();
@@ -116,53 +117,29 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
         this.isOverDue = false;
         this.isReturnBook = false;
 
-        if (this.bc) {            
-
-            if (this.bc.IssuedDate != null && this.bc.IssuedDate !== '') {
-                this.setMinAndMaxDate(new Date(this.bc.IssuedDate));
-            }
-            else {
-                const today = new Date();
-                this.setMinAndMaxDate(today);
-            }
-
+        if (this.bc) {
             this.selectedBook = { ...this.bc };
 
-            if (this.bc.IssuedDate != null && this.bc.IssuedDate !== '') {
-                this.selectedBook.IssuedDate = this.parseCustomDateStringForUI(new Date(this.bc.IssuedDate));
-            }
-
-            if (this.bc.ReturnDate != null && this.bc.ReturnDate !== '') {
-                this.selectedBook.ReturnDate = this.parseCustomDateStringForUI(new Date(this.bc.ReturnDate));
-            }
-            else {
+            if (this.selectedBook.ReturnDate === null || this.selectedBook.ReturnDate === '') {
                 this.selectedBook.ReturnDate = this.todayDate;
-            }
-
-            if (this.bc.OverDueFrom != null && this.bc.OverDueFrom !== '') {
-                this.selectedBook.OverDueFrom = this.parseCustomDateStringForUI(new Date(this.bc.OverDueFrom));
             }
 
             if (this.selectedBook.OverDueId != null && this.selectedBook.OverDueId > 0) {
                 this.isOverDue = true;
             }
-            
+
             if (this.type === 'CheckIn') {
                 this.selectedBook.Status = 'Returned';
                 this.selectedBook.ReturnDate = this.todayDate;
             }
 
-            if(this.selectedBook.ReturnDate !=null && this.selectedBook.ReturnDate !='')
-            {
-                const predate = new Date(this.selectedBook.ReturnDate);
-                this.setReturnMinAndMaxDate(predate);
+            if (this.selectedBook.ReturnDate) {
+                this.setMinAndMaxDate(new Date(this.selectedBook.ReturnDate));
             }
-            
 
             this.returnByDifferentUser();
 
-            if(this.isViewOnly)
-            {
+            if (this.isViewOnly) {
                 if (this.selectedBook.Status === 'Issued') {
                     this.header = 'View Issued Book Details';
                 }
@@ -170,9 +147,8 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
                     this.header = 'View Returned Book Details';
                 }
             }
-            else
-            {
-                if (this.selectedBook.Status === 'Issued' && (this.selectedBook.BookCirculationId  == null || this.selectedBook.BookCirculationId == 0)) {
+            else {
+                if (this.selectedBook.Status === 'Issued' && (this.selectedBook.BookCirculationId == null || this.selectedBook.BookCirculationId == 0)) {
                     this.header = 'Issue Book';
                     this.isIssueNewBook = true;
                 }
@@ -182,16 +158,18 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
                 else if (this.selectedBook.Status === 'Returned' && this.selectedBook.BookCirculationId > 0) {
                     this.header = 'Return Book Details';
                 }
-                else  {
+                else {
                     this.header = 'Update Returned Book Details';
                 }
             }
 
-            
-
             console.log('openDialog(if) --> this.isIssueNewBook :', this.isIssueNewBook);
 
             this.bindOnlyActiveDetails();
+
+            this.issueDate = this.selectedBook.IssuedDate ? new Date(this.selectedBook.IssuedDate) : null;
+            this.returnDate = this.selectedBook.ReturnDate ? new Date(this.selectedBook.ReturnDate) : null;
+            this.overdueFrom = this.selectedBook.OverDueFrom ? new Date(this.selectedBook.OverDueFrom) : null;
         }
         else {
             this.isIssueNewBook = true;
@@ -216,14 +194,11 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
                 UpdatedByUserMailId: '', PaidAmount: 0, PaymentTypeId: 0
             };
 
-            if(this.selectedBorrower !=null && this.selectedBorrower?.UserId !=null &&  this.selectedBorrower.UserId > 0)
-            {
+            if (this.selectedBorrower != null && this.selectedBorrower?.UserId != null && this.selectedBorrower.UserId > 0) {
                 this.selectedBook.IssuedByUserId = this.selectedBorrower.UserId;
                 this.selectedBook.IssuedByUserName = this.selectedBorrower.FullName;
                 this.selectedBook.IssuedByUserMailId = this.selectedBorrower.MailId;
             }
-            
-            
 
             this.header = 'Issue book';
         }
@@ -240,7 +215,6 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     }
 
     bindOnlyActiveDetails(): void {
-
         console.log('bindOnlyActiveDetails() --> this.isIssueNewBook :', this.isIssueNewBook);
         console.log('bindOnlyActiveDetails() --> this.lstUserDetails :', this.lstUserDetails);
 
@@ -274,44 +248,12 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
         this.maxDate = new Date();
     }
 
-    setReturnMinAndMaxDate(dateStr: Date): void {
-        const previousDay = new Date();
-        previousDay.setDate(dateStr.getDate() - 1);
-
-        this.minReturnDate = previousDay;
-        this.maxReturnDate = dateStr;
-    }
-
-    parseCustomDateStringForAPI(dateStr: string): string | null {
-        if (!dateStr) return null;
-
-        console.log('dateStr :', dateStr);
-
-        const parts = dateStr.split('-');
-        if (parts.length !== 3) return null;
-
-        const day = parseInt(parts[2], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const year = parseInt(parts[0], 10);
-
-        const nativeDate = new Date(year, month, day);
-        return nativeDate.toISOString();
-    }
-
-    parseCustomDateStringForUI(dateStr: Date): string {
-        const day = String(dateStr.getDate()).padStart(2, '0');
-        const month = String(dateStr.getMonth() + 1).padStart(2, '0');
-        const year = dateStr.getFullYear();
-
-        return `${year}-${month}-${day}`;
-    }
-
     loadBooks(): void {
         this.bookService.getAllBookDetails().subscribe({
             next: (data: BookDetails[]) => {
                 this.lstBookDetails = data;
                 if (this.isIssueNewBook) {
-                     this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
+                    this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
                         return { label: book.BookName ?? '', value: book.BookId };
                     });
                 }
@@ -330,19 +272,19 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
     loadUserDetails(): void {
         this.userService.getAllUserDetails().subscribe({
             next: (data: UserDetails[]) => {
-                this.lstUserDetails = data;               
+                this.lstUserDetails = data;
 
-                 if (this.isIssueNewBook) {
+                if (this.isIssueNewBook) {
                     this.userOptions = data.filter(x => x.IsActive == true && x.FullName?.trim() != '').map(usr => {
                         return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
                     });
-                    
+
                 }
                 else {
                     this.userOptions = data.filter(x => x.FullName?.trim() != '').map(usr => {
                         return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
                     });
-                }                
+                }
             },
             error: (err) => {
                 console.error('Error loading users:', err);
@@ -469,7 +411,6 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
 
     issueBook(): void {
         let _issuedBook = { ...this.selectedBook };
-        _issuedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
 
         this.bcService.issueBook(_issuedBook).subscribe({
             next: (res: any) => {
@@ -502,7 +443,6 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
 
     updateBcBook(): void {
         let _issuedBook = { ...this.selectedBook };
-        _issuedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
 
         if (_issuedBook.Status == "Issued" && _issuedBook.ReturnByUserId != null && _issuedBook.ReturnByUserId > 0) {
             _issuedBook.ReturnByUserId = null;
@@ -546,8 +486,6 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
 
     returnBook(): void {
         let _returnedBook = { ...this.selectedBook };
-        _returnedBook.IssuedDate = this.parseCustomDateStringForAPI(this.selectedBook.IssuedDate ?? "");
-        _returnedBook.ReturnDate = this.parseCustomDateStringForAPI(this.selectedBook.ReturnDate ?? "");
         _returnedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
 
         if (_returnedBook.OverDueId == null || _returnedBook.OverDueId == 0) {
@@ -648,6 +586,33 @@ export class IssueReturnBooksComponent implements OnInit, OnChanges {
         }
 
         this.validateInput('ReturnByUserName');
+    }
+
+    onIssueDateChange(): void {
+        if (this.issueDate) {
+            this.selectedBook.IssuedDate = this.issueDate.toISOString();
+        }
+        else {
+            this.selectedBook.IssuedDate = null;
+        }
+    }
+
+    onReturnDateChange(): void {
+        if (this.returnDate) {
+            this.selectedBook.ReturnDate = this.returnDate.toISOString();
+        }
+        else {
+            this.selectedBook.ReturnDate = null;
+        }
+    }
+
+    onOverdueFromChange(): void {
+        if (this.overdueFrom) {
+            this.selectedBook.OverDueFrom = this.overdueFrom.toISOString();
+        }
+        else {
+            this.selectedBook.OverDueFrom = null;
+        }
     }
 
     hideDialog(): void {

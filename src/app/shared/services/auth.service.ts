@@ -11,32 +11,30 @@ export class AuthService {
     readonly organizationDetails = signal<OrganizationDetails | null>(null);
 
     readonly userDataTemp = {
-                        "UserId": 1,
-                        "RoleId": 1,
-                        "RoleName": "Super Admin",
-                        "FullName": "Saravana Kumar M",
-                        "Gender": "M",
-                        "MobileNo": "8892632453",
-                        "DOB": null,
-                        "MailId": "m.saravanakumar2703@gmail.com",
-                        "ProfilePhoto": "",
-                        "Status": "Approved",
-                        "CreatedByUserId": null,
-                        "CreatedByUserName": null,
-                        "LastLogInTime": "2026-03-21T15:20:06.84",
-                        "UserBarcode": "LIB_U_001",
-                        "IsActive": true
-                        };
+        "UserId": 1,
+        "RoleId": 1,
+        "RoleName": "Super Admin",
+        "FullName": "Saravana Kumar M",
+        "Gender": "M",
+        "MobileNo": "8892632453",
+        "DOB": null,
+        "MailId": "m.saravanakumar2703@gmail.com",
+        "ProfilePhoto": "",
+        "Status": "Approved",
+        "CreatedByUserId": null,
+        "CreatedByUserName": null,
+        "LastLogInTime": "2026-03-21T15:20:06.84",
+        "UserBarcode": "LIB_U_001",
+        "IsActive": true
+    };
 
     setUserDetails(userDetails: UserDetails): void {
-
-        // this.userData.set(userDetails);
         this.userRole.set(userDetails.RoleName);
         this.userName.set(userDetails.FullName);
     }
 
     setOrganizationDetails(_org: OrganizationDetails): void {
-        this.organizationDetails.set(_org);        
+        this.organizationDetails.set(_org);
     }
 
     logout(): void {
@@ -51,5 +49,27 @@ export class AuthService {
 
     getUserRole(): string | null | undefined {
         return this.userRole();
+    }
+
+    isDomainExpired(): boolean {
+        try {
+            const org = this.organizationDetails();
+            if (org && org.ValidUpto) {
+                const validupto = new Date(org.ValidUpto);
+                validupto.setHours(0, 0, 0, 0);
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (today <= validupto) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        catch (error) {
+            return true;
+        }
     }
 }
