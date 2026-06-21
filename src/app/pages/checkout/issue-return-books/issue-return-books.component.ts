@@ -95,7 +95,8 @@ export class IssueReturnBooksComponent implements OnChanges {
     constructor() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        this.setMinAndMaxDate(today);
+        this.minDate = new Date();
+        this.maxDate = new Date();
         this.todayDate = today.toISOString();
         this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
 
@@ -133,8 +134,9 @@ export class IssueReturnBooksComponent implements OnChanges {
                 this.selectedBook.ReturnDate = this.todayDate;
             }
 
-            if (this.selectedBook.ReturnDate) {
-                this.setMinAndMaxDate(new Date(this.selectedBook.ReturnDate));
+            if (this.selectedBook.IssuedDate && this.selectedBook.ReturnDate) {
+                this.minDate = new Date(this.selectedBook.IssuedDate);
+                this.maxDate = new Date(this.selectedBook.ReturnDate);
             }
 
             this.returnByDifferentUser();
@@ -178,8 +180,8 @@ export class IssueReturnBooksComponent implements OnChanges {
 
             this.bindOnlyActiveDetails();
 
-            const today = new Date();
-            this.setMinAndMaxDate(today);
+            this.minDate = new Date();
+            this.maxDate = new Date();
 
             this.selectedBook = {
                 BookCirculationId: 0, BookId: 0, BookName: '',
@@ -238,14 +240,6 @@ export class IssueReturnBooksComponent implements OnChanges {
         }
 
         console.log('bindOnlyActiveDetails() --> this.bookOptions :', this.bookOptions);
-    }
-
-    setMinAndMaxDate(dateStr: Date): void {
-        const previousDay = new Date();
-        previousDay.setDate(dateStr.getDate() - 1);
-
-        this.minDate = previousDay;
-        this.maxDate = new Date();
     }
 
     loadBooks(): void {
