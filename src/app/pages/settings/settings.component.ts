@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SettingDetails } from '@app/shared/models/api.models';
+import { RoleDetails, SettingDetails, UserDetails } from '@app/shared/models/api.models';
 import { AdminService } from '@app/shared/services/admin.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { MessageService } from 'primeng/api';
@@ -11,13 +11,19 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { AccordionModule } from 'primeng/accordion';
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
+import { environment } from '../../../environments/environment';
+import { RoleService } from '@app/shared/services/role.service';
+import { UserService } from '@app/shared/services/user.service';
 
 @Component({
     selector: 'app-settings',
     standalone: true,
     imports: [
         ButtonModule, FormsModule, InputTextModule, CommonModule, CheckboxModule,
-        InputGroupModule, InputGroupAddonModule, AccordionModule
+        InputGroupModule, InputGroupAddonModule, AccordionModule, DatePickerModule,
+        SelectModule
     ],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss'
@@ -26,6 +32,9 @@ export class SettingsComponent {
     private messageService = inject(MessageService);
     private _authService = inject(AuthService);
     private _adminService = inject(AdminService);
+    private roleService = inject(RoleService);
+    private userService = inject(UserService);
+
     public loggedInUserDetails: any = {};
     public settingDetails: SettingDetails = {
         SettingId: 0, CutOffDays: 90, FinePercentage: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
@@ -34,9 +43,85 @@ export class SettingsComponent {
     public finePercentage: string = "";
     public errors: { CutOffDays: string, FinePercentage: string } = { CutOffDays: '', FinePercentage: '' };
 
+    public dobDate: Date | null = null;
+    public currentUser: UserDetails = {
+        UserId: 0,
+        FullName: '',
+        Gender: '',
+        DOB: '',
+        MailId: '',
+        MobileNo: '',
+        ProfilePhoto: '',
+        RoleId: 0,
+        RoleName: '',
+        CreatedByUserId: 0,
+        CreatedByUserName: '',
+        IsActive: true,
+        Status: null
+    };
+    public userErrors: {
+        FullName: string,
+        Gender: string,
+        DOB: string,
+        MailId: string,
+        MobileNo: string,
+        RoleId: string
+    } = {
+            FullName: '',
+            Gender: '',
+            DOB: '',
+            MailId: '',
+            MobileNo: '',
+            RoleId: ''
+        };
+    public roleOptions: { label: string; value: number; }[] = [];
+    public genderOptions: { label: string; value: string; }[] = [
+        { label: 'Male', value: 'M' },
+        { label: 'Female', value: 'F' },
+        { label: 'Others', value: 'O' },
+    ];
+
+    public minDate: Date | undefined;
+    public maxDate: Date | undefined;
+    public calendarFocusDate!: Date;
+
     ngOnInit(): void {
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+        const today = new Date();
+
+        let year = today.getFullYear();
+        let minYear = year - 100;
+        let maxYear = year - environment.studentsMinimumAge;
+
+        this.minDate = new Date();
+        this.minDate.setDate(1);
+        this.minDate.setMonth(0);
+        this.minDate.setFullYear(minYear);
+
+        this.maxDate = new Date();
+        this.maxDate.setMonth(11);
+        this.maxDate.setDate(31);
+        this.maxDate.setFullYear(maxYear);
+
+        this.calendarFocusDate = new Date(this.maxDate.getFullYear(), today.getMonth(), today.getDate());
         this.loadSettingDetails();
+        this.loadRoleDetails();
+
+        this.currentUser = { ...this.loggedInUserDetails };
+        this.dobDate = this.currentUser.DOB ? new Date(this.currentUser.DOB) : null;
+    }
+
+    loadRoleDetails(): void {
+        this.roleService.getRoleDetails().subscribe({
+            next: (data: RoleDetails[]) => {
+                this.roleOptions = data.map(role => {
+                    return { label: role.RoleName ?? '', value: role.RoleId };
+                });
+            },
+            error: (err) => {
+                console.error('Error loading role:', err);
+            }
+        });
     }
 
     loadSettingDetails(): void {
@@ -127,4 +212,165 @@ export class SettingsComponent {
         });
     }
 
+    onRoleChange(): void {
+        const role = this.roleOptions.find(l => l.value === this.currentUser.RoleId);
+        if (role) {
+            this.currentUser.RoleName = role.label;
+        }
+
+        this.validateUserInput('RoleId');
+    }
+
+    onDOBChange(): void {
+        if (this.dobDate) {
+            const userTimezoneOffset = this.dobDate.getTimezoneOffset(); // Will be -330 for India    
+            const correctedDate = new Date(this.dobDate.getTime() - (userTimezoneOffset * 60 * 1000));
+
+            this.currentUser.DOB = correctedDate.toISOString().split('T')[0] + 'T00:00:00.000Z';
+        }
+        else {
+            this.currentUser.DOB = null;
+        }
+
+        this.validateUserInput('DOB');
+    }
+
+    validateNumberInput(event: KeyboardEvent, allowedKeys: string[]): void {
+        const isNumber = event.key >= '0' && event.key <= '9';
+
+        // If it's not a number and not in our allowed keys list, block the input
+        if (!isNumber && !allowedKeys.includes(event.key)) {
+            event.preventDefault();
+        }
+    }
+
+    validateUserInput(key: string): boolean {
+        let isValid = true;
+
+        switch (key) {
+            case 'FullName':
+                if (!this.currentUser.FullName?.trim()) {
+                    this.userErrors.FullName = 'Full name is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.FullName = '';
+                }
+                break;
+
+            case 'RoleId':
+                if (!(this.currentUser.RoleId != null && this.currentUser.RoleId > 0)) {
+                    this.userErrors.RoleId = 'Please select Role.';
+                    isValid = false;
+                } else {
+                    this.userErrors.RoleId = '';
+                }
+                break;
+
+            case 'Gender':
+                if (!this.currentUser.Gender?.trim()) {
+                    this.userErrors.Gender = 'Please select Gender.';
+                    isValid = false;
+                } else {
+                    this.userErrors.Gender = '';
+                }
+                break;
+
+            case 'MailId':
+                if (!this.currentUser.MailId?.trim()) {
+                    this.userErrors.MailId = 'MailId is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.MailId = '';
+                }
+                break;
+
+            case 'MobileNo':
+                if (!this.currentUser.MobileNo?.trim()) {
+                    this.userErrors.MobileNo = 'MobileNo is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.MobileNo = '';
+                }
+                break;
+
+            case 'DOB':
+                if (!this.currentUser.DOB?.trim()) {
+                    this.userErrors.DOB = 'DOB is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.DOB = '';
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return isValid;
+    }
+
+    validateUser(): boolean {
+        const isNameValid = this.validateUserInput('FullName');
+        const isRoleIdValid = this.validateUserInput('RoleId');
+        const isGenderValid = this.validateUserInput('Gender');
+        const isMailIdValid = this.validateUserInput('MailId');
+        const isMobileNoValid = this.validateUserInput('MobileNo');
+        const isDOBValid = this.validateUserInput('DOB');
+        return isNameValid && isRoleIdValid && isGenderValid &&
+            isMailIdValid && isMobileNoValid && isDOBValid;
+    }
+
+    saveUser(): void {
+        if (!this.validateUser()) {
+            return;
+        }
+
+        const payload = this.currentUser;
+        this.userService.updateUserDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage User - Failed',
+                        detail: res ? res.Message : 'Failed to update User. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage User - Success',
+                        detail: 'User updated successfully.'
+                    });
+                }
+
+                this.loadUserDetails();
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage User - Failed',
+                    detail: 'Failed to update User. Please try again.'
+                });
+            }
+        });
+    }
+
+    loadUserDetails(): void {
+        this.userService.getLoggedInUserDetails(this.loggedInUserDetails.MobileNo ?? undefined, this.loggedInUserDetails.MailId ?? undefined)
+            .subscribe({
+                next: (detailsRes: any) => {
+                    this._authService.setUserDetails(detailsRes);
+                    
+                    this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+                    this.currentUser = { ...this.loggedInUserDetails };
+                    this.dobDate = this.currentUser.DOB ? new Date(this.currentUser.DOB) : null;
+                },
+                error: () => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Login Failed',
+                        detail: 'Unable to load logged-in user details.'
+                    });
+                }
+            });
+    }
 }
