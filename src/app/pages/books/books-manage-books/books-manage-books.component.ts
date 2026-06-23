@@ -30,6 +30,7 @@ import { NgxBarcode6 } from 'ngx-barcode6';
 import { BookCirculationService } from '@app/shared/services/book-circulation.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
+import { ManageWishlistComponent } from '../manage-wishlist/manage-wishlist.component';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -42,7 +43,7 @@ type ImportBookDetails = BookDetails & {
         CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
         SelectModule, FormsModule, DatePickerModule, TooltipModule,
-        TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent
+        TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent, ManageWishlistComponent
     ],
     templateUrl: './books-manage-books.component.html',
     styleUrl: './books-manage-books.component.scss'

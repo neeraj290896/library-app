@@ -25,6 +25,7 @@ import { BookCirculationService } from '@app/shared/services/book-circulation.se
 import { AuthService } from '@app/shared/services/auth.service';
 import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
 import { environment } from '../../../../environments/environment';
+import { ManageWishlistComponent } from '@app/pages/books/manage-wishlist/manage-wishlist.component';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -34,7 +35,7 @@ type ImportUserDetails = UserDetails & {
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule,
-        SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent, IssueReturnBooksComponent],
+        SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent, IssueReturnBooksComponent, ManageWishlistComponent],
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.scss'
 })
