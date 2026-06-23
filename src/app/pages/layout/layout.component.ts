@@ -3,6 +3,8 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from "primeng/tooltip";
+import { UserDetails } from '@app/shared/models/api.models';
+import { WishlistService } from '@app/shared/services/wishlist.service';
 
 @Component({
     selector: 'app-layout',
@@ -15,10 +17,13 @@ export class LayoutComponent {
     public authService = inject(AuthService);
     private router = inject(Router);
     private elementRef = inject(ElementRef);
+    private _wishlistService = inject(WishlistService);
 
     public userRole = this.authService.userRole;
     public userName = this.authService.userName;
     public sidebarCollapsed = signal(true);
+    public loggedInUserDetails: UserDetails = {};
+    public _wishlistCount : number = 0;
 
     public readonly menuItems = [
         { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar' },
@@ -28,6 +33,24 @@ export class LayoutComponent {
         { path: '/settings', label: 'Settings', icon: 'pi pi-cog' },
         { path: '/help', label: 'Help', icon: 'pi pi-question-circle' },
     ];
+
+    ngOnInit(): void {
+
+        this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
+        this.authService.setUserDetails(this.loggedInUserDetails);
+        this.getWishlistCountDetails();
+    }
+
+    getWishlistCountDetails(): void {
+          this._wishlistService.getWishlistCount().subscribe({
+              next: (data: number) => {
+                  this._wishlistCount = data;
+              },
+              error: (err) => {
+                  console.error('Error loading Wishlist Count details:', err);
+              }
+          });             
+      }
 
     logout(): void {
         this.authService.logout();

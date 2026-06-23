@@ -361,3 +361,20 @@ export interface OverDueRefreshDetails {
     CreatedDate?: string | null;
     UpdatedDate?: string | null;
 }
+
+
+export interface WishlistDetails {
+    WishlistId: number; 
+    BookId: number;
+    BookName: string;   
+    UserId: number ;
+    UserName: string;
+    Status: string;    
+    CreatedByUserId: number;
+    CreatedByUserName: string;
+    CreatedOn: string;
+    IsNotificationRead: boolean;
+    IssuedOn?: string | null;
+    NotifiedOn?: string | null;
+    UpdatedOn?: string | null;
+}

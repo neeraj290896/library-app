@@ -560,6 +560,11 @@
                     (onSuccess)="loadBooks(true)"></app-books-view-circulation>
                 }
             </p-tabPanel>
+            <p-tabPanel header="View Wishlist">
+                @if (activeTab === 2) {
+                <app-manage-wishlist [selectedBookId]="currentBook.BookId" [selectedUserId] = 0 [selectedBookStatus] = "currentBook.Status || ''" ></app-manage-wishlist>
+                }
+            </p-tabPanel>
         </p-tabView>
         }
 

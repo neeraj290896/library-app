@@ -20,7 +20,7 @@ import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-book
     selector: 'app-books-view-circulation',
     imports: [CommonModule, TagModule, TableModule, ButtonModule, FormsModule, PaginatorModule,
         MultiSelectModule, DialogModule, InputTextModule,
-        SelectModule, FormsModule, DatePickerModule, TooltipModule, IssueReturnBooksComponent],
+        SelectModule, DatePickerModule, TooltipModule, IssueReturnBooksComponent],
     templateUrl: './books-view-circulation.component.html',
     styleUrl: './books-view-circulation.component.scss'
 })
@@ -70,7 +70,7 @@ export class BooksViewCirculationComponent {
     public bcDialogVisible = false;
     public todayDate: string | undefined;
     bcDetailsCount = 0;
-    public header: string = '';
+    // public header: string = '';
     public loggedInUserDetails: UserDetails = {};
     public isReturnBook: boolean = true;
     public isOverDue: boolean = false;

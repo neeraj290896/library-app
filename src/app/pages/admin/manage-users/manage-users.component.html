@@ -388,6 +388,13 @@
                     [isReturnOnly]="false"></app-users-book-circulation>
                 }
             </p-tabPanel>
+
+            <p-tabPanel header="View Wishlist">
+                @if (activeTab === 2) {
+                    <app-manage-wishlist [selectedBookId] = 0 [selectedUserId] = "currentUser.UserId || 0"  [selectedBookStatus] = "''" ></app-manage-wishlist>
+                }
+            </p-tabPanel>"
+
         </p-tabView>
         }
 

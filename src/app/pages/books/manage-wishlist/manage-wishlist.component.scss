@@ -1,0 +1,17 @@
+$color-primary: #22c55e;
+
+::ng-deep {
+    .manage-wl-container {
+        .searchIcon {
+            margin-left: 12px;
+            margin-top: 12px;
+        }
+    }
+
+    .disabled-span {
+        opacity: 0.5;
+        pointer-events: none; /* Prevents clicks visually */
+        cursor: not-allowed;
+    }
+
+}

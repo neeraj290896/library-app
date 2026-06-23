@@ -1,0 +1,35 @@
+<div class="manage-wl-container">
+    
+    <p-dialog header="Add Wishlist" [(visible)]="addWishlistDialogVisible" [modal]="true" [style]="{ width: '40vw' }"
+        appendTo="body" >
+        <div class="row">
+            <div class="col-6 mb-3">
+                 <label class="d-block small fw-medium text-secondary mb-1" for="book">
+                Book Name<sup>*</sup>
+                </label>
+                <p-select id="book" [disabled]="selectedBookId >0" [(ngModel)]="selectedWishlist.BookId"
+                    [ngModelOptions]="{standalone: true}" [options]="bookOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select Book" [editable]="true" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onBookChange()" />
+                <div *ngIf="errors.BookName" class="text-danger mt-1 small">{{ errors.BookName }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="userName">
+                    User Name<sup>*</sup>
+                </label>
+                <p-select id="userName" [disabled]="selectedUserId >0" [(ngModel)]="selectedWishlist.UserId" [ngModelOptions]="{standalone: true}"
+                    [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select User"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onUserChange()" />
+                <div *ngIf="errors.UserName" class="text-danger mt-1 small">{{ errors.UserName }}</div>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="addWishlistDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="addToWishlist()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>
