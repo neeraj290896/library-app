@@ -46,7 +46,7 @@ export class ManageUsersComponent {
     private userService = inject(UserService);
     private roleService = inject(RoleService);
     private _bcService = inject(BookCirculationService);
-    private _authService = inject(AuthService);
+    public _authService = inject(AuthService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;

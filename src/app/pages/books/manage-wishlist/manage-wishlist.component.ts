@@ -242,7 +242,7 @@ export class ManageWishlistComponent {
                   });
                   
                   this.getWishlistDetails();
-                  
+                  this.getWishlistCountDetails();
               }
 
           },
@@ -260,4 +260,15 @@ export class ManageWishlistComponent {
   addWishlist():void{
     this.addWishlistDialogVisible = true;
   }
+
+   getWishlistCountDetails(): void {
+          this._wishlistService.getWishlistCount().subscribe({
+              next: (data: number) => {
+                  this._authService.setWishlistCount(data);
+              },
+              error: (err) => {
+                  console.error('Error loading Wishlist Count details:', err);
+              }
+          });             
+    }
 }

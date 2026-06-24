@@ -560,7 +560,7 @@
                     (onSuccess)="loadBooks(true)"></app-books-view-circulation>
                 }
             </p-tabPanel>
-            <p-tabPanel header="View Wishlist">
+            <p-tabPanel header="View Wishlist" *ngIf="_authService.settingsDetails()?.EnableWishlistNotification">
                 @if (activeTab === 2) {
                 <app-manage-wishlist [selectedBookId]="currentBook.BookId" [selectedUserId] = 0 [selectedBookStatus] = "currentBook.Status || ''" ></app-manage-wishlist>
                 }
@@ -572,6 +572,9 @@
             @if (header === 'Add Book' || (header === 'Edit Book' && activeTab === 0)|| (header === 'View Book' &&
             activeTab === 0)) {
             <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" icon="pi pi-bookmark-fill" label="Add to Wishlist" [style]="{ width: '10rem' }"
+                    class="p-button-outlined" styleClass="btn-main-outlined" *ngIf="_authService.settingsDetails()?.EnableWishlistNotification && currentBook.BookId >0 && currentBook.Status =='Issued'"
+                    (click)="addToWishlist()" pTooltip="Add to wishlist"></p-button>
                 <p-button icon="pi pi-sign-in" type="button" label="CheckIn" [style]="{ width: '7rem' }"
                     styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Issued'"
                     (click)="checkInBook(currentBook)" pTooltip="CheckIn"></p-button>
@@ -1106,6 +1109,11 @@
     <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower]=null
         [isViewOnly]="false" (onSuccess)="loadBooks()"
         (onDialogClose)="bcDialogVisible = false"></app-issue-return-books>
+    }
+
+    @if (addWishlistDialogVisible) {
+        <app-add-wishlist [selectedBookId]="currentBook.BookId" [selectedUserId]="0"  
+         (onDialogClose)="addWishlistDialogVisible = false"></app-add-wishlist>
     }
 
 </div>

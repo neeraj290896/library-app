@@ -31,6 +31,7 @@ import { BookCirculationService } from '@app/shared/services/book-circulation.se
 import { AuthService } from '@app/shared/services/auth.service';
 import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
 import { ManageWishlistComponent } from '../manage-wishlist/manage-wishlist.component';
+import { AddWishlistComponent } from '../add-wishlist/add-wishlist.component';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -43,7 +44,7 @@ type ImportBookDetails = BookDetails & {
         CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
         SelectModule, FormsModule, DatePickerModule, TooltipModule,
-        TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent, ManageWishlistComponent
+        TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent, ManageWishlistComponent, AddWishlistComponent
     ],
     templateUrl: './books-manage-books.component.html',
     styleUrl: './books-manage-books.component.scss'
@@ -61,7 +62,7 @@ export class BooksManageBooksComponent implements OnInit {
     private floorService = inject(FloorService);
     private rackService = inject(RackService);
     private _bcService = inject(BookCirculationService);
-    private _authService = inject(AuthService);
+    public _authService = inject(AuthService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
@@ -191,6 +192,7 @@ export class BooksManageBooksComponent implements OnInit {
     public type: string = '';
     public bcDialogVisible: boolean = false;
     public todayDate: string | undefined;
+    public addWishlistDialogVisible: boolean = false;
 
     ngOnInit(): void {
         const today = new Date();
@@ -1629,5 +1631,9 @@ export class BooksManageBooksComponent implements OnInit {
 
         // 3. Assemble into the exact "yyyy-mm-dd" layout match        
         return `${year}-${month}-${day}`;
+    }
+
+    addToWishlist(): void{
+        this.addWishlistDialogVisible = true;
     }
 }

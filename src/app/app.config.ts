@@ -12,6 +12,7 @@ import { environment } from '../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
 import { routes } from './app.routes';
+import { AdminService } from './shared/services/admin.service';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
         provideAppInitializer(async () => {
             const orgService = inject(OrganizationService);
             const authService = inject(AuthService);
+            const adminService = inject(AdminService);
 
             const org = environment.OrganizationDetails;
             authService.setOrganizationDetails(org);
@@ -41,9 +43,22 @@ export const appConfig: ApplicationConfig = {
                 if (data && data.length > 0) {
                     const activeOrg = data.find((x: any) => x.IsActive == true) ?? environment.OrganizationDetails;
                     authService.setOrganizationDetails(activeOrg);
-                }
+                }                
+
             } catch (err) {
                 console.error('Error loading OrganizationDetails:', err);
+            }
+
+             try {
+                
+                const settings = await firstValueFrom(adminService.getSettingDetails());
+                if (settings && settings.length > 0) {
+                    const activeSettings = settings.find((x: any) => x.IsActive == true);
+                    authService.setSettingsDetails(activeSettings);
+                }
+
+            } catch (err) {
+                console.error('Error loading SettingDetails:', err);
             }
         })
     ]

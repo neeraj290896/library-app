@@ -372,7 +372,7 @@ export interface WishlistDetails {
     Status: string;    
     CreatedByUserId: number;
     CreatedByUserName: string;
-    CreatedOn: string;
+    CreatedOn?: string |null;
     IsNotificationRead: boolean;
     IssuedOn?: string | null;
     NotifiedOn?: string | null;
