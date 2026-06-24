@@ -3,13 +3,17 @@ import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from "primeng/tooltip";
-import { UserDetails } from '@app/shared/models/api.models';
+import { UserDetails, WishlistDetails } from '@app/shared/models/api.models';
 import { WishlistService } from '@app/shared/services/wishlist.service';
+import { CommonModule } from '@angular/common';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { TimeAgoPipe } from '@app/shared/pipe/time-ago.pipe';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [RouterModule, ButtonModule, TooltipModule],
+    imports: [RouterModule, ButtonModule, TooltipModule, CommonModule, OverlayPanelModule, TimeAgoPipe ],
     templateUrl: './layout.component.html',
     styleUrl: './layout.component.scss'
 })
@@ -18,12 +22,13 @@ export class LayoutComponent {
     private router = inject(Router);
     private elementRef = inject(ElementRef);
     private _wishlistService = inject(WishlistService);
-
+    private messageService = inject(MessageService);
     public userRole = this.authService.userRole;
     public userName = this.authService.userName;
     public sidebarCollapsed = signal(true);
     public loggedInUserDetails: UserDetails = {};
-    public _wishlistCount : number = 0;
+    // public _wishlistCount : number = 0;
+    public wlDetails : WishlistDetails[] = [];
 
     public readonly menuItems = [
         { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar' },
@@ -44,13 +49,13 @@ export class LayoutComponent {
     getWishlistCountDetails(): void {
           this._wishlistService.getWishlistCount().subscribe({
               next: (data: number) => {
-                  this._wishlistCount = data;
+                 this.authService.setWishlistCount(data);
               },
               error: (err) => {
                   console.error('Error loading Wishlist Count details:', err);
               }
           });             
-      }
+    }
 
     logout(): void {
         this.authService.logout();
@@ -81,5 +86,55 @@ export class LayoutComponent {
 
     isActive(path: string): boolean {
         return this.router.url === path;
+    }
+
+    getWishListDetailsForNotification() : void{
+        this._wishlistService.getWishlistDetails().subscribe({
+            next: (data: WishlistDetails[]) => {
+                this.wlDetails = data.filter(x => x.Status == 'Added').sort((a, b) => b.WishlistId - a.WishlistId);
+                
+            },
+            error: (err) => {
+                console.error('Error loading Wishlist details:', err);
+            }
+        });
+    }
+
+    clearAllNotifications() : void{
+        this.wlDetails = [];
+    }
+
+    markAsRead(readNotification : WishlistDetails):void
+    {
+        if(readNotification !=null)
+        {
+            this._wishlistService.updateWishlistNotificationDetails(readNotification).subscribe({
+                next: (res: any) => {
+                    if (!res || !res.Status) {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Notification Update - Failed',
+                            detail: res ? res.Message : 'Failed to update Wishlist notification. Please try again.'
+                        });
+                    }
+                    else {
+                        
+                        readNotification.IsNotificationRead = true;
+                        if(this.authService.wishlistCount()  >0 )
+                        {
+                            this.authService.setWishlistCount((this.authService.wishlistCount() - 1));
+                        }                        
+                    }
+                },
+                error: () => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Notification Update - Failed',
+                        detail: 'Failed to update Wishlist notification. Please try again.'
+                    });
+                }
+            });
+        }
+        
     }
 }

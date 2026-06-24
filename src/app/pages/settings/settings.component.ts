@@ -84,10 +84,16 @@ export class SettingsComponent {
     public minDate: Date | undefined;
     public maxDate: Date | undefined;
     public calendarFocusDate!: Date;
+    public enableAplnSettingsAccess : boolean = false;
 
     ngOnInit(): void {
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
         const today = new Date();
+
+        if(this.loggedInUserDetails.RoleId <=2)
+        {
+            this.enableAplnSettingsAccess = true;
+        }
 
         let year = today.getFullYear();
         let minYear = year - 100;
@@ -200,6 +206,8 @@ export class SettingsComponent {
                         summary: 'Manage Application Settings - Success',
                         detail: 'Application Settings updated successfully.'
                     });
+
+                    this._authService.setSettingsDetails({...payload});
                 }
             },
             error: () => {

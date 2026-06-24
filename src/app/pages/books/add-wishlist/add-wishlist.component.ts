@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BookDetails, UserDetails, WishlistDetails } from '@app/shared/models/api.models';
 import { AuthService } from '@app/shared/services/auth.service';
@@ -23,13 +23,15 @@ import { TooltipModule } from 'primeng/tooltip';
 export class AddWishlistComponent {
   @Input() selectedBookId: number = 0;
   @Input() selectedUserId: number = 0;
+  @Output() private onSuccess: EventEmitter<void> = new EventEmitter<void>();
+  @Output() private onDialogClose: EventEmitter<void> = new EventEmitter<void>();
   private messageService = inject(MessageService);
   private _authService = inject(AuthService);
   private _wishlistService = inject(WishlistService);
   private bookService = inject(BookService);
   private userService = inject(UserService);
-  public selectedWishlist: WishlistDetails = { WishlistId : 0, BookId :this.selectedBookId, BookName : '', CreatedByUserId : 0, CreatedByUserName : '', CreatedOn : '', IsNotificationRead : false,
-      Status: 'Added', UserId: this.selectedUserId, UserName: ''};
+  public selectedWishlist: WishlistDetails = { WishlistId : 0, BookId :0, BookName : '', CreatedByUserId : 0, CreatedByUserName : '', CreatedOn : null, IsNotificationRead : false,
+      Status: 'Added', UserId: 0, UserName: ''};
 
   public loggedInUserDetails: UserDetails = {};
   public addWishlistDialogVisible: boolean = true;
@@ -41,6 +43,8 @@ export class AddWishlistComponent {
   public errors: { BookName: string, UserName: string} = {BookName: '', UserName: ''};
 
   ngOnInit(): void {
+
+    console.log('selectedBookId : ', this.selectedBookId, ' -- selectedUserId : ', this.selectedUserId);
 
     this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
 
@@ -56,12 +60,16 @@ export class AddWishlistComponent {
               if (this.selectedBookId == 0) {
                   this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Issued").map(book => {
                       return { label: book.BookName ?? '', value: book.BookId };
-                  });
+                  });                  
               }
               else {
                   this.bookOptions = data.map(book => {
                       return { label: book.BookName ?? '', value: book.BookId };
                   });
+
+                  this.selectedWishlist.BookId = this.selectedBookId;
+
+                  this.onBookChange();
               }
           },
           error: (err) => {
@@ -78,13 +86,17 @@ export class AddWishlistComponent {
               if (this.selectedUserId == 0) {
                   this.userOptions = data.filter(x => x.IsActive == true && x.FullName?.trim() != '').map(usr => {
                       return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
-                  });
+                  });                  
 
               }
               else {
                   this.userOptions = data.filter(x => x.FullName?.trim() != '').map(usr => {
                       return { label: usr.FullName ?? '', value: usr.UserId ?? 0 };
                   });
+
+                  this.selectedWishlist.UserId = this.selectedUserId;
+
+                  this.onUserChange();
               }
           },
           error: (err) => {
@@ -109,7 +121,7 @@ export class AddWishlistComponent {
             
         }
 
-        this.validateInput('BorrowerName');
+        this.validateInput('UserName');
   }
 
   validateInput(key: string): boolean {
@@ -159,6 +171,7 @@ export class AddWishlistComponent {
       this.selectedWishlist.CreatedByUserId = this.loggedInUserDetails.UserId ?? 0;
       this.selectedWishlist.CreatedByUserName = this.loggedInUserDetails.FullName ?? '';
       
+      
       this._wishlistService.addWishlistDetails(this.selectedWishlist).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
@@ -175,8 +188,9 @@ export class AddWishlistComponent {
                         detail: 'Updated Add Wishlist successfully.'
                     });
 
+                    this.getWishlistCountDetails();
                     this.addWishlistDialogVisible = false;
-                    
+                    this.onSuccess.emit();
                 }
             },
             error: () => {
@@ -189,5 +203,20 @@ export class AddWishlistComponent {
         });
         
   }
+
+  hideDialog(): void {
+        this.onDialogClose.emit();
+    }
+
+    getWishlistCountDetails(): void {
+          this._wishlistService.getWishlistCount().subscribe({
+              next: (data: number) => {
+                  this._authService.setWishlistCount(data);
+              },
+              error: (err) => {
+                  console.error('Error loading Wishlist Count details:', err);
+              }
+          });             
+    }
 
 }

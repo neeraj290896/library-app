@@ -236,3 +236,37 @@ main {
         }
     }
 }
+
+/* Base container style for hover animations */
+.list-item-hover {
+    transition: background-color 0.2s ease-in-out;
+    cursor: pointer;
+}
+.list-item-hover:hover {
+    background-color: #f1f3f5 !important;
+}
+
+/* Unread State Style: Soft blue background highlight tint */
+.bg-unread {
+    background-color: #edf2fa; 
+}
+
+/* Read State Style: Transparent plain background */
+.bg-read {
+    background-color: #ffffff;
+}
+
+/* Vibrant blue dot for unread status alerts */
+.unread-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #0b57d0;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* Muted soft gray for text elements inside read rows */
+.text-muted-read {
+    color: #8a8a8a !important;
+}

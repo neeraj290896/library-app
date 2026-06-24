@@ -149,7 +149,7 @@
             <tr class="border-bottom">
                 <td>{{ index + 1 }}</td>
                 <td>{{ wishlist.BookName }}</td>
-                <td>{{ wishlist.BorrowerName }}</td>
+                <td>{{ wishlist.UserName }}</td>
                  <td>
                     <p-tag [value]="wishlist.Status" [severity]="getStatusSeverity(wishlist.Status, wishlist.CreatedOn)"></p-tag>
                 </td>                               
@@ -160,7 +160,7 @@
                 <td>
                     <div class="d-flex align-items-center gap-2">
                         <button pButton icon="pi pi-times-circle" (click)="cancelWishlist(wishlist)"
-                            *ngIf="(wishlist.Status == 'Added')" class="p-button-rounded p-button-text p-button-sm"
+                            *ngIf="(wishlist.Status == 'Added')" class="p-button-rounded p-button-text p-button-danger p-button-sm"
                             pTooltip="Cancel Wishlist"></button>                        
                     </div>
                 </td>

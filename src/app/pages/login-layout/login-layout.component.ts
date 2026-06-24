@@ -10,4 +10,6 @@ import { AuthService } from '@app/shared/services/auth.service';
 })
 export class LoginLayoutComponent {
     public authService = inject(AuthService);
+
+    
 }

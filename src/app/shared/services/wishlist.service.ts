@@ -39,4 +39,8 @@ export class WishlistService {
         return this.http.get(`${this.baseUrl}/GetWishlistCount`);
     }
 
+    updateWishlistNotificationDetails(payload: WishlistDetails): Observable<any> {
+        return this.http.post(`${this.baseUrl}/UpdateWishlistNotificationDetails`, payload);
+    }
+
 }

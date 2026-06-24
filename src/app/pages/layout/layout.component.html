@@ -61,13 +61,75 @@
                     }
                 </div>
                 <div class="col-4 d-flex align-items-center justify-content-end gap-3 fs-5">
-                    <div class="position-relative d-inline-block">
-                        <span>🔔</span>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-6" *ngIf="_wishlistCount > 0">
-                            {{_wishlistCount}}
-                            <span class="visually-hidden">unread notifications</span>
-                        </span>
-                    </div>
+                    @if(authService.settingsDetails()?.EnableWishlistNotification){
+                         <div class="position-relative d-inline-block">
+                            <span (click)="op.toggle($event); getWishListDetailsForNotification()" style="cursor: pointer;" class="position-relative">
+                                <span>🔔</span>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-6" *ngIf="authService.wishlistCount() > 0">
+                                    {{authService.wishlistCount()}}
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                            </span>
+                            
+
+                            <p-overlayPanel #op [style]="{ width: '380px', padding: '0' }">
+                                <div class="notification-dropdown">
+                                    <!-- Header with Clear All Button -->
+                                    <div class="p-2 border-bottom d-flex justify-content-between align-items-center bg-light">
+                                        <h6 class="m-0 fw-bold text-dark">Wishlist Notifications</h6>
+                                        <button *ngIf="authService.wishlistCount() > 0" 
+                                                class="btn btn-sm btn-link text-danger text-decoration-none p-0" 
+                                                (click)="clearAllNotifications()">
+                                            Clear All
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Case 1: Dynamic Notification List -->
+                                    <div *ngIf="authService.wishlistCount() > 0; else noNotifications" class="notification-list" style="max-height: 300px; overflow-y: auto;">
+                                        <div *ngFor="let item of wlDetails" (click)="markAsRead(item)"
+                                            [ngClass]="{'bg-unread': !item.IsNotificationRead, 'bg-read': item.IsNotificationRead}"
+                                            class="p-2 border-bottom d-flex flex-column gap-1 list-item-hover">
+                                            
+                                            <!-- Row 1: Book Name & Unread Dot Status Indicator -->
+                                            <div class="d-flex align-items-center gap-2">
+                                                <!-- Blue dot indicator appears ONLY if notification is unread -->
+                                                <span *ngIf="!item.IsNotificationRead" class="unread-dot"></span>
+                                                
+                                                <span class="text-sm fw-semibold" 
+                                                    [ngClass]="{'text-dark': !item.IsNotificationRead, 'text-muted-read': item.IsNotificationRead}">
+                                                    {{ item.BookName }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Row 2: User Name & Relative Time Format Stamp -->
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small [ngClass]="{'text-secondary': !item.IsNotificationRead, 'text-muted-read': item.IsNotificationRead}" 
+                                                    style="font-size: 0.75rem;">                                                
+                                                    {{ item.UserName }}
+                                                </small>
+                                                <small [ngClass]="{'text-primary fw-medium': !item.IsNotificationRead, 'text-muted-read': item.IsNotificationRead}" 
+                                                    style="font-size: 0.75rem; white-space: nowrap;">
+                                                    {{ item.CreatedOn | timeAgo }}
+                                                </small>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- Case 2: Empty State -->
+                                    <ng-template #noNotifications>
+                                        <div class="p-3 text-center text-muted">
+                                            <i class="pi pi-bell-slash" style="font-size: 2rem"></i>
+                                            <p class="mt-2 mb-0">No new notifications</p>
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </p-overlayPanel>
+
+                        </div>
+                    }
+                   
+
                     <div class="d-flex align-items-center gap-2" [routerLink]="'/settings'">
                         <span>👤</span>
                         <span class="fs-6 text-muted">{{ userName() }}</span>

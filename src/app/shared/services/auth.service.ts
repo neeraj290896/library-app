@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { OrganizationDetails, UserDetails } from '../models/api.models';
+import { OrganizationDetails, SettingDetails, UserDetails } from '../models/api.models';
 
 @Injectable({
     providedIn: 'root'
@@ -8,11 +8,13 @@ export class AuthService {
     readonly userRole = signal<string | null | undefined>(null);
     readonly userName = signal<string | null | undefined>(null);
     readonly userData = signal<UserDetails | null>(null);
+    readonly wishlistCount = signal<number | 0 >(0);
     readonly organizationDetails = signal<OrganizationDetails | null>(null);
+    readonly settingsDetails = signal<SettingDetails | null>(null);
 
     readonly userDataTemp = {
         "UserId": 1,
-        "RoleId": 1,
+        "RoleId": 2,
         "RoleName": "Super Admin",
         "FullName": "Saravana Kumar M",
         "Gender": "M",
@@ -33,8 +35,8 @@ export class AuthService {
         this.userName.set(userDetails.FullName);
     }
 
-    setOrganizationDetails(_org: OrganizationDetails): void {
-        this.organizationDetails.set(_org);
+    setWishlistCount(_cnt: number): void {
+        this.wishlistCount.set(_cnt);
     }
 
     logout(): void {
@@ -71,5 +73,12 @@ export class AuthService {
         catch (error) {
             return true;
         }
+    }
+
+    setOrganizationDetails(_org: OrganizationDetails): void {
+        this.organizationDetails.set(_org);
+    }
+    setSettingsDetails(_settings: SettingDetails): void {
+        this.settingsDetails.set(_settings);
     }
 }
