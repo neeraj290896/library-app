@@ -274,6 +274,15 @@
                     styleClass="w-100" inputStyleClass="w-100" />
                 <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
             </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove">
+                <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                    Department<sup>*</sup>
+                </label>
+                <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}"  [editable]="true"
+                    [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
+                <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
+            </div>
             <!-- <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="status">
                     Access Request Status<sup>*</sup>
@@ -359,6 +368,15 @@
                             inputStyleClass="w-100" />
                         <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
                     </div>
+                    <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                            Department<sup>*</sup>
+                        </label>
+                        <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" [editable]="true"
+                            [disabled]="isViewOnly" [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
+                            styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
+                        <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
+                    </div>
                     <!-- <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="status">
                             Access Request Status<sup>*</sup>
@@ -393,7 +411,7 @@
                 @if (activeTab === 2) {
                     <app-manage-wishlist [selectedBookId] = 0 [selectedUserId] = "currentUser.UserId || 0"  [selectedBookStatus] = "''" ></app-manage-wishlist>
                 }
-            </p-tabPanel>"
+            </p-tabPanel>
 
         </p-tabView>
         }
@@ -405,7 +423,7 @@
                 <p-button icon="pi pi-sign-in" type="button" label="CheckIn" [style]="{ width: '7rem' }"
                     styleClass="btn-main" *ngIf="currentUser.BorrowedBooksCount"
                     (click)="checkInBook(currentUser)"></p-button>
-                <p-button icon="pi pi-sign-out" type="button" label="CheckOut" [style]="{ width: '7rem' }"
+                <p-button icon="pi pi-sign-out" type="button" label="CheckOut" [style]="{ width: '7rem' }" *ngIf="currentUser.UserId !=null && currentUser.UserId >0"
                     styleClass="btn-main" (click)="checkOutBook(currentUser)"></p-button>
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     *ngIf="!isViewOnly" styleClass="btn-main-outlined" (click)="userDialogVisible = false"></p-button>
@@ -416,7 +434,7 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Import Users" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }"
+    <p-dialog header="Import Users" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
         appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
@@ -453,7 +471,7 @@
                             </div>
                         </div>
                     </th>
-                    <th class="text-start text-muted fw-medium" style="width: 16%;">
+                    <th class="text-start text-muted fw-medium" style="width: 14%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="FullName">
                                 FullName
@@ -508,6 +526,17 @@
                                 (click)="showImportFilter()"></span>
                         </div>
                     </th>
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="DepartmentName">
+                                Department
+                                <p-sortIcon field="DepartmentName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedDepartmentList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
                     <!-- <th class="text-start text-muted fw-medium" style="width: 10%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
@@ -530,7 +559,7 @@
                                 (click)="showImportFilter()"></span>
                         </div>
                     </th>
-                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <th class="text-start text-muted fw-medium" style="width: 8%;">
                         <div class="d-flex align-items-center justify-content-center gap-3">
                             Actions
                         </div>
@@ -592,6 +621,15 @@
                             </ng-template>
                         </p-columnFilter>
                     </th>
+                    <th><p-columnFilter field="DepartmentName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importDepartmentList" [(ngModel)]="importSelectedDepartmentList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter></th>
                     <!-- <th>
                         <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -627,6 +665,7 @@
                     <td>{{ user.Gender }}</td>
                     <td>{{ user.MobileNo }}</td>
                     <td>{{ user.MailId }}</td>
+                    <td>{{ user.DepartmentName }}</td>
                     <!-- <td>
                         <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
                             [severity]="getStatusSeverity(user.IsActive)"></p-tag>
@@ -729,6 +768,15 @@
                     [disabled]="isViewOnly" [minDate]="minDate" [maxDate]="maxDate" (ngModelChange)="onDOBChange()"
                     placeholder="Select DOB" styleClass="w-100" inputStyleClass="w-100" />
                 <div *ngIf="errors.DOB" class="text-danger mt-1 small">{{ errors.DOB }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove">
+                <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                    Department<sup>*</sup>
+                </label>
+                <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" [editable]="true"
+                    [disabled]="isViewOnly" [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
+                <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
             </div>
             <!-- <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="status">
