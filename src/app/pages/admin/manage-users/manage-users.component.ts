@@ -8,7 +8,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { BookCirculationDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookCirculationDetails, DepartmentDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
 import { MessageService } from 'primeng/api';
 import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
@@ -26,6 +26,7 @@ import { AuthService } from '@app/shared/services/auth.service';
 import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
 import { environment } from '../../../../environments/environment';
 import { ManageWishlistComponent } from '@app/pages/books/manage-wishlist/manage-wishlist.component';
+import { DepartmentService } from '@app/shared/services/department.service';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -47,12 +48,14 @@ export class ManageUsersComponent {
     private roleService = inject(RoleService);
     private _bcService = inject(BookCirculationService);
     public _authService = inject(AuthService);
+    public departmentService = inject(DepartmentService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
 
     public minDate: Date | undefined;
     public maxDate: Date | undefined;
+    public departments: DepartmentDetails[] = [];
 
     public users: UserDetails[] = [];
     public roles: RoleDetails[] = [];
@@ -63,6 +66,7 @@ export class ManageUsersComponent {
     public genderList: { label: string, value: string }[] = [];
     public mailIdList: { label: string, value: string }[] = [];
     public statusList: { label: string, value: boolean }[] = [];
+    public departmentList: { label: string, value: string }[] = [];
     public selectedUserNameList: string[] = [];
     public selectedRoleList: string[] = [];
     public selectedMobileNoList: string[] = [];
@@ -95,6 +99,7 @@ export class ManageUsersComponent {
         MailId: string,
         MobileNo: string,
         RoleId: string,
+        DepartmentId: string,
         Status: string,
         IsActive: string
     } = {
@@ -104,6 +109,7 @@ export class ManageUsersComponent {
             MailId: '',
             MobileNo: '',
             RoleId: '',
+            DepartmentId: '',
             Status: '',
             IsActive: ''
         };
@@ -122,6 +128,7 @@ export class ManageUsersComponent {
         { label: 'Rejected', value: 'Rejected' },
         { label: 'Pending', value: 'Pending' }
     ];
+    public departmentOptions: { label: string; value: number; }[] = [];
 
     public importIndex: number = -1;
     public importUserDialogVisible = false;
@@ -135,9 +142,11 @@ export class ManageUsersComponent {
     public importGenderList: { label: string, value: string }[] = [];
     public importMailIdList: { label: string, value: string }[] = [];
     public importStatusList: { label: string, value: boolean }[] = [];
+    public importDepartmentList: { label: string, value: string }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
     public importSelectedUserNameList: string[] = [];
     public importSelectedRoleList: string[] = [];
+    public importSelectedDepartmentList: string[] = [];
     public importSelectedMobileNoList: string[] = [];
     public importSelectedGenderList: string[] = [];
     public importSelectedMailIdList: string[] = [];
@@ -155,8 +164,10 @@ export class ManageUsersComponent {
     public loggedInUserDetails: UserDetails = {};
     public todayDate: string | undefined;
     calendarFocusDate!: Date; 
+    public departmentEligibleForRoleIdAbove: number  = 1;
 
     ngOnInit(): void {
+        this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
         const today = new Date();
         this.todayDate = this.parseCustomDateStringForUI(today);
 
@@ -180,6 +191,7 @@ export class ManageUsersComponent {
 
 
         this.loadRoleDetails();
+        this.loadDepartmentDetails();
         this.loadUserDetails();
     }
 
@@ -222,6 +234,20 @@ export class ManageUsersComponent {
         }
     }
 
+    loadDepartmentDetails(): void {
+            this.departmentService.getDepartmentDetails().subscribe({
+                next: (data: DepartmentDetails[]) => {
+                    this.departments = data;
+                    this.departmentOptions = data.map(dept => {
+                    return { label: dept.DepartmentName ?? '', value: dept.DepartmentId };
+                });
+                },
+                error: (err :any) => {
+                    console.error('Error loading departments:', err);
+                }
+            });
+    }
+
     initializeFilterLists(): void {
         this.userNameList = [...new Set(this.users.map(user => user.FullName))]
             .map(e => ({ label: e!, value: e! }));
@@ -247,6 +273,8 @@ export class ManageUsersComponent {
         this.importMailIdList = [...new Set(this.importPreview.map(user => user.MailId))]
             .map(e => ({ label: e!, value: e! }));
         this.importMobileNoList = [...new Set(this.importPreview.map(user => user.MobileNo))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importDepartmentList = [...new Set(this.importPreview.map(user => user.DepartmentName))]
             .map(e => ({ label: e!, value: e! }));
         this.importStatusList = [...new Set(this.importPreview.map(user => user.IsActive ?? false))]
             .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
@@ -277,6 +305,7 @@ export class ManageUsersComponent {
         this.importDataTable?.reset();
         this.importSelectedUserNameList = [];
         this.importSelectedRoleList = [];
+        this.importSelectedDepartmentList = [];
         this.importSelectedMobileNoList = [];
         this.importSelectedMailIdList = [];
         this.importSelectedGenderList = [];
@@ -297,14 +326,14 @@ export class ManageUsersComponent {
         }
         else {
             this.currentUser = {
-                UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '',
+                UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', DepartmentId : 0,
                 RoleId: 0, RoleName: '', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending'
             };
             this.header = 'Add User';
             this.dobDate = null;
         }
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', Status: '', IsActive: '' };
         this.userDialogVisible = true;
         this.isViewOnly = false;
     }
@@ -316,7 +345,7 @@ export class ManageUsersComponent {
             this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
         }
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId : '', Status: '', IsActive: '' };
         this.userDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -328,6 +357,13 @@ export class ManageUsersComponent {
         }
 
         this.validateInput('RoleId');
+
+        if(this.currentUser.RoleId !=null && this.currentUser.RoleId <= this.departmentEligibleForRoleIdAbove)
+        {
+            this.currentUser.DepartmentId = 0;
+            this.currentUser.DepartmentName = "";
+        }
+        this.validateInput('DepartmentId');
     }
 
     onDOBChange(): void {
@@ -344,6 +380,15 @@ export class ManageUsersComponent {
         }
 
         this.validateInput('DOB');
+    }
+
+    onDepartmentChange(): void{
+        const department = this.departmentOptions.find(l => l.value === this.currentUser.DepartmentId);
+        if (department) {
+            this.currentUser.DepartmentName = department.label;
+        }
+
+        this.validateInput('DepartmentId');
     }
 
     // onGenderChange(): void {
@@ -422,6 +467,15 @@ export class ManageUsersComponent {
                 }
                 break;
 
+            case 'DepartmentId':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove) && !(this.currentUser.DepartmentId != null && this.currentUser.DepartmentId > 0)) {
+                    this.errors.DepartmentId = 'Please select Department.';
+                    isValid = false;
+                } else {
+                    this.errors.DepartmentId = '';
+                }
+                break;
+
             case 'Status':
                 if (this.currentUser.Status === null) {
                     this.errors.Status = 'Access Request Status is required.';
@@ -454,10 +508,11 @@ export class ManageUsersComponent {
         const isMailIdValid = this.validateInput('MailId');
         const isMobileNoValid = this.validateInput('MobileNo');
         const isDOBValid = this.validateInput('DOB');
+        const isDepartmentIdValid = this.validateInput('DepartmentId');
         // const isAccessRequestValid = this.validateInput('Status');
         // const isStatusValid = this.validateInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid;
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid;
     }
 
     saveUser(): void {
@@ -465,6 +520,49 @@ export class ManageUsersComponent {
             return;
         }
 
+        if(this.currentUser.UserId !=null && this.currentUser.UserId >0)
+        {
+            this.updateUser();
+        }
+        else
+        {
+            this.addNewUser();
+        }
+        
+    }
+
+    addNewUser():void{
+        const payload = this.currentUser;
+        this.userService.addUserDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage User - Failed',
+                        detail: res ? res.Message : 'Failed to add new User. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage User - Success',
+                        detail: 'User added successfully.'
+                    });
+                }
+
+                this.loadUserDetails();
+                this.userDialogVisible = false;
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage User - Failed',
+                    detail: 'Failed to add new User. Please try again.'
+                });
+            }
+        });
+    }
+
+    updateUser():void{
         const payload = this.currentUser;
         this.userService.updateUserDetails(payload).subscribe({
             next: (res: any) => {
@@ -551,7 +649,7 @@ export class ManageUsersComponent {
         };
 
         const worksheet = workbook.addWorksheet('Users');
-        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID']);
+        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -559,7 +657,7 @@ export class ManageUsersComponent {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'E1'
+            to: 'F1'
         };
 
         const rolesSheet = workbook.addWorksheet('RoleList');
@@ -567,6 +665,12 @@ export class ManageUsersComponent {
             rolesSheet.getCell(idx + 1, 1).value = role.RoleName;
         });
         rolesSheet.state = 'hidden';
+
+        const departmentSheet = workbook.addWorksheet('DepartmentList');
+        this.departments.filter(x => x.IsActive == true).forEach((dept, idx) => {
+            departmentSheet.getCell(idx + 1, 1).value = dept.DepartmentName;
+        });
+        departmentSheet.state = 'hidden';
 
         for (let rowIndex = 2; rowIndex <= 1000; rowIndex++) {
             const roleCell = worksheet.getCell(rowIndex, 2);
@@ -607,6 +711,16 @@ export class ManageUsersComponent {
                 showErrorMessage: true,
                 errorTitle: 'Invalid Email',
                 error: 'Please enter a valid email address.'
+            };
+
+            const departmentCell = worksheet.getCell(rowIndex, 6);
+            departmentCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`DepartmentList!$A$1:$A$${this.departments.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Department',
+                error: 'Please select a valid department from the list.'
             };
 
             // const dobCell = worksheet.getCell(rowIndex, 6);
@@ -701,7 +815,7 @@ export class ManageUsersComponent {
                 }
 
                 const headerRow = Object.keys(rows[0] || {});
-                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID'];
+                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -713,6 +827,7 @@ export class ManageUsersComponent {
                     const gender = row['GENDER']?.toString().trim();
                     const mobileNo = row['MOBILE NO']?.toString().trim();
                     const mailId = row['MAIL ID']?.toString().trim();
+                    const departmentName = row['DEPARTMENT NAME']?.toString().trim();
                     // const dob = row['DOB']?.toString().trim();
                     // const status = row['ACCESS STATUS']?.toString().trim();
                     // const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
@@ -727,6 +842,8 @@ export class ManageUsersComponent {
                         ProfilePhoto: '',
                         RoleId: 0,
                         RoleName: roleName,
+                        DepartmentId: 0,
+                        DepartmentName: departmentName,
                         CreatedByUserId: 0,
                         CreatedByUserName: '',
                         IsActive: true,
@@ -757,12 +874,21 @@ export class ManageUsersComponent {
                 this.currentUser.RoleId = _roleDetails.value;
             }
         }
+
+        if(_user.DepartmentName !="")
+        {
+            var _deptDetails = this.departmentOptions.find(x => x.label == _user.DepartmentName);
+            if(_deptDetails?.label !=null && _deptDetails.label !="")
+            {
+                this.currentUser.DepartmentId = _deptDetails.value;
+            }
+        }
         
 
         this.header = 'Edit User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'', Status: '', IsActive: '' };
         this.importUserDialogVisible = true;
         this.isViewOnly = false;
     }
@@ -779,10 +905,19 @@ export class ManageUsersComponent {
             }
         }
 
+        if(_user.DepartmentName !="")
+        {
+            var _deptDetails = this.departmentOptions.find(x => x.label == _user.DepartmentName);
+            if(_deptDetails?.label !=null && _deptDetails.label !="")
+            {
+                this.currentUser.DepartmentId = _deptDetails.value;
+            }
+        }
+
         this.header = 'View User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'', Status: '', IsActive: '' };
         this.importUserDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -802,6 +937,7 @@ export class ManageUsersComponent {
         this.validateImportInput('Gender', this.importIndex);
         this.validateImportInput('MobileNo', this.importIndex);
         this.validateImportInput('MailId', this.importIndex);
+        this.validateImportInput('DepartmentName', this.importIndex);
         // this.validateImportInput('DOB', this.importIndex);
 
         this.importIndex = -1;
@@ -934,6 +1070,32 @@ export class ManageUsersComponent {
                     }
                 }
                 break;
+            
+            case 'DepartmentName':
+                if (this.importPreview && this.importPreview[index] && this.importPreview[index].RoleId && this.importPreview[index].RoleId > this.departmentEligibleForRoleIdAbove)
+                {
+                    if (!this.importPreview[index].DepartmentName?.trim()) {
+                        this.importPreview[index].Error = 'Department is required.';
+                        isValid = false;
+                    }
+                    else if (!this.departments.some(dept => dept.DepartmentName?.toLowerCase() === this.importPreview[index].DepartmentName?.trim().toLowerCase())) {
+                        this.importPreview[index].Error = 'Department not enlisted.';
+                        isValid = false;
+                    }
+                    else {
+                        const dept = this.departments.find(r => r.DepartmentName?.toLowerCase() === this.importPreview[index].DepartmentName?.trim().toLowerCase());
+                        if (dept) {
+                            this.importPreview[index].DepartmentId = dept.DepartmentId;
+                            this.importPreview[index].DepartmentName = dept.DepartmentName;
+                        }
+                        this.importPreview[index].Error = '';
+                    }
+                }
+                else
+                {
+                    this.importPreview[index].Error = '';
+                }                
+                break;
 
             case 'Status':
                 if (!this.importPreview[index].Status?.trim()) {
@@ -972,7 +1134,8 @@ export class ManageUsersComponent {
                 this.validateImportInput('RoleName', index) &&
                 this.validateImportInput('Gender', index) &&
                 this.validateImportInput('MobileNo', index) &&
-                this.validateImportInput('MailId', index);
+                this.validateImportInput('MailId', index) &&
+                this.validateImportInput('DepartmentName', index);
                 // this.validateImportInput('DOB', index) &&
                 // this.validateImportInput('Status', index) &&
                 // this.validateImportInput('IsActive', index);
@@ -998,8 +1161,10 @@ export class ManageUsersComponent {
                 MailId: item.MailId,
                 MobileNo: item.MobileNo,
                 ProfilePhoto: item.ProfilePhoto,
-                RoleId: item.RoleId,
+                RoleId: item.RoleId,                
                 RoleName: item.RoleName,
+                DepartmentId: item.DepartmentId,
+                DepartmentName: item.DepartmentName,
                 CreatedByUserId: item.CreatedByUserId,
                 CreatedByUserName: item.CreatedByUserName,
                 IsActive: item.IsActive,

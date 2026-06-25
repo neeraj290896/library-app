@@ -182,6 +182,7 @@ export interface MultipleUserDetails {
     MobileNo?: string | null;
     DOB?: string | null;
     MailId?: string | null;
+    DepartmentId?: number | null;
     ProfilePhoto?: string | null;
     CreatedBy?: string | null;
     Status?: string | null;
@@ -287,6 +288,8 @@ export interface UserDetails {
     MobileNo?: string | null;
     DOB?: string | null;
     MailId?: string | null;
+    DepartmentId?: number | null;
+    DepartmentName?: string | null;
     ProfilePhoto?: string | null;
     Status?: string | null;
     CreatedByUserId?: number | null;
