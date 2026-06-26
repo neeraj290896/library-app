@@ -8,7 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { DashboardService } from '@app/shared/services/dashboard.service';
-import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, DashboardSummaryDetails, FloorDetails, LanguageDetails, OverDueDetails, PublisherDetails, RackDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
+import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, DashboardSummaryDetails, DepartmentDetails, FloorDetails, LanguageDetails, OverDueDetails, PublisherDetails, RackDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
 import { OverDueService } from '@app/shared/services/overdue.service';
 import { BooksOverdueComponent } from '../checkout/books-overdue/books-overdue.component';
 import { BooksManageBooksComponent } from '../books/books-manage-books/books-manage-books.component';
@@ -32,6 +32,8 @@ import { UserService } from '@app/shared/services/user.service';
 import { IssueReturnBooksComponent } from '../checkout/issue-return-books/issue-return-books.component';
 import { SearchComponent } from '@app/shared/components/search/search.component';
 import { AuthService } from '@app/shared/services/auth.service';
+import { environment } from '../../../environments/environment';
+import { DepartmentService } from '@app/shared/services/department.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -61,6 +63,7 @@ export class DashboardComponent {
     private userService = inject(UserService);
     private roleService = inject(RoleService);
     private authService = inject(AuthService);
+    public departmentService = inject(DepartmentService);
 
     public currentDate: Date = new Date();
 
@@ -164,10 +167,12 @@ export class DashboardComponent {
         ProfilePhoto: '',
         RoleId: 0,
         RoleName: '',
+        DepartmentId: 0,
+        DepartmentName: '',
         CreatedByUserId: 0,
         CreatedByUserName: '',
         IsActive: true,
-        Status: null
+        Status: 'Pending'
     };
     public userErrors: {
         FullName: string,
@@ -176,6 +181,7 @@ export class DashboardComponent {
         MailId: string,
         MobileNo: string,
         RoleId: string,
+        DepartmentId: string,
         Status: string,
         IsActive: string
     } = {
@@ -185,6 +191,7 @@ export class DashboardComponent {
             MailId: '',
             MobileNo: '',
             RoleId: '',
+            DepartmentId: '',
             Status: '',
             IsActive: ''
         };
@@ -207,20 +214,30 @@ export class DashboardComponent {
     public type: string = '';
     public bcDialogVisible: boolean = false;
     public loggedInUserDetails: UserDetails = {};
+    public departmentEligibleForRoleIdAbove: number  = 1;
+    public departmentOptions: { label: string; value: number; }[] = [];
+    public departments: DepartmentDetails[] = [];
+    calendarFocusDate!: Date; 
+    public dobDate: Date | null = null;
 
     ngOnInit(): void {
+        this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
         let today = new Date();
         let year = today.getFullYear();
         let userMinYear = year - 100;
-        let userMaxYear = year - 15;
+        let userMaxYear = year - environment.studentsMinimumAge;
 
         this.userMinDate = new Date();
-        this.userMinDate.setMonth(1);
+        this.userMinDate.setDate(1);
+        this.userMinDate.setMonth(0);
         this.userMinDate.setFullYear(userMinYear);
 
         this.userMaxDate = new Date();
-        this.userMaxDate.setMonth(12);
+        this.userMaxDate.setMonth(11);
+        this.userMaxDate.setDate(31);
         this.userMaxDate.setFullYear(userMaxYear);
+
+        this.calendarFocusDate = new Date(this.userMaxDate.getFullYear(),  today.getMonth(), today.getDate());
 
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
@@ -238,6 +255,7 @@ export class DashboardComponent {
         this.loadFloors();
         this.loadRacks();
         this.loadRoleDetails();
+        this.loadDepartmentDetails();
     }
 
     parseCustomDateStringForUI(dateStr: Date): string {
@@ -393,6 +411,20 @@ export class DashboardComponent {
             },
             error: (err) => {
                 console.error('Error loading role:', err);
+            }
+        });
+    }
+
+    loadDepartmentDetails(): void {
+        this.departmentService.getDepartmentDetails().subscribe({
+            next: (data: DepartmentDetails[]) => {
+                this.departments = data;
+                this.departmentOptions = data.map(dept => {
+                return { label: dept.DepartmentName ?? '', value: dept.DepartmentId };
+            });
+            },
+            error: (err :any) => {
+                console.error('Error loading departments:', err);
             }
         });
     }
@@ -717,9 +749,11 @@ export class DashboardComponent {
                         summary: 'Add Book - Success',
                         detail: 'Book added successfully.'
                     });
+                
+                    this.addNewBookDialogVisible = false;
                 }
 
-                this.addNewBookDialogVisible = false;
+                
             },
             error: () => {
                 this.messageService.add({
@@ -733,10 +767,13 @@ export class DashboardComponent {
 
     openRegisterUserDialog(): void {
         this.currentUser = {
-            UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '',
-            RoleId: 0, RoleName: '', CreatedByUserId: this.loggedInUserDetails.UserId, CreatedByUserName: this.loggedInUserDetails.FullName, IsActive: true, Status: 'Pending'
+            UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', RoleId: 0, RoleName: '', DepartmentId:0, DepartmentName:'',
+            CreatedByUserId: this.loggedInUserDetails.UserId, CreatedByUserName: this.loggedInUserDetails.FullName, IsActive: true, Status: 'Pending'
         };
-        this.userErrors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', Status: '', IsActive: '' };
+
+        this.dobDate = null;
+
+        this.userErrors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', Status: '', IsActive: '' };
         this.registerUserDialogVisible = true;
     }
 
@@ -747,6 +784,38 @@ export class DashboardComponent {
         }
 
         this.validateUserInput('RoleId');
+
+        if(this.currentUser.RoleId !=null && this.currentUser.RoleId <= this.departmentEligibleForRoleIdAbove)
+        {
+            this.currentUser.DepartmentId = 0;
+            this.currentUser.DepartmentName = "";
+        }
+        this.validateUserInput('DepartmentId');
+    }
+
+    onDepartmentChange(): void{
+        const department = this.departmentOptions.find(l => l.value === this.currentUser.DepartmentId);
+        if (department) {
+            this.currentUser.DepartmentName = department.label;
+        }
+
+        this.validateUserInput('DepartmentId');
+    }
+
+     onDOBChange(): void {
+        if (this.dobDate) {
+            // this.dobDate.setHours(0, 0, 0, 0);
+             // Reverse the 5 hour 30 min shift (in minutes: 5 * 60 + 30 = 330)
+            const userTimezoneOffset = this.dobDate.getTimezoneOffset(); // Will be -330 for India    
+            const correctedDate = new Date(this.dobDate.getTime() - (userTimezoneOffset * 60 * 1000));    
+
+            this.currentUser.DOB = correctedDate.toISOString().split('T')[0] + 'T00:00:00.000Z';
+        }
+        else {
+            this.currentUser.DOB = null;
+        }
+
+        this.validateUserInput('DOB');
     }
 
     validateUserInput(key: string): boolean {
@@ -806,7 +875,16 @@ export class DashboardComponent {
                     this.userErrors.DOB = '';
                 }
                 break;
-
+                
+            case 'DepartmentId':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove) && !(this.currentUser.DepartmentId != null && this.currentUser.DepartmentId > 0)) {
+                    this.userErrors.DepartmentId = 'Please select Department.';
+                    isValid = false;
+                } else {
+                    this.userErrors.DepartmentId = '';
+                }
+                break;
+            
             case 'Status':
                 if (this.currentUser.Status === null) {
                     this.userErrors.Status = 'Access Request Status is required.';
@@ -839,10 +917,11 @@ export class DashboardComponent {
         const isMailIdValid = this.validateUserInput('MailId');
         const isMobileNoValid = this.validateUserInput('MobileNo');
         const isDOBValid = this.validateUserInput('DOB');
+        const isDepartmentIdValid = this.validateUserInput('DepartmentId');
         const isAccessRequestValid = this.validateUserInput('Status');
         const isStatusValid = this.validateUserInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid &&
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid &&
             isAccessRequestValid && isStatusValid;
     }
 
@@ -852,29 +931,28 @@ export class DashboardComponent {
         }
 
         const payload = this.currentUser;
-        this.userService.updateUserDetails(payload).subscribe({
+        this.userService.addUserDetails(payload).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'Register User - Failed',
-                        detail: res ? res.Message : 'Failed to register User. Please try again.'
+                        summary: 'Manage User - Failed',
+                        detail: res ? res.Message : 'Failed to add new User. Please try again.'
                     });
                 } else {
                     this.messageService.add({
                         severity: 'success',
-                        summary: 'Register User - Success',
-                        detail: 'User registered successfully.'
+                        summary: 'Manage User - Success',
+                        detail: 'User added successfully.'
                     });
-                }
-
-                this.registerUserDialogVisible = false;
+                    this.registerUserDialogVisible = false;
+                }                
             },
             error: () => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Register User - Failed',
-                    detail: 'Failed to register User. Please try again.'
+                    summary: 'Manage User - Failed',
+                    detail: 'Failed to add new User. Please try again.'
                 });
             }
         });
