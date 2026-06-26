@@ -277,11 +277,20 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="dob">
                 DOB<sup>*</sup>
             </label>
-            <p-datepicker [(ngModel)]="currentUser.DOB" [ngModelOptions]="{standalone: true}" appendTo="body"
-                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
-                [minDate]="userMinDate" [maxDate]="userMaxDate" placeholder="Select DOB" styleClass="w-100"
+            <p-datepicker [(ngModel)]="dobDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [defaultDate]="calendarFocusDate"
+                [minDate]="userMinDate" [maxDate]="userMaxDate" placeholder="Select DOB" styleClass="w-100" (ngModelChange)="onDOBChange()"
                 inputStyleClass="w-100" />
             <div *ngIf="userErrors.DOB" class="text-danger mt-1 small">{{ userErrors.DOB }}</div>
+        </div>
+        <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove">
+            <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                Department<sup>*</sup>
+            </label>
+            <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" [editable]="true"
+                [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
+                styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
+            <div *ngIf="userErrors.DepartmentId" class="text-danger mt-1 small">{{ userErrors.DepartmentId }}</div>
         </div>
         <!-- <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="status">
