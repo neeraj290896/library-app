@@ -1,4 +1,4 @@
-<p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body"
+<p-dialog [header]="header" [(visible)]="bcDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body" (onShow)="setFocus()"
     (onHide)="hideDialog()">
     <ng-template pTemplate="header">
         <span *ngIf="selectedBook.BookCirculationId  == null || selectedBook.BookCirculationId  == 0">{{header}}</span>
@@ -13,10 +13,10 @@
         <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="book">
                 Book Name<sup>*</sup>
-            </label>
-            <p-select id="book" [disabled]="!isIssueNewBook || isViewOnly" [(ngModel)]="selectedBook.BookId"
-                [ngModelOptions]="{standalone: true}" [options]="bookOptions" optionLabel="label" optionValue="value"
-                placeholder="Select Book" [editable]="true" styleClass="w-100" appendTo="body"
+            </label>            
+            <p-select #bookDropdown id="book" [disabled]="!isIssueNewBook || isViewOnly" [(ngModel)]="selectedBook.BookId" (keydown)="onBookKeydown($event)" [showClear]="true"
+                [ngModelOptions]="{standalone: true}" [options]="bookOptions" optionLabel="label" optionValue="value" 
+                placeholder="Select Book" [editable]="true" styleClass="w-100" appendTo="body" [filter]="true"
                 (ngModelChange)="onBookChange()" />
             <div *ngIf="errors.BookName" class="text-danger mt-1 small">{{ errors.BookName }}</div>
         </div>
@@ -24,9 +24,11 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="borrowerName">
                 Borrower Name<sup>*</sup>
             </label>
-            <p-select id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
-                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"
-                [disabled]="!isIssueNewBook || isViewOnly" [editable]="true" styleClass="w-100" appendTo="body"
+            <!-- <input #userBarcodeInput type="text" (keydown.enter)="onUserBarcodeScanned(userBarcodeInput.value); userBarcodeInput.value=''" style="position: absolute; opacity: 0; pointer-events: none;"> -->
+            <!-- (keydown.enter)="onUserBarcodeScanned($any($event))" -->
+            <p-select #borrwerDropdown id="borrowerName" [(ngModel)]="selectedBook.BorrowerId" [ngModelOptions]="{standalone: true}"
+                [options]="userOptions" optionLabel="label" optionValue="value" placeholder="Select Borrower"  (keydown)="onUserKeydown($event)"  [showClear]="true"
+                [disabled]="!isIssueNewBook || isViewOnly" [editable]="true" styleClass="w-100" appendTo="body" [filter] = "true"
                 (ngModelChange)="onBorrowerChange()" />
             <div *ngIf="errors.BorrowerName" class="text-danger mt-1 small">{{ errors.BorrowerName }}</div>
         </div>

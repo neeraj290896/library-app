@@ -219,6 +219,7 @@ export class DashboardComponent {
     public departments: DepartmentDetails[] = [];
     calendarFocusDate!: Date; 
     public dobDate: Date | null = null;
+   
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -853,7 +854,13 @@ export class DashboardComponent {
                 if (!this.currentUser.MailId?.trim()) {
                     this.userErrors.MailId = 'MailId is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this.currentUser.MailId?.trim())))
+                {
+                    this.userErrors.MailId = 'Valid MailId is required.';
+                    isValid = false;
+                }
+                else {
                     this.userErrors.MailId = '';
                 }
                 break;
@@ -861,6 +868,10 @@ export class DashboardComponent {
             case 'MobileNo':
                 if (!this.currentUser.MobileNo?.trim()) {
                     this.userErrors.MobileNo = 'MobileNo is required.';
+                    isValid = false;
+                }
+                else if(!(/^[6-9]\d{9}$/.test(this.currentUser.MobileNo?.trim()))){
+                    this.userErrors.MobileNo = 'Valid MobileNo is required.';
                     isValid = false;
                 } else {
                     this.userErrors.MobileNo = '';
@@ -966,5 +977,14 @@ export class DashboardComponent {
 
     openReturnBooksDialog(): void {
         this.issuedBooksDialogVisible = true;
+    }
+
+    validateNumberInput(event: KeyboardEvent, allowedKeys : string[]): void {    
+        const isNumber = event.key >= '0' && event.key <= '9';
+
+        // If it's not a number and not in our allowed keys list, block the input
+        if (!isNumber && !allowedKeys.includes(event.key)) {
+            event.preventDefault();
+        }
     }
 }
