@@ -187,7 +187,7 @@ export class BooksManageBooksComponent implements OnInit {
     public printBarcodeDialogVisible: boolean = false;
     public isViewOnly: boolean = false;
 
-    public loggedInUserDetails: UserDetails = {};
+    public loggedInUserDetails: UserDetails | null = null;
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
     public bcDialogVisible: boolean = false;
@@ -1596,8 +1596,8 @@ export class BooksManageBooksComponent implements OnInit {
     checkOutBook(_book: BookDetails): void {
         this.bc = {
             BookCirculationId: 0, BookId: _book.BookId, BookName: _book.BookName, BorrowerId: 0, BorrowerName: '',
-            IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
-            IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+            IssuedByUserId: this.loggedInUserDetails?.UserId, IssuedByUserName: this.loggedInUserDetails?.FullName,
+            IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails?.MailId, OverDueId: 0, FineAmount: 0.0,
             OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
             ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
             UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0

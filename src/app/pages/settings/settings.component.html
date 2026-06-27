@@ -76,7 +76,7 @@
                             notifications</label>
                     </div>
                     <div class="d-flex gap-2 align-items-center col-md-6"
-                        *ngIf="(loggedInUserDetails.RoleId ?? 0) == 1">
+                        *ngIf="(loggedInUserDetails?.RoleId ?? 0) == 1">
                         <p-checkbox inputId="mobile-notif" [binary]="true" [disabled] = "!enableAplnSettingsAccess"
                             [(ngModel)]="settingDetails.EnableMobileNotification"
                             [ngModelOptions]="{standalone: true}"></p-checkbox>
@@ -121,7 +121,7 @@
                             [editable]="true" [options]="roleOptions" optionLabel="label" optionValue="value"
                             placeholder="Select Role" styleClass="w-100" appendTo="body"
                             (ngModelChange)="onRoleChange()"
-                            [disabled]="loggedInUserDetails.RoleId !== 1 && loggedInUserDetails.RoleId !== 2" />
+                            [disabled]="loggedInUserDetails?.RoleId !== 1 && loggedInUserDetails?.RoleId !== 2" />
                         <div *ngIf="userErrors.RoleId" class="text-danger mt-1 small">{{ userErrors.RoleId }}</div>
                     </div>
                     <div class="col-md-6 mb-3">
@@ -141,7 +141,7 @@
                         <input id="mailId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MailId"
                             [ngModelOptions]="{standalone: true}" placeholder="Enter MailId"
                             (ngModelChange)="validateUserInput('MailId')"
-                            [disabled]="loggedInUserDetails.RoleId !== 1 && loggedInUserDetails.RoleId !== 2" />
+                            [disabled]="loggedInUserDetails?.RoleId !== 1 && loggedInUserDetails?.RoleId !== 2" />
                         <div *ngIf="userErrors.MailId" class="text-danger mt-1 small">{{ userErrors.MailId }}</div>
                     </div>
                     <div class="col-md-6">
@@ -152,7 +152,7 @@
                             (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                             [(ngModel)]="currentUser.MobileNo" [ngModelOptions]="{standalone: true}"
                             placeholder="Enter MobileNo" (ngModelChange)="validateUserInput('MobileNo')"
-                            [disabled]="loggedInUserDetails.RoleId !== 1 && loggedInUserDetails.RoleId !== 2" />
+                            [disabled]="loggedInUserDetails?.RoleId !== 1 && loggedInUserDetails?.RoleId !== 2" />
                         <div *ngIf="userErrors.MobileNo" class="text-danger mt-1 small">{{ userErrors.MobileNo }}</div>
                     </div>
                     <div class="col-md-6">

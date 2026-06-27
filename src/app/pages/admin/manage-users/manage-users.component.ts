@@ -161,7 +161,7 @@ export class ManageUsersComponent {
     public checkInDialogVisible: boolean = false;
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
-    public loggedInUserDetails: UserDetails = {};
+    public loggedInUserDetails: UserDetails | null = null;
     public todayDate: string | undefined;
     calendarFocusDate!: Date; 
     public departmentEligibleForRoleIdAbove: number  = 1;
@@ -661,7 +661,7 @@ export class ManageUsersComponent {
         };
 
         const rolesSheet = workbook.addWorksheet('RoleList');
-        this.roles.filter(x => x.IsActive == true && x.RoleId >= (this.loggedInUserDetails.RoleId || 0)).forEach((role, idx) => {
+        this.roles.filter(x => x.IsActive == true && x.RoleId >= (this.loggedInUserDetails?.RoleId || 0)).forEach((role, idx) => {
             rolesSheet.getCell(idx + 1, 1).value = role.RoleName;
         });
         rolesSheet.state = 'hidden';
@@ -1260,8 +1260,8 @@ export class ManageUsersComponent {
     checkOutBook(_user: UserDetails): void {
         this.bc = {
             BookCirculationId: 0, BookId: 0, BookName: '', BorrowerId: _user.UserId, BorrowerName: _user.FullName,
-            IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
-            IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+            IssuedByUserId: this.loggedInUserDetails?.UserId, IssuedByUserName: this.loggedInUserDetails?.FullName,
+            IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails?.MailId, OverDueId: 0, FineAmount: 0.0,
             OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
             ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
             UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0

@@ -26,7 +26,7 @@ export class LayoutComponent {
     public userRole = this.authService.userRole;
     public userName = this.authService.userName;
     public sidebarCollapsed = signal(true);
-    public loggedInUserDetails: UserDetails = {};
+    public loggedInUserDetails: UserDetails | null = null;
     // public _wishlistCount : number = 0;
     public wlDetails : WishlistDetails[] = [];
 
