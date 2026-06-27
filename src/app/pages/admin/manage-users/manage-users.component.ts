@@ -1,4 +1,4 @@
-import { Component, inject, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Table, TableModule } from 'primeng/table';
@@ -8,7 +8,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { BookCirculationDetails, DepartmentDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
+import { BookCirculationDetails, BookDetails, DepartmentDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
 import { MessageService } from 'primeng/api';
 import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
@@ -27,6 +27,7 @@ import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-book
 import { environment } from '../../../../environments/environment';
 import { ManageWishlistComponent } from '@app/pages/books/manage-wishlist/manage-wishlist.component';
 import { DepartmentService } from '@app/shared/services/department.service';
+import { BookService } from '@app/shared/services/book.service';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -42,9 +43,17 @@ type ImportUserDetails = UserDetails & {
 })
 export class ManageUsersComponent {
     @Input() public searchTerm: string = '';
+    @ViewChild('bookInput') set userInputElement(content: ElementRef<HTMLInputElement>) {
+    if (content && content.nativeElement) {
+        setTimeout(() => {
+            content.nativeElement.focus();
+        }, 150); // Slightly longer delay to bypass heavy framework rendering
+        }
+    }
 
     private messageService = inject(MessageService);
     private userService = inject(UserService);
+    private bookService = inject(BookService);
     private roleService = inject(RoleService);
     private _bcService = inject(BookCirculationService);
     public _authService = inject(AuthService);
@@ -165,6 +174,9 @@ export class ManageUsersComponent {
     public todayDate: string | undefined;
     calendarFocusDate!: Date; 
     public departmentEligibleForRoleIdAbove: number  = 1;
+    public isBarcodeSearch : boolean = false;
+    public searchBookTerm: string = '';
+    public lstBookDetails: BookDetails[] = [];
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -193,6 +205,7 @@ export class ManageUsersComponent {
         this.loadRoleDetails();
         this.loadDepartmentDetails();
         this.loadUserDetails();
+        this.loadBooks();
     }
 
     loadRoleDetails(): void {
@@ -209,12 +222,30 @@ export class ManageUsersComponent {
         });
     }
 
+    loadBooks(): void {
+            this.bookService.getAllBookDetails().subscribe({
+                next: (data: BookDetails[]) => {
+                    this.lstBookDetails = data;
+                },
+                error: (err) => {
+                    console.error('Error loading books:', err);
+                }
+            });
+    }
+
     loadUserDetails(): void {
         if (this.searchTerm) {
             this.userService.searchUserDetails(this.searchTerm).subscribe({
                 next: (data: UserDetails[]) => {
                     this.users = data;
                     this.initializeFilterLists();
+
+                    if(this.users !=null && this.users.length == 1 )
+                    {
+                        this.isBarcodeSearch = true;
+                        this.currentUser = {...this.users[0]};                        
+                    }
+
                 },
                 error: (err) => {
                     console.error('Error loading users:', err);
@@ -1298,13 +1329,59 @@ export class ManageUsersComponent {
     validateNumberInput(event: KeyboardEvent, allowedKeys : string[]): void {    
     const isNumber = event.key >= '0' && event.key <= '9';
 
-    // If it's not a number and not in our allowed keys list, block the input
-    if (!isNumber && !allowedKeys.includes(event.key)) {
-      event.preventDefault();
-    }
+        // If it's not a number and not in our allowed keys list, block the input
+        if (!isNumber && !allowedKeys.includes(event.key)) {
+        event.preventDefault();
+        }
     }
 
     printTable(): void {
     window.print();
     }
+
+    onBookSearch():void{
+        
+        let searchBook = null;
+
+        if (this.searchBookTerm.includes(environment.booksBarcodeSyntax)) {
+            searchBook = this.lstBookDetails.find(x => x.BookBarcode === this.searchBookTerm);
+        }        
+        else{
+            searchBook = this.lstBookDetails.find(x => x.BookName === this.searchBookTerm.trim());
+        }
+
+        if(searchBook != null && searchBook.BookId != null &&  searchBook.BookId > 0)
+        {
+            if(searchBook.BookName !=null && searchBook.BookName !='')
+            {
+                this.searchBookTerm = searchBook.BookName;
+
+                if(searchBook.Status == "Issued")
+                {
+                    this.checkInBook(this.currentUser);
+                }
+                else
+                {
+                    this.bc = {
+                        BookCirculationId: 0, BookId: searchBook.BookId, BookName: searchBook.BookName, BorrowerId: this.currentUser.UserId, BorrowerName: this.currentUser.FullName,
+                        IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
+                        IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+                        OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
+                        ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
+                        UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0
+                    };
+
+                    this.type = "CheckOut";
+                    this.bcDialogVisible = true;
+                }
+            }
+            else
+            {
+                this.searchBookTerm = '';
+            }
+            
+        }
+        
+    }
+
 }

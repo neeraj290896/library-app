@@ -1,5 +1,12 @@
 $color-primary: #22c55e;
 
+.search-icon {
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+}
+
 ::ng-deep {
     .barcode-label {
         font-family: 'Courier New', Courier, monospace;

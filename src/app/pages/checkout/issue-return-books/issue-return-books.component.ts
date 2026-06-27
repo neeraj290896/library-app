@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, inject, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BookCirculationDetails, BookDetails, TransactionTypeDetails, UserDetails } from '@app/shared/models/api.models';
 import { AuthService } from '@app/shared/services/auth.service';
@@ -13,13 +13,15 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { Select, SelectModule } from 'primeng/select';
+import { environment } from '../../../../environments/environment';
+import { AutoFocusModule } from 'primeng/autofocus';
 
 @Component({
     selector: 'app-issue-return-books',
     imports: [
         CommonModule, ButtonModule, CheckboxModule, FormsModule,
-        DialogModule, InputTextModule, SelectModule,
+        DialogModule, InputTextModule, SelectModule, AutoFocusModule,
         DatePickerModule
     ],
     templateUrl: './issue-return-books.component.html',
@@ -33,6 +35,9 @@ export class IssueReturnBooksComponent implements OnChanges {
     @Input() public selectedBorrower: UserDetails | null = null;
     @Output() private onSuccess: EventEmitter<void> = new EventEmitter<void>();
     @Output() private onDialogClose: EventEmitter<void> = new EventEmitter<void>();
+
+    @ViewChild('borrwerDropdown', { read: ElementRef }) borrowerDropdown!: ElementRef;
+    @ViewChild('bookDropdown', { read: ElementRef }) bookDropdown!: ElementRef;
 
     private messageService = inject(MessageService);
     private bcService = inject(BookCirculationService);
@@ -92,6 +97,10 @@ export class IssueReturnBooksComponent implements OnChanges {
             PaymentTypeId: ''
         };
 
+    
+    private barcodeBuffer: string = '';
+    private lastKeyTime: number = Date.now();
+
     constructor() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -112,6 +121,47 @@ export class IssueReturnBooksComponent implements OnChanges {
             this.openDialog();
         }
     }
+
+//     ngAfterViewInit() {
+//     this.setFocus();
+//   }
+
+  setFocus() {
+    // console.log('this.bc?.BookId :', this.bc?.BookId);
+    if(this.isViewOnly == false)
+    {
+        if(this.bc?.BookId !=null && this.bc?.BookId >0)
+        {
+            // console.log('borrwerDropdown.Focus()');        
+            // Small timeout guarantees the DOM is fully painted and active
+            setTimeout(() => {
+                // Find the editable input text box inside PrimeNG's component structure
+                const inputElement = this.borrowerDropdown.nativeElement.querySelector('.p-select-label-input, input');
+                
+                if (inputElement) {
+                inputElement.focus();
+                inputElement.select(); // Optional: selects existing text for easy overwrite scanning
+                }
+            }, 50);
+
+        }
+        else{
+            // console.log('bookDropdown.Focus()');
+        
+            setTimeout(() => {
+                    // Find the editable input text box inside PrimeNG's component structure
+                    const inputElement = this.bookDropdown.nativeElement.querySelector('.p-select-label-input, input');
+                    
+                    if (inputElement) {
+                    inputElement.focus();
+                    inputElement.select(); // Optional: selects existing text for easy overwrite scanning
+                    }
+                }, 50);
+
+        }
+    }
+    
+  }
 
     private openDialog(): void {
         this.isIssueNewBook = false;
@@ -214,6 +264,7 @@ export class IssueReturnBooksComponent implements OnChanges {
         };
 
         this.bcDialogVisible = true;
+        // this.setFocus();
     }
 
     bindOnlyActiveDetails(): void {
@@ -611,5 +662,160 @@ export class IssueReturnBooksComponent implements OnChanges {
 
     hideDialog(): void {
         this.onDialogClose.emit();
+    }
+
+    onUserKeydown(event: Event): void {
+        const keyboardEvent = event as KeyboardEvent;
+        const currentTime = Date.now();
+        
+        // 1. Completely ignore modifier keys so they don't corrupt the string buffer
+        if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(keyboardEvent.key)) {
+            return;
+        }
+
+        // 2. Always permit functional layout navigation keys
+        if (['Backspace', 'Tab', 'ArrowDown', 'ArrowUp'].includes(keyboardEvent.key)) {
+            return;
+        }
+
+        // 3. Process the complete barcode when Enter is fired
+        if (keyboardEvent.key === 'Enter') {
+            keyboardEvent.preventDefault(); 
+            this.processScannedUserBarcode(keyboardEvent);
+            return;
+        }
+
+        // 4. Measure time between keys to distinguish scanner vs human
+        const timeDiff = currentTime - this.lastKeyTime;
+        this.lastKeyTime = currentTime;
+
+        // Scanners drop keys within 0-40ms of each other.
+        if (timeDiff > 50) {
+            // If the buffer is empty, this is the FIRST valid character of the scan stream.
+            if (this.barcodeBuffer.length === 0) {
+                this.barcodeBuffer += keyboardEvent.key;
+            } else {
+                // Human is typing subsequent characters slowly. Block it.
+                keyboardEvent.preventDefault();
+                return;
+            }
+        } else {
+            // High-speed data stream detected (Scanner). Collect the character.
+            this.barcodeBuffer += keyboardEvent.key;
+        }
+
+        // Prevent characters from visibly rendering inside the input field until validated
+        keyboardEvent.preventDefault();
+    }
+
+// 3. New separate processing logic to handle the clean buffer
+    private processScannedUserBarcode(event: KeyboardEvent): void {
+        const target = event.target as HTMLInputElement;
+        const searchTerm = this.barcodeBuffer.trim();
+        
+        console.log('Collected Barcode Buffer:', searchTerm);
+
+        // Reset buffer instantly for the next scan cycle
+        this.barcodeBuffer = '';
+
+        if (!searchTerm) return;
+
+        if (searchTerm.includes(environment.usersBarcodeSyntax)) {
+            let matchedUser = this.lstUserDetails.filter(x => x.UserBarcode === searchTerm);
+
+            if (matchedUser && matchedUser.length > 0) {
+                this.selectedBook.BorrowerId = matchedUser[0].UserId;
+                
+                // Sync the visible PrimeNG UI input display text with the matched label
+                if (target) {
+                    target.value = matchedUser[0].FullName || ''; 
+                }
+                
+                this.onBorrowerChange();
+            } else {
+                console.warn('User not found for barcode:', searchTerm);
+                if (target) target.value = '';
+            }
+        } else {
+            // If it doesn't match your barcode syntax rules, clear the field
+            if (target) target.value = '';
+        }
+    }
+
+    onBookKeydown(event: Event): void {
+        const keyboardEvent = event as KeyboardEvent;
+        const currentTime = Date.now();
+        
+        // 1. Completely ignore modifier keys so they don't corrupt the string buffer
+        if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock'].includes(keyboardEvent.key)) {
+            return;
+        }
+
+        // 2. Always permit functional layout navigation keys
+        if (['Backspace', 'Tab', 'ArrowDown', 'ArrowUp'].includes(keyboardEvent.key)) {
+            return;
+        }
+
+        // 3. Process the complete barcode when Enter is fired
+        if (keyboardEvent.key === 'Enter') {
+            keyboardEvent.preventDefault(); 
+            this.processScannedBookBarcode(keyboardEvent);
+            return;
+        }
+
+        // 4. Measure time between keys to distinguish scanner vs human
+        const timeDiff = currentTime - this.lastKeyTime;
+        this.lastKeyTime = currentTime;
+
+        // Scanners drop keys within 0-40ms of each other.
+        if (timeDiff > 50) {
+            // If the buffer is empty, this is the FIRST valid character of the scan stream.
+            if (this.barcodeBuffer.length === 0) {
+                this.barcodeBuffer += keyboardEvent.key;
+            } else {
+                // Human is typing subsequent characters slowly. Block it.
+                keyboardEvent.preventDefault();
+                return;
+            }
+        } else {
+            // High-speed data stream detected (Scanner). Collect the character.
+            this.barcodeBuffer += keyboardEvent.key;
+        }
+
+        // Prevent characters from visibly rendering inside the input field until validated
+        keyboardEvent.preventDefault();
+    }
+
+    private processScannedBookBarcode(event: KeyboardEvent): void {
+        const target = event.target as HTMLInputElement;
+        const searchTerm = this.barcodeBuffer.trim();
+        
+        console.log('Collected Barcode Buffer:', searchTerm);
+
+        // Reset buffer instantly for the next scan cycle
+        this.barcodeBuffer = '';
+
+        if (!searchTerm) return;
+
+        if (searchTerm.includes(environment.booksBarcodeSyntax)) {
+            let matchedBook = this.lstBookDetails.filter(x => x.BookBarcode === searchTerm);
+
+            if (matchedBook && matchedBook.length > 0) {
+                this.selectedBook.BookId = matchedBook[0].BookId;
+                
+                // Sync the visible PrimeNG UI input display text with the matched label
+                if (target) {
+                    target.value = matchedBook[0].BookName || ''; 
+                }
+                
+                this.onBookChange();
+            } else {
+                console.warn('Book not found for barcode:', searchTerm);
+                if (target) target.value = '';
+            }
+        } else {
+            // If it doesn't match your barcode syntax rules, clear the field
+            if (target) target.value = '';
+        }
     }
 }

@@ -240,7 +240,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="role">
                 RoleName<sup>*</sup>
             </label>
-            <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"
+            <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"  [editable]="true"
                 [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Select Role"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onRoleChange()" />
             <div *ngIf="userErrors.RoleId" class="text-danger mt-1 small">{{ userErrors.RoleId }}</div>
@@ -249,7 +249,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="gender">
                 Gender<sup>*</sup>
             </label>
-            <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
+            <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}" [editable]="true"
                 [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
                 styleClass="w-100" appendTo="body" />
             <!-- (ngModelChange)="onGenderChange()" -->
@@ -269,7 +269,7 @@
                 MobileNo<sup>*</sup>
             </label>
             <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
-                [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                 (ngModelChange)="validateUserInput('MobileNo')" />
             <div *ngIf="userErrors.MobileNo" class="text-danger mt-1 small">{{ userErrors.MobileNo }}</div>
         </div>

@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { Table, TableModule } from 'primeng/table';
@@ -32,6 +32,8 @@ import { AuthService } from '@app/shared/services/auth.service';
 import { IssueReturnBooksComponent } from '@app/pages/checkout/issue-return-books/issue-return-books.component';
 import { ManageWishlistComponent } from '../manage-wishlist/manage-wishlist.component';
 import { AddWishlistComponent } from '../add-wishlist/add-wishlist.component';
+import { environment } from '../../../../environments/environment';
+import { UserService } from '@app/shared/services/user.service';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -51,6 +53,13 @@ type ImportBookDetails = BookDetails & {
 })
 export class BooksManageBooksComponent implements OnInit {
     @Input() public searchTerm: string = '';
+    @ViewChild('userInput') set userInputElement(content: ElementRef<HTMLInputElement>) {
+    if (content && content.nativeElement) {
+        setTimeout(() => {
+            content.nativeElement.focus();
+        }, 150); // Slightly longer delay to bypass heavy framework rendering
+        }
+    }
 
     private messageService = inject(MessageService);
     private bookService = inject(BookService);
@@ -63,6 +72,7 @@ export class BooksManageBooksComponent implements OnInit {
     private rackService = inject(RackService);
     private _bcService = inject(BookCirculationService);
     public _authService = inject(AuthService);
+    public userService = inject(UserService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
@@ -193,6 +203,9 @@ export class BooksManageBooksComponent implements OnInit {
     public bcDialogVisible: boolean = false;
     public todayDate: string | undefined;
     public addWishlistDialogVisible: boolean = false;
+    public isBarcodeSearch : boolean = false;
+    public searchUserTerm: string = '';
+    public lstUserDetails: UserDetails[] = [];
 
     ngOnInit(): void {
         const today = new Date();
@@ -207,14 +220,40 @@ export class BooksManageBooksComponent implements OnInit {
         this.loadBuildings();
         this.loadFloors();
         this.loadRacks();
+        this.loadUserDetails();
     }
 
+    // private focusUserInput(): void {
+    //     if (this.userInput && this.userInput.nativeElement) {
+    //     // Wrap in a microtask timeout to clear the browser's execution stack 
+    //     // and avoid ExpressionChangedAfterItHasBeenCheckedError
+    //     setTimeout(() => {
+    //         this.userInput.nativeElement.focus();
+    //     }, 100);
+    //     }
+    // }
+
+    // ngAfterViewInit(): void {
+    //     console.log('this.isBarcodeSearch :', this.isBarcodeSearch);
+    //     // if(this.isBarcodeSearch)
+    //         this.focusUserInput();
+    // }
+
     loadBooks(updateCurrentBook: boolean = false): void {
+
+        // this.isBarcodeSearch = false;
+
         if (this.searchTerm) {
             this.bookService.searchBookDetails(this.searchTerm).subscribe({
                 next: (data: BookDetails[]) => {
                     this.books = data;
                     this.initializeFilterLists();
+
+                    if(this.books !=null && this.books.length ==1 )
+                    {
+                        this.isBarcodeSearch = true;
+                        this.currentBook = {...this.books[0]};                        
+                    }
 
                     if (updateCurrentBook) {
                         if (this.currentBook.BookId) {
@@ -1635,5 +1674,72 @@ export class BooksManageBooksComponent implements OnInit {
 
     addToWishlist(): void{
         this.addWishlistDialogVisible = true;
+    }
+
+    loadUserDetails(): void {
+        this.userService.getAllUserDetails().subscribe({
+            next: (data: UserDetails[]) => {
+                this.lstUserDetails = data;
+                
+            },
+            error: (err) => {
+                console.error('Error loading users:', err);
+            }
+        });
+    }
+
+    onUserSearch():void{
+        const isMobile = /^[6-9]\d{9}$/.test(this.searchUserTerm);
+        const isEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this.searchUserTerm);
+
+         let searchUser = null;
+
+        if (this.searchUserTerm.includes(environment.usersBarcodeSyntax)) {
+            searchUser = this.lstUserDetails.find(x => x.UserBarcode === this.searchUserTerm);
+        }
+        else if(isMobile)
+        {
+            searchUser = this.lstUserDetails.find(x => x.MobileNo === this.searchUserTerm);
+        }
+        else if(isEmail)
+        {
+            searchUser = this.lstUserDetails.find(x => x.MailId === this.searchUserTerm);
+        }
+        else{
+            searchUser = this.lstUserDetails.find(x => x.FullName === this.searchUserTerm.trim());
+        }
+
+        if(searchUser != null && searchUser.UserId != null &&  searchUser.UserId > 0)
+        {
+            if(searchUser.FullName !=null && searchUser.FullName !='')
+            {
+                this.searchUserTerm = searchUser.FullName;
+            }
+            else
+            {
+                this.searchUserTerm = '';
+            }
+            
+
+            if(this.currentBook !=null && this.currentBook.Status !=null && this.currentBook.Status == "Available")
+            {
+                this.bc = {
+                    BookCirculationId: 0, BookId: this.currentBook.BookId, BookName: this.currentBook.BookName, BorrowerId: searchUser.UserId, BorrowerName: searchUser.FullName,
+                    IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
+                    IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+                    OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
+                    ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
+                    UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0
+                };
+
+                this.type = "CheckOut";
+                this.bcDialogVisible = true;
+            }
+            else if(this.currentBook !=null && this.currentBook.Status !=null && this.currentBook.Status == "Issued")
+            {
+                this.checkInBook(this.currentBook);
+            }
+        }
+        
     }
 }
