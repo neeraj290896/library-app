@@ -41,7 +41,7 @@ export class ManageWishlistComponent {
   public selectedStatusList: string[] = [];
   public wlDetails: WishlistDetails[] = [];
   public filteredWlDetails: WishlistDetails[] = [];
-  public loggedInUserDetails: UserDetails = {};
+  public loggedInUserDetails: UserDetails | null = null;
   public searchBookTerm = '';
   public searchUserTerm = '';
   public addWishlistDialogVisible : boolean = false;

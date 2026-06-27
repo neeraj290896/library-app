@@ -23,12 +23,9 @@ import { UserDetails } from '@app/shared/models/api.models';
 export class AdminComponent {
     public activeTab: number = 0;
     private _authService = inject(AuthService);
-    public loggedInUserDetails: UserDetails = {};
+    public loggedInUserDetails: UserDetails | null = null;
 
     ngOnInit(): void {
-
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
     }
-
-    
 }

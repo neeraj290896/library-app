@@ -53,7 +53,7 @@ export class ManageIssuedBooksComponent {
   public todayDate :string | undefined ;
   bcDetailsCount = 0;
   public header: string = '';
-  public loggedInUserDetails: UserDetails = {};
+  public loggedInUserDetails: UserDetails | null = null;
   public isReturnBook: boolean = true;
   public isOverDue: boolean = false;
   public lstUserDetails: UserDetails[] = [];
@@ -337,8 +337,8 @@ export class ManageIssuedBooksComponent {
         else
         {
             this.bc = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId:0, BorrowerName : '', 
-                        IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName :this.loggedInUserDetails.FullName, 
-                        IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0, 
+                        IssuedByUserId: this.loggedInUserDetails?.UserId, IssuedByUserName :this.loggedInUserDetails?.FullName, 
+                        IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails?.MailId, OverDueId: 0, FineAmount: 0.0, 
                         OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
                         ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 
                         UpdatedByUserName :'', UpdatedDate: null, PaidAmount:0, PaymentTypeId:0 };            

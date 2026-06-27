@@ -12,27 +12,29 @@ export class AuthService {
     readonly organizationDetails = signal<OrganizationDetails | null>(null);
     readonly settingsDetails = signal<SettingDetails | null>(null);
 
-    readonly userDataTemp = {
-        "UserId": 1,
-        "RoleId": 2,
-        "RoleName": "Super Admin",
-        "FullName": "Saravana Kumar M",
-        "Gender": "M",
-        "MobileNo": "8892632453",
-        "DOB": null,
-        "MailId": "m.saravanakumar2703@gmail.com",
-        "ProfilePhoto": "",
-        "Status": "Approved",
-        "CreatedByUserId": null,
-        "CreatedByUserName": null,
-        "LastLogInTime": "2026-03-21T15:20:06.84",
-        "UserBarcode": "LIB_U_001",
-        "IsActive": true
-    };
+    readonly userDataTemp = null;
+    // readonly userDataTemp = {
+    //     "UserId": 1,
+    //     "RoleId": 2,
+    //     "RoleName": "Super Admin",
+    //     "FullName": "Saravana Kumar M",
+    //     "Gender": "M",
+    //     "MobileNo": "8892632453",
+    //     "DOB": null,
+    //     "MailId": "m.saravanakumar2703@gmail.com",
+    //     "ProfilePhoto": "",
+    //     "Status": "Approved",
+    //     "CreatedByUserId": null,
+    //     "CreatedByUserName": null,
+    //     "LastLogInTime": "2026-03-21T15:20:06.84",
+    //     "UserBarcode": "LIB_U_001",
+    //     "IsActive": true
+    // };
 
-    setUserDetails(userDetails: UserDetails): void {
-        this.userRole.set(userDetails.RoleName);
-        this.userName.set(userDetails.FullName);
+    setUserDetails(userDetails: UserDetails | null): void {
+        this.userRole.set(userDetails?.RoleName);
+        this.userName.set(userDetails?.FullName);
+        this.userData.set(userDetails);
     }
 
     setWishlistCount(_cnt: number): void {
@@ -42,7 +44,7 @@ export class AuthService {
     logout(): void {
         this.userRole.set(null);
         this.userName.set(null);
-        // this.userData.set(null);
+        this.userData.set(null);
     }
 
     isAuthenticated(): boolean {
@@ -78,6 +80,7 @@ export class AuthService {
     setOrganizationDetails(_org: OrganizationDetails): void {
         this.organizationDetails.set(_org);
     }
+
     setSettingsDetails(_settings: SettingDetails): void {
         this.settingsDetails.set(_settings);
     }

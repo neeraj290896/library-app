@@ -60,7 +60,7 @@ export class IssueReturnBooksComponent implements OnChanges {
     public isOverDue: boolean = false;
     public isIssueNewBook: boolean = false;
 
-    public loggedInUserDetails: UserDetails = {};
+    public loggedInUserDetails: UserDetails | null = null;
     public lstBookDetails: BookDetails[] = [];
     public lstUserDetails: UserDetails[] = [];
     public bookOptions: { label: string; value: number; }[] = [];
@@ -235,8 +235,8 @@ export class IssueReturnBooksComponent implements OnChanges {
 
             this.selectedBook = {
                 BookCirculationId: 0, BookId: 0, BookName: '',
-                BorrowerId: 0, BorrowerName: '', IssuedByUserId: this.loggedInUserDetails.UserId,
-                IssuedByUserName: this.loggedInUserDetails.FullName, IssuedDate: this.todayDate, OverDueId: 0,
+                BorrowerId: 0, BorrowerName: '', IssuedByUserId: this.loggedInUserDetails?.UserId,
+                IssuedByUserName: this.loggedInUserDetails?.FullName, IssuedDate: this.todayDate, OverDueId: 0,
                 FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0,
                 OverDueStatus: '', SytemUpdatedDate: '',
                 ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: '',
@@ -495,9 +495,9 @@ export class IssueReturnBooksComponent implements OnChanges {
             _issuedBook.ReturnByUserMailId = null;
         }
 
-        _issuedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
-        _issuedBook.UpdatedByUserMailId = this.loggedInUserDetails.MailId;
-        _issuedBook.UpdatedByUserName = this.loggedInUserDetails.FullName;
+        _issuedBook.UpdatedByUserId = this.loggedInUserDetails?.UserId;
+        _issuedBook.UpdatedByUserMailId = this.loggedInUserDetails?.MailId;
+        _issuedBook.UpdatedByUserName = this.loggedInUserDetails?.FullName;
 
         this.bcService.updateBookCirculation(_issuedBook).subscribe({
             next: (res: any) => {
@@ -531,7 +531,7 @@ export class IssueReturnBooksComponent implements OnChanges {
 
     returnBook(): void {
         let _returnedBook = { ...this.selectedBook };
-        _returnedBook.UpdatedByUserId = this.loggedInUserDetails.UserId;
+        _returnedBook.UpdatedByUserId = this.loggedInUserDetails?.UserId;
 
         if (_returnedBook.OverDueId == null || _returnedBook.OverDueId == 0) {
             _returnedBook.PaidAmount = 0;

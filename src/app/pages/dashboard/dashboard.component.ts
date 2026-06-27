@@ -213,7 +213,7 @@ export class DashboardComponent {
     public bc: BookCirculationDetails | null = null;
     public type: string = '';
     public bcDialogVisible: boolean = false;
-    public loggedInUserDetails: UserDetails = {};
+    public loggedInUserDetails: UserDetails | null = null;
     public departmentEligibleForRoleIdAbove: number  = 1;
     public departmentOptions: { label: string; value: number; }[] = [];
     public departments: DepartmentDetails[] = [];
@@ -769,7 +769,7 @@ export class DashboardComponent {
     openRegisterUserDialog(): void {
         this.currentUser = {
             UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', RoleId: 0, RoleName: '', DepartmentId:0, DepartmentName:'',
-            CreatedByUserId: this.loggedInUserDetails.UserId, CreatedByUserName: this.loggedInUserDetails.FullName, IsActive: true, Status: 'Pending'
+            CreatedByUserId: this.loggedInUserDetails?.UserId, CreatedByUserName: this.loggedInUserDetails?.FullName, IsActive: true, Status: 'Pending'
         };
 
         this.dobDate = null;

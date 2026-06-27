@@ -55,7 +55,7 @@ searchBookTerm = '';
   public todayDate :string | undefined ;
   bcDetailsCount = 0;
   public header: string = '';
-  public loggedInUserDetails: UserDetails = {};
+  public loggedInUserDetails: UserDetails | null = null;
   public isReturnBook: boolean = true;
   public isOverDue: boolean = false;
   public lstUserDetails: UserDetails[] = [];

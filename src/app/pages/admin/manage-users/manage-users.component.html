@@ -200,9 +200,9 @@
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckOut"></button>
                         <button pButton icon="pi pi-eye" (click)="viewUser(user)"
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="View User"></button>
-                        <button pButton icon="pi pi-pencil" (click)="editUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails.RoleId ?? 0)"
+                        <button pButton icon="pi pi-pencil" (click)="editUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails?.RoleId ?? 0)"
                             class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Edit User"></button>
-                        <button pButton icon="pi pi-trash" (click)="deleteUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails.RoleId ?? 0)"
+                        <button pButton icon="pi pi-trash" (click)="deleteUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails?.RoleId ?? 0)"
                             class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"
                             pTooltip="Delete User"></button>
                     </div>

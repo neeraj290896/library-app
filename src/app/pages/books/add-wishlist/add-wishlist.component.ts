@@ -33,7 +33,7 @@ export class AddWishlistComponent {
   public selectedWishlist: WishlistDetails = { WishlistId : 0, BookId :0, BookName : '', CreatedByUserId : 0, CreatedByUserName : '', CreatedOn : null, IsNotificationRead : false,
       Status: 'Added', UserId: 0, UserName: ''};
 
-  public loggedInUserDetails: UserDetails = {};
+  public loggedInUserDetails: UserDetails | null = null;
   public addWishlistDialogVisible: boolean = true;
   public lstBookDetails: BookDetails[] = [];
   public lstUserDetails: UserDetails[] = [];
@@ -168,8 +168,8 @@ export class AddWishlistComponent {
             return;
         }
 
-      this.selectedWishlist.CreatedByUserId = this.loggedInUserDetails.UserId ?? 0;
-      this.selectedWishlist.CreatedByUserName = this.loggedInUserDetails.FullName ?? '';
+      this.selectedWishlist.CreatedByUserId = this.loggedInUserDetails?.UserId ?? 0;
+      this.selectedWishlist.CreatedByUserName = this.loggedInUserDetails?.FullName ?? '';
       
       
       this._wishlistService.addWishlistDetails(this.selectedWishlist).subscribe({

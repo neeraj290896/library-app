@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { expiredGuard } from './shared/guards/expired.guard';
+import { authGuard } from './shared/guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -26,7 +27,7 @@ export const routes: Routes = [
     {
         path: '',
         loadComponent: () => import('./pages/layout/layout.component').then(m => m.LayoutComponent),
-        canActivate: [expiredGuard],
+        canActivate: [expiredGuard, authGuard],
         children: [
             {
                 path: 'dashboard',

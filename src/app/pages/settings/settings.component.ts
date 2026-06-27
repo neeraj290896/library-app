@@ -35,7 +35,7 @@ export class SettingsComponent {
     private roleService = inject(RoleService);
     private userService = inject(UserService);
 
-    public loggedInUserDetails: any = {};
+    public loggedInUserDetails: UserDetails | null = null;
     public settingDetails: SettingDetails = {
         SettingId: 0, CutOffDays: 90, FinePercentage: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
         EnableMobileNotification: false, IsActive: true
@@ -90,7 +90,7 @@ export class SettingsComponent {
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
         const today = new Date();
 
-        if(this.loggedInUserDetails.RoleId <=2)
+        if(this.loggedInUserDetails?.RoleId && this.loggedInUserDetails.RoleId <= 2)
         {
             this.enableAplnSettingsAccess = true;
         }
@@ -363,7 +363,7 @@ export class SettingsComponent {
     }
 
     loadUserDetails(): void {
-        this.userService.getLoggedInUserDetails(this.loggedInUserDetails.MobileNo ?? undefined, this.loggedInUserDetails.MailId ?? undefined)
+        this.userService.getLoggedInUserDetails(this.loggedInUserDetails?.MobileNo ?? undefined, this.loggedInUserDetails?.MailId ?? undefined)
             .subscribe({
                 next: (detailsRes: any) => {
                     this._authService.setUserDetails(detailsRes);

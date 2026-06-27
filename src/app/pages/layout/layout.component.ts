@@ -26,7 +26,7 @@ export class LayoutComponent {
     public userRole = this.authService.userRole;
     public userName = this.authService.userName;
     public sidebarCollapsed = signal(true);
-    public loggedInUserDetails: UserDetails = {};
+    public loggedInUserDetails: UserDetails | null = null;
     // public _wishlistCount : number = 0;
     public wlDetails : WishlistDetails[] = [];
 
@@ -60,10 +60,7 @@ export class LayoutComponent {
     logout(): void {
         this.authService.logout();
 
-        localStorage.clear(); 
-        sessionStorage.clear();
-
-        this.router.navigate(['/login'], { replaceUrl: true });
+        this.router.navigate(['/login']);
     }
 
     toggleSidebar(): void {
