@@ -109,7 +109,7 @@ export class DashboardComponent {
         BuildingId: null,
         BuildingName: '',
         FloorId: null,
-        FloorNumber: 0,
+        FloorNumber: '',
         FloorName: '',
         RackId: null,
         RackNumber: 0,
@@ -169,6 +169,8 @@ export class DashboardComponent {
         RoleName: '',
         DepartmentId: 0,
         DepartmentName: '',
+        AdmissionNumber: 0,
+        StaffId: '',
         CreatedByUserId: 0,
         CreatedByUserName: '',
         IsActive: true,
@@ -182,6 +184,8 @@ export class DashboardComponent {
         MobileNo: string,
         RoleId: string,
         DepartmentId: string,
+        AdmissionNumber: string,
+        StaffId: string,
         Status: string,
         IsActive: string
     } = {
@@ -192,6 +196,8 @@ export class DashboardComponent {
             MobileNo: '',
             RoleId: '',
             DepartmentId: '',
+            AdmissionNumber: '',
+            StaffId:'',
             Status: '',
             IsActive: ''
         };
@@ -219,10 +225,12 @@ export class DashboardComponent {
     public departments: DepartmentDetails[] = [];
     calendarFocusDate!: Date; 
     public dobDate: Date | null = null;
-   
+    public studentRoleId: number  = 5;
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
+        this.studentRoleId = environment.studentRoleId;
+
         let today = new Date();
         let year = today.getFullYear();
         let userMinYear = year - 100;
@@ -465,7 +473,7 @@ export class DashboardComponent {
             BuildingId: null,
             BuildingName: '',
             FloorId: null,
-            FloorNumber: 0,
+            FloorNumber: '',
             FloorName: '',
             RackId: null,
             RackNumber: 0,
@@ -540,7 +548,7 @@ export class DashboardComponent {
 
     onBuildingChange(): void {
         this.currentBook.FloorId = 0;
-        this.currentBook.FloorNumber = 0;
+        this.currentBook.FloorNumber = '';
         this.currentBook.FloorName = '';
         this.currentBook.RackId = 0;
         this.currentBook.RackNumber = 0;
@@ -774,11 +782,12 @@ export class DashboardComponent {
 
         this.dobDate = null;
 
-        this.userErrors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', Status: '', IsActive: '' };
+        this.userErrors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', AdmissionNumber:'', StaffId:'', Status: '', IsActive: '' };
         this.registerUserDialogVisible = true;
     }
 
     onRoleChange(): void {
+        
         const role = this.roleOptions.find(l => l.value === this.currentUser.RoleId);
         if (role) {
             this.currentUser.RoleName = role.label;
@@ -790,8 +799,23 @@ export class DashboardComponent {
         {
             this.currentUser.DepartmentId = 0;
             this.currentUser.DepartmentName = "";
+            this.currentUser.StaffId = "";
+        }    
+
+        if(this.currentUser.RoleId !=null && this.currentUser.RoleId < this.studentRoleId)
+        {
+            this.currentUser.AdmissionNumber = 0;            
         }
+
+        if(this.currentUser.RoleId !=null && this.currentUser.RoleId == this.studentRoleId)
+        {
+            this.currentUser.StaffId = "";          
+        }
+
         this.validateUserInput('DepartmentId');
+        this.validateUserInput('AdmissionNumber');
+        this.validateUserInput('StaffId');
+    
     }
 
     onDepartmentChange(): void{
@@ -896,6 +920,24 @@ export class DashboardComponent {
                 }
                 break;
             
+            case 'AdmissionNumber':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber > 0)) {
+                    this.userErrors.AdmissionNumber = 'Adminssion Number is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.AdmissionNumber = '';
+                }
+                break;
+            
+            case 'StaffId':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="")) {
+                    this.userErrors.StaffId = 'StaffId is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.StaffId = '';
+                }
+                break;
+            
             case 'Status':
                 if (this.currentUser.Status === null) {
                     this.userErrors.Status = 'Access Request Status is required.';
@@ -929,10 +971,12 @@ export class DashboardComponent {
         const isMobileNoValid = this.validateUserInput('MobileNo');
         const isDOBValid = this.validateUserInput('DOB');
         const isDepartmentIdValid = this.validateUserInput('DepartmentId');
+        const isAdmissionNumberValid = this.validateUserInput('AdmissionNumber');
+        const isStaffIdValid = this.validateUserInput('StaffId');
         const isAccessRequestValid = this.validateUserInput('Status');
         const isStatusValid = this.validateUserInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid &&
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid &&
             isAccessRequestValid && isStatusValid;
     }
 

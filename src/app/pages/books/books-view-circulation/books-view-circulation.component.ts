@@ -42,7 +42,7 @@ export class BooksViewCirculationComponent {
         BuildingId: null,
         BuildingName: '',
         FloorId: null,
-        FloorNumber: 0,
+        FloorNumber: '',
         FloorName: '',
         RackId: null,
         RackNumber: 0,

@@ -96,6 +96,10 @@ export class ManageUsersComponent {
         ProfilePhoto: '',
         RoleId: 0,
         RoleName: '',
+        DepartmentId: 0,
+        DepartmentName: '',
+        AdmissionNumber: 0,
+        StaffId:'',
         CreatedByUserId: 0,
         CreatedByUserName: '',
         IsActive: true,
@@ -109,6 +113,8 @@ export class ManageUsersComponent {
         MobileNo: string,
         RoleId: string,
         DepartmentId: string,
+        AdmissionNumber: string,
+        StaffId: string,
         Status: string,
         IsActive: string
     } = {
@@ -119,6 +125,8 @@ export class ManageUsersComponent {
             MobileNo: '',
             RoleId: '',
             DepartmentId: '',
+            AdmissionNumber:'',
+            StaffId:'',
             Status: '',
             IsActive: ''
         };
@@ -152,13 +160,17 @@ export class ManageUsersComponent {
     public importMailIdList: { label: string, value: string }[] = [];
     public importStatusList: { label: string, value: boolean }[] = [];
     public importDepartmentList: { label: string, value: string }[] = [];
+    public importAdmissionNumberList: { label: number, value: number }[] = [];
+    public importStaffIdList: { label: string, value: string }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
     public importSelectedUserNameList: string[] = [];
     public importSelectedRoleList: string[] = [];
     public importSelectedDepartmentList: string[] = [];
-    public importSelectedMobileNoList: string[] = [];
+    public importSelectedMobileNoList: number[] = [];
     public importSelectedGenderList: string[] = [];
     public importSelectedMailIdList: string[] = [];
+    public importSelectedAdmissionNumberList: number[] = [];
+    public importSelectedStaffIdList: string[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
 
@@ -177,9 +189,11 @@ export class ManageUsersComponent {
     public isBarcodeSearch : boolean = false;
     public searchBookTerm: string = '';
     public lstBookDetails: BookDetails[] = [];
+    public studentRoleId: number  = 5;
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
+        this.studentRoleId = environment.studentRoleId;
         const today = new Date();
         this.todayDate = this.parseCustomDateStringForUI(today);
 
@@ -307,6 +321,10 @@ export class ManageUsersComponent {
             .map(e => ({ label: e!, value: e! }));
         this.importDepartmentList = [...new Set(this.importPreview.map(user => user.DepartmentName))]
             .map(e => ({ label: e!, value: e! }));
+        this.importAdmissionNumberList = [...new Set(this.importPreview.map(user => user.AdmissionNumber))]
+            .map(e => ({ label: e!, value: e! }));
+        this.importStaffIdList = [...new Set(this.importPreview.map(user => user.StaffId))]
+            .map(e => ({ label: e!, value: e! }));
         this.importStatusList = [...new Set(this.importPreview.map(user => user.IsActive ?? false))]
             .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
         this.importErrorList = [...new Set(this.importPreview.map(lang => lang.Error))]
@@ -340,6 +358,8 @@ export class ManageUsersComponent {
         this.importSelectedMobileNoList = [];
         this.importSelectedMailIdList = [];
         this.importSelectedGenderList = [];
+        this.importSelectedAdmissionNumberList = [];
+        this.importSelectedStaffIdList = [];
         this.importSelectedStatusList = [];
         this.importSelectedErrorList = [];
         this.importShowFt = false;
@@ -358,13 +378,13 @@ export class ManageUsersComponent {
         else {
             this.currentUser = {
                 UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', DepartmentId : 0,
-                RoleId: 0, RoleName: '', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending'
+                RoleId: 0, RoleName: '', AdmissionNumber: 0, StaffId:'', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending'
             };
             this.header = 'Add User';
             this.dobDate = null;
         }
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', AdmissionNumber: '', StaffId:'', Status: '', IsActive: '' };
         this.userDialogVisible = true;
         this.isViewOnly = false;
     }
@@ -376,7 +396,7 @@ export class ManageUsersComponent {
             this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
         }
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId : '', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId : '', AdmissionNumber: '', StaffId:'', Status: '', IsActive: '' };
         this.userDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -393,8 +413,22 @@ export class ManageUsersComponent {
         {
             this.currentUser.DepartmentId = 0;
             this.currentUser.DepartmentName = "";
+            this.currentUser.StaffId = "";
+        }    
+
+        if(this.currentUser.RoleId !=null && this.currentUser.RoleId < this.studentRoleId)
+        {
+            this.currentUser.AdmissionNumber = 0;            
         }
+
+        if(this.currentUser.RoleId !=null && this.currentUser.RoleId == this.studentRoleId)
+        {
+            this.currentUser.StaffId = "";          
+        }
+
         this.validateInput('DepartmentId');
+        this.validateInput('AdmissionNumber');
+        this.validateInput('StaffId');
     }
 
     onDOBChange(): void {
@@ -507,6 +541,24 @@ export class ManageUsersComponent {
                 }
                 break;
 
+            case 'AdmissionNumber':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber>0)) {
+                    this.errors.AdmissionNumber = 'Adminssion Number is required.';
+                    isValid = false;
+                } else {
+                    this.errors.AdmissionNumber = '';
+                }
+                break;
+            
+            case 'StaffId':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="")) {
+                    this.errors.StaffId = 'StaffId is required.';
+                    isValid = false;
+                } else {
+                    this.errors.StaffId = '';
+                }
+                break;
+
             case 'Status':
                 if (this.currentUser.Status === null) {
                     this.errors.Status = 'Access Request Status is required.';
@@ -540,10 +592,12 @@ export class ManageUsersComponent {
         const isMobileNoValid = this.validateInput('MobileNo');
         const isDOBValid = this.validateInput('DOB');
         const isDepartmentIdValid = this.validateInput('DepartmentId');
+        const isAdmissionNumberValid = this.validateInput('AdmissionNumber');
+        const isStaffIdValid = this.validateInput('StaffId');
         // const isAccessRequestValid = this.validateInput('Status');
         // const isStatusValid = this.validateInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid;
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid;
     }
 
     saveUser(): void {
@@ -680,7 +734,7 @@ export class ManageUsersComponent {
         };
 
         const worksheet = workbook.addWorksheet('Users');
-        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME']);
+        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME', 'ADMISSION NUMBER', 'STAFF ID']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -688,7 +742,7 @@ export class ManageUsersComponent {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'F1'
+            to: 'H1'
         };
 
         const rolesSheet = workbook.addWorksheet('RoleList');
@@ -752,6 +806,16 @@ export class ManageUsersComponent {
                 showErrorMessage: true,
                 errorTitle: 'Invalid Department',
                 error: 'Please select a valid department from the list.'
+            };
+
+            const adNumCell = worksheet.getCell(rowIndex, 7);
+            adNumCell.dataValidation = {
+                type: 'custom',
+                allowBlank: false,
+                formulae: [`AND(ISNUMBER(D${rowIndex}))`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Admission Number',
+                error: 'Please enter a valid Admission number.'
             };
 
             // const dobCell = worksheet.getCell(rowIndex, 6);
@@ -846,7 +910,7 @@ export class ManageUsersComponent {
                 }
 
                 const headerRow = Object.keys(rows[0] || {});
-                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME'];
+                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME', 'ADMISSION NUMBER', 'STAFF ID'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -859,6 +923,8 @@ export class ManageUsersComponent {
                     const mobileNo = row['MOBILE NO']?.toString().trim();
                     const mailId = row['MAIL ID']?.toString().trim();
                     const departmentName = row['DEPARTMENT NAME']?.toString().trim();
+                    const admissionNumber = row['ADMISSION NUMBER']?.toString().trim();
+                    const staffId = row['STAFF ID']?.toString().trim();
                     // const dob = row['DOB']?.toString().trim();
                     // const status = row['ACCESS STATUS']?.toString().trim();
                     // const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
@@ -875,6 +941,8 @@ export class ManageUsersComponent {
                         RoleName: roleName,
                         DepartmentId: 0,
                         DepartmentName: departmentName,
+                        AdmissionNumber: admissionNumber,
+                        StaffId: staffId,
                         CreatedByUserId: 0,
                         CreatedByUserName: '',
                         IsActive: true,
@@ -919,7 +987,7 @@ export class ManageUsersComponent {
         this.header = 'Edit User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'', AdmissionNumber:'', StaffId:'', Status: '', IsActive: '' };
         this.importUserDialogVisible = true;
         this.isViewOnly = false;
     }
@@ -948,7 +1016,7 @@ export class ManageUsersComponent {
         this.header = 'View User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'',  AdmissionNumber:'', StaffId:'', Status: '', IsActive: '' };
         this.importUserDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -969,6 +1037,8 @@ export class ManageUsersComponent {
         this.validateImportInput('MobileNo', this.importIndex);
         this.validateImportInput('MailId', this.importIndex);
         this.validateImportInput('DepartmentName', this.importIndex);
+        this.validateImportInput('AdmissionNumber', this.importIndex);
+        this.validateImportInput('StaffId', this.importIndex);
         // this.validateImportInput('DOB', this.importIndex);
 
         this.importIndex = -1;
@@ -1128,7 +1198,30 @@ export class ManageUsersComponent {
                 }                
                 break;
 
-            case 'Status':
+            case 'AdmissionNumber':
+                if ((this.importPreview[index].RoleId !=null && this.importPreview[index].RoleId >0 && this.importPreview[index].RoleId == this.studentRoleId) 
+                    &&(!(this.importPreview[index].AdmissionNumber !=null && this.importPreview[index].AdmissionNumber >0))) {
+                    this.importPreview[index].Error = 'AdmissionNumber is required.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+            
+            case 'StaffId':
+                if ((this.importPreview[index].RoleId !=null && this.importPreview[index].RoleId >0 && 
+                        this.importPreview[index].RoleId > this.departmentEligibleForRoleIdAbove && this.importPreview[index].RoleId < this.studentRoleId) 
+                    &&(!this.importPreview[index].StaffId?.trim())) {
+                    this.importPreview[index].Error = 'StaffId is required.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
+                case 'Status':
                 if (!this.importPreview[index].Status?.trim()) {
                     this.importPreview[index].Error = 'Access Status is required.';
                     isValid = false;
@@ -1166,7 +1259,9 @@ export class ManageUsersComponent {
                 this.validateImportInput('Gender', index) &&
                 this.validateImportInput('MobileNo', index) &&
                 this.validateImportInput('MailId', index) &&
-                this.validateImportInput('DepartmentName', index);
+                this.validateImportInput('DepartmentName', index) &&
+                this.validateImportInput('AdmissionNumber', index) &&
+                this.validateImportInput('StaffId', index);
                 // this.validateImportInput('DOB', index) &&
                 // this.validateImportInput('Status', index) &&
                 // this.validateImportInput('IsActive', index);
@@ -1196,6 +1291,8 @@ export class ManageUsersComponent {
                 RoleName: item.RoleName,
                 DepartmentId: item.DepartmentId,
                 DepartmentName: item.DepartmentName,
+                AdmissionNumber: item.AdmissionNumber,
+                StaffId: item.StaffId,
                 CreatedByUserId: item.CreatedByUserId,
                 CreatedByUserName: item.CreatedByUserName,
                 IsActive: item.IsActive,
@@ -1364,8 +1461,8 @@ export class ManageUsersComponent {
                 {
                     this.bc = {
                         BookCirculationId: 0, BookId: searchBook.BookId, BookName: searchBook.BookName, BorrowerId: this.currentUser.UserId, BorrowerName: this.currentUser.FullName,
-                        IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
-                        IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+                        IssuedByUserId: this.loggedInUserDetails?.UserId, IssuedByUserName: this.loggedInUserDetails?.FullName,
+                        IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails?.MailId, OverDueId: 0, FineAmount: 0.0,
                         OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
                         ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
                         UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0

@@ -288,6 +288,24 @@
                     styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
                 <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
             </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="admissionNumber">
+                    Admission Number<sup>*</sup>
+                </label>
+                <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    (ngModelChange)="validateInput('AdmissionNumber')" />
+                <div *ngIf="errors.AdmissionNumber" class="text-danger mt-1 small">{{ errors.AdmissionNumber }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove && currentUser.RoleId < studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="staffId">
+                    StaffId<sup>*</sup>
+                </label>
+                <input id="staffId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.StaffId"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId"
+                    (ngModelChange)="validateInput('StaffId')" />
+                <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
+            </div>
             <!-- <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="status">
                     Access Request Status<sup>*</sup>
@@ -382,6 +400,24 @@
                             styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
                         <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
                     </div>
+                    <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="admissionNumber">
+                            Admission Number<sup>*</sup>
+                        </label>
+                        <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber" [disabled]="isViewOnly" 
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                            (ngModelChange)="validateInput('AdmissionNumber')" />
+                        <div *ngIf="errors.AdmissionNumber" class="text-danger mt-1 small">{{ errors.AdmissionNumber }}</div>
+                    </div>
+                    <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove && currentUser.RoleId < studentRoleId">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="staffId">
+                            StaffId<sup>*</sup>
+                        </label>
+                        <input id="staffId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.StaffId"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId" [disabled]="isViewOnly" 
+                            (ngModelChange)="validateInput('StaffId')" />
+                        <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
+                    </div>
                     <!-- <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="status">
                             Access Request Status<sup>*</sup>
@@ -391,8 +427,8 @@
                             placeholder="Select Access Request Status" styleClass="w-100" appendTo="body" />
                             (ngModelChange)="onStatusChange()"
                         <div *ngIf="errors.Status" class="text-danger mt-1 small">{{ errors.Status }}</div>
-                    </div>
-                    <div class="col-6 mb-3">
+                    </div>-->
+                    <div class="col-6 mb-3" *ngIf="!currentUser.IsActive">
                         <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
                             Status<sup>*</sup>
                         </label>
@@ -400,7 +436,7 @@
                             [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status"
                             styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
                         <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
-                    </div> -->
+                    </div> 
                 </div>
                 }
             </p-tabPanel>
@@ -542,6 +578,28 @@
                                 (click)="showImportFilter()"></span>
                         </div>
                     </th>
+                    <th class="text-start text-muted fw-medium" style="width: 13%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="AdmissionNumber">
+                                AdmissionNumber
+                                <p-sortIcon field="AdmissionNumber"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedAdmissionNumberList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 13%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="StaffId">
+                                StaffId
+                                <p-sortIcon field="StaffId"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="importSelectedStaffIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showImportFilter()"></span>
+                        </div>
+                    </th>
                     <!-- <th class="text-start text-muted fw-medium" style="width: 10%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
@@ -635,6 +693,28 @@
                                 </p-multiSelect>
                             </ng-template>
                         </p-columnFilter></th>
+                    <th>
+                        <p-columnFilter field="AdmissionNumber" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importAdmissionNumberList" [(ngModel)]="importSelectedAdmissionNumberList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="StaffId" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="importStaffIdList" [(ngModel)]="importSelectedStaffIdList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
                     <!-- <th>
                         <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -671,6 +751,8 @@
                     <td>{{ user.MobileNo }}</td>
                     <td>{{ user.MailId }}</td>
                     <td>{{ user.DepartmentName }}</td>
+                    <td>{{ user.AdmissionNumber }}</td>
+                    <td>{{ user.StaffId }}</td>
                     <!-- <td>
                         <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
                             [severity]="getStatusSeverity(user.IsActive)"></p-tag>
@@ -698,7 +780,7 @@
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="8" class="text-center">
+                    <td colspan="11" class="text-center">
                         No Users found.
                     </td>
                 </tr>
@@ -782,6 +864,24 @@
                     [disabled]="isViewOnly" [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
                 <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="admissionNumber">
+                    Admission Number<sup>*</sup>
+                </label>
+                <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber" [disabled]="isViewOnly"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    (ngModelChange)="validateInput('AdmissionNumber')" />
+                <div *ngIf="errors.AdmissionNumber" class="text-danger mt-1 small">{{ errors.AdmissionNumber }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove && currentUser.RoleId < studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="staffId">
+                    StaffId<sup>*</sup>
+                </label>
+                <input id="staffId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.StaffId"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId" [disabled]="isViewOnly"
+                    (ngModelChange)="validateInput('StaffId')" />
+                <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
             </div>
             <!-- <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="status">
