@@ -1,0 +1,194 @@
+<div class="manage-floor-container">
+    <div class="table-clear-filter">
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
+    </div>
+    <p-table #dt [value]="floors" [autoLayout]="false" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <ng-template pTemplate="header">
+            <tr class="border-bottom">
+                <th class="text-start text-muted fw-medium" style="width: 5%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            S.No
+                        </div>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="BuildingName">
+                            Building Name
+                            <p-sortIcon field="BuildingName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedBuildingNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="FloorNumber">
+                            Floor Number
+                            <p-sortIcon field="FloorNumber"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedFloorNumberList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="FloorName">
+                            Floor Name
+                            <p-sortIcon field="FloorName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedFloorNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                            Status
+                            <p-sortIcon field="IsActive"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="pi pi-plus-circle" (click)="editFloor()" pTooltip="Add Floor"></span>
+                    </div></th>
+            </tr>
+            @if (showFt) {
+            <tr>
+                <th></th>
+                <th>
+                    <p-columnFilter field="BuildingName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="buildingNameList" [(ngModel)]="selectedBuildingNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="FloorNumber" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="floorNumberList" [(ngModel)]="selectedFloorNumberList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="FloorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="floorNameList" [(ngModel)]="selectedFloorNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+            </tr>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="body" let-floor let-index="rowIndex">
+            <tr class="border-bottom">
+                <td>{{ index + 1 }}</td>
+                <td>{{ floor.BuildingName }}</td>
+                <td>{{ floor.FloorNumber }}</td>
+                <td>{{ floor.FloorName }}</td>
+                <td>
+                    <p-tag [value]="floor.IsActive ? 'Active' : 'In-Active'"
+                        [severity]="getStatusSeverity(floor.IsActive)"></p-tag>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2 justify-content-center">
+                        <button pButton icon="pi pi-pencil" (click)="editFloor(floor)"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Floor"></button>
+                        <button pButton icon="pi pi-trash" (click)="deleteFloor(floor)"
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm" pTooltip="Delete Floor"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6" class="text-center">
+                    No floor details found.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <p-dialog [header]="header" [(visible)]="floorDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
+        <div class="row">
+            <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="buildingName">
+                    Building Name<sup>*</sup>
+                </label>
+                <p-select id="buildingName" [(ngModel)]="currentFloor.BuildingId" [ngModelOptions]="{standalone: true}"
+                    [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select Building"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onBuildingChange()" />
+                <div *ngIf="errors.BuildingId" class="text-danger mt-1 small">{{ errors.BuildingId }}</div>
+            </div>
+             <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="floorNumber">
+                    Floor Number<sup>*</sup>
+                </label>
+                <input id="floorNumber" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentFloor.FloorNumber" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter FloorNumber" (ngModelChange)="validateInput('FloorNumber')" />
+                <div *ngIf="errors.FloorNumber" class="text-danger mt-1 small">{{ errors.FloorNumber }}</div>
+            </div>
+            <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="floorName">
+                    Floor Name<sup>*</sup>
+                </label>
+                <input id="floorName" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentFloor.FloorName" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter FloorName" (ngModelChange)="validateInput('FloorName')" />
+                <div *ngIf="errors.FloorName" class="text-danger mt-1 small">{{ errors.FloorName }}</div>
+            </div>
+            <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="isActive" [(ngModel)]="currentFloor.IsActive" [ngModelOptions]="{standalone: true}"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status" [disabled] = "currentFloor.FloorId ==0"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="floorDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveFloor()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>

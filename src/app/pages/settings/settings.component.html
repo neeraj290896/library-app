@@ -83,6 +83,14 @@
                         <label for="mobile-notif" class="form-check-label small text-secondary">Enable SMS
                             notifications</label>
                     </div>
+                    <div class="d-flex gap-2 align-items-center col-md-6"
+                        *ngIf="(loggedInUserDetails?.RoleId ?? 0) == 1">
+                        <p-checkbox inputId="barcode-scan" [binary]="true" [disabled] = "!enableAplnSettingsAccess"
+                            [(ngModel)]="settingDetails.EnableBarcodeScanning"
+                            [ngModelOptions]="{standalone: true}"></p-checkbox>
+                        <label for="barcode-scan" class="form-check-label small text-secondary">Enable Barcode
+                            scanning</label>
+                    </div>
                 </div>
                 <div class="d-flex align-items-center gap-3 justify-content-end border-top pt-4">
                     <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main" [disabled] = "!enableAplnSettingsAccess"

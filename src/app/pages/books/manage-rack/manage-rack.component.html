@@ -1,0 +1,225 @@
+<div class="manage-rack-container">
+    <div class="table-clear-filter">
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
+    </div>
+    <p-table #dt [value]="racks" [autoLayout]="false" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <ng-template pTemplate="header">
+            <tr class="border-bottom">
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            S.No
+                        </div>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="BuildingName">
+                            Building Name
+                            <p-sortIcon field="BuildingName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedBuildingNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="FloorName">
+                            Floor Name
+                            <p-sortIcon field="FloorName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedFloorNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="RackNumber">
+                            Rack Number
+                            <p-sortIcon field="RackNumber"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedRackNumberList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="RackLabel">
+                            Rack Name
+                            <p-sortIcon field="RackLabel"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedRackNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                            Status
+                            <p-sortIcon field="IsActive"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="pi pi-plus-circle" (click)="editRack()" pTooltip="Add Rack"></span>
+                    </div></th>
+            </tr>
+            @if (showFt) {
+            <tr>
+                <th></th>
+                <th>
+                    <p-columnFilter field="BuildingName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="buildingNameList" [(ngModel)]="selectedBuildingNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="FloorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="floorNameList" [(ngModel)]="selectedFloorNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="RackNumber" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="rackNumberList" [(ngModel)]="selectedRackNumberList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="RackLabel" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="rackNameList" [(ngModel)]="selectedRackNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+            </tr>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rack let-index="rowIndex">
+            <tr class="border-bottom">
+                <td>{{ index + 1 }}</td>
+                <td>{{ rack.BuildingName }}</td>
+                <td>{{ rack.FloorName }}</td>
+                <td>{{ rack.RackNumber }}</td>
+                <td>{{ rack.RackLabel }}</td>
+                <td>
+                    <p-tag [value]="rack.IsActive ? 'Active' : 'In-Active'"
+                        [severity]="getStatusSeverity(rack.IsActive)"></p-tag>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2 justify-content-center">
+                        <button pButton icon="pi pi-pencil" (click)="editRack(rack)"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Rack"></button>
+                        <button pButton icon="pi pi-trash" (click)="deleteRack(rack)"
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm" pTooltip="Delete Rack"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="7" class="text-center">
+                    No rack details found.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <p-dialog [header]="header" [(visible)]="rackDialogVisible" [modal]="true" [style]="{ width: '60vw' }" appendTo="body">
+        <div class="row">
+            <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="buildingName">
+                    Building Name<sup>*</sup>
+                </label>
+                <p-select id="buildingName" [(ngModel)]="currentRack.BuildingId" [ngModelOptions]="{standalone: true}"
+                    [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select Building"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onBuildingChange()" />
+                <div *ngIf="errors.BuildingId" class="text-danger mt-1 small">{{ errors.BuildingId }}</div>
+            </div>
+            <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="floorName">
+                    Floor Name<sup>*</sup>
+                </label>
+                <p-select id="floorName" [(ngModel)]="currentRack.FloorId" [ngModelOptions]="{standalone: true}"
+                    [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select Floor"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="onFloorChange()" />
+                <div *ngIf="errors.FloorId" class="text-danger mt-1 small">{{ errors.FloorId }}</div>
+            </div>
+             <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="rackNumber">
+                    Rack Number<sup>*</sup>
+                </label>
+                <input id="rackNumber" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentRack.RackNumber" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter RackNumber" (ngModelChange)="validateInput('RackNumber')" />
+                <div *ngIf="errors.RackNumber" class="text-danger mt-1 small">{{ errors.RackNumber }}</div>
+            </div>
+            <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="floorName">
+                    Rack Name<sup>*</sup>
+                </label>
+                <input id="rackName" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentRack.RackLabel" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter RackName" (ngModelChange)="validateInput('RackName')" />
+                <div *ngIf="errors.RackLabel" class="text-danger mt-1 small">{{ errors.RackLabel }}</div>
+            </div>
+            <div class="col-6  mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="isActive" [(ngModel)]="currentRack.IsActive" [ngModelOptions]="{standalone: true}"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status" [disabled] = "currentRack.RackId ==0"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="rackDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveRack()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>

@@ -165,10 +165,11 @@ export class ManageRoleComponent {
                             summary: 'Manage Role - Success',
                             detail: 'Role updated successfully.'
                         });
+                        this.loadRoleDetails();
+                        this.roleDialogVisible = false;
                     }
 
-                    this.loadRoleDetails();
-                    this.roleDialogVisible = false;
+                    
                 },
                 error: () => {
                     this.messageService.add({
@@ -195,10 +196,13 @@ export class ManageRoleComponent {
                             summary: 'Manage Role - Success',
                             detail: 'Role inserted successfully.'
                         });
+
+                         this.loadRoleDetails();
+                        this.roleDialogVisible = false;
+
                     }
 
-                    this.loadRoleDetails();
-                    this.roleDialogVisible = false;
+                   
                 },
                 error: () => {
                     this.messageService.add({
@@ -214,5 +218,37 @@ export class ManageRoleComponent {
     }
 
 
-    deleteRole(role: RoleDetails): void { }
+    deleteRole(role: RoleDetails): void {
+
+        role.IsActive = false;
+
+        this.roleService.deleteRoleDetails(role).subscribe({
+                next: (res: any) => {
+                    if (!res || !res.Status) {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Manage Role - Failed',
+                            detail: res ? res.Message : 'Failed to delete Role. Please try again.'
+                        });
+                    } else {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Manage Role - Success',
+                            detail: 'Role deleted successfully.'
+                        });
+
+                        this.loadRoleDetails();                    
+                    }
+
+                    
+                },
+                error: () => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage Role - Failed',
+                        detail: 'Failed to delete Role. Please try again.'
+                    });
+                }
+            });
+     }
 }

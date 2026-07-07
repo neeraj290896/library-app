@@ -120,7 +120,7 @@ export class BooksManageBooksComponent implements OnInit {
         BuildingId: null,
         BuildingName: '',
         FloorId: null,
-        FloorNumber: 0,
+        FloorNumber: null,
         FloorName: '',
         RackId: null,
         RackNumber: 0,
@@ -503,7 +503,7 @@ export class BooksManageBooksComponent implements OnInit {
                 BuildingId: null,
                 BuildingName: '',
                 FloorId: null,
-                FloorNumber: 0,
+                FloorNumber: null,
                 FloorName: '',
                 RackId: null,
                 RackNumber: 0,
@@ -622,7 +622,7 @@ export class BooksManageBooksComponent implements OnInit {
 
     onBuildingChange(): void {
         this.currentBook.FloorId = 0;
-        this.currentBook.FloorNumber = 0;
+        this.currentBook.FloorNumber = '';
         this.currentBook.FloorName = '';
         this.currentBook.RackId = 0;
         this.currentBook.RackNumber = 0;
@@ -1198,7 +1198,7 @@ export class BooksManageBooksComponent implements OnInit {
                         BuildingId: null,
                         BuildingName: buildingName,
                         FloorId: null,
-                        FloorNumber: 0,
+                        FloorNumber: null,
                         FloorName: floorName,
                         RackId: null,
                         RackNumber: 0,
@@ -1725,8 +1725,8 @@ export class BooksManageBooksComponent implements OnInit {
             {
                 this.bc = {
                     BookCirculationId: 0, BookId: this.currentBook.BookId, BookName: this.currentBook.BookName, BorrowerId: searchUser.UserId, BorrowerName: searchUser.FullName,
-                    IssuedByUserId: this.loggedInUserDetails.UserId, IssuedByUserName: this.loggedInUserDetails.FullName,
-                    IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails.MailId, OverDueId: 0, FineAmount: 0.0,
+                    IssuedByUserId: this.loggedInUserDetails?.UserId, IssuedByUserName: this.loggedInUserDetails?.FullName,
+                    IssuedDate: this.todayDate, IssuedByUserMailId: this.loggedInUserDetails?.MailId, OverDueId: 0, FineAmount: 0.0,
                     OverDueFrom: null, OverDueDays: 0, OverDueStatus: '', SytemUpdatedDate: null, ReturnByUserId: 0,
                     ReturnByUserName: '', ReturnDate: null, Comments: '', Status: 'Issued', UpdatedByUserId: 0,
                     UpdatedByUserName: '', UpdatedDate: null, PaidAmount: 0, PaymentTypeId: 0

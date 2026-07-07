@@ -38,7 +38,7 @@ export class SettingsComponent {
     public loggedInUserDetails: UserDetails | null = null;
     public settingDetails: SettingDetails = {
         SettingId: 0, CutOffDays: 90, FinePercentage: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
-        EnableMobileNotification: false, IsActive: true
+        EnableMobileNotification: false, EnableBarcodeScanning:false, IsActive: true
     };
     public finePercentage: string = "";
     public errors: { CutOffDays: string, FinePercentage: string } = { CutOffDays: '', FinePercentage: '' };

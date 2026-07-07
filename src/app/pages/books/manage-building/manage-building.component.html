@@ -1,0 +1,294 @@
+<div class="manage-building-container">
+    <div class="table-clear-filter">
+        <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+            (onClick)="clear()"></p-button>
+    </div>
+    <p-table #dt [value]="buildings" [autoLayout]="false" [paginator]="true" [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <ng-template pTemplate="header">
+            <tr class="border-bottom">
+                <th class="text-start text-muted fw-medium" style="width: 5%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            S.No
+                        </div>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="buildingName">
+                            Building Name
+                            <p-sortIcon field="buildingName"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedBuildingNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="addressLine1">
+                            AddressLine1                            
+                        </div>                        
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="state">
+                            State
+                            <p-sortIcon field="state"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedStateNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="district">
+                            District
+                            <p-sortIcon field="district"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedDistrictNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="city">
+                            City
+                            <p-sortIcon field="city"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedCityNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 15%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="area">
+                            Area
+                            <p-sortIcon field="area"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedAreaNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                            Status
+                            <p-sortIcon field="IsActive"></p-sortIcon>
+                        </div>
+                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                            (click)="showFilter()"></span>
+                    </div>
+                </th>
+                <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <span class="pi pi-plus-circle" (click)="editbuilding()" pTooltip="Add building"></span>
+                    </div></th>
+            </tr>
+            @if (showFt) {
+            <tr>
+                <th></th>
+                <th>
+                    <p-columnFilter field="buildingName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="buildingList" [(ngModel)]="selectedBuildingNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+                <th>
+                    <p-columnFilter field="state" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="stateList" [(ngModel)]="selectedStateNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="district" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="districtList" [(ngModel)]="selectedDistrictNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="city" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="cityList" [(ngModel)]="selectedCityNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="area" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="areaList" [(ngModel)]="selectedAreaNameList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th>
+                    <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                placeholder="All">
+                            </p-multiSelect>
+                        </ng-template>
+                    </p-columnFilter>
+                </th>
+                <th></th>
+            </tr>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="body" let-building let-index="rowIndex">
+            <tr class="border-bottom">
+                <td>{{ index + 1 }}</td>
+                <td>{{ building.BuildingName }}</td>
+                <td>{{ building.AddressLine1 }}</td>
+                <td>{{ building.StateName }}</td>
+                <td>{{ building.DistrictName }}</td>
+                <td>{{ building.CityName }}</td>
+                <td>{{ building.AreaName }}</td>
+                <td>
+                    <p-tag [value]="building.IsActive ? 'Active' : 'In-Active'"
+                        [severity]="getStatusSeverity(building.IsActive)"></p-tag>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center gap-2 justify-content-center">
+                        <button pButton icon="pi pi-pencil" (click)="editbuilding(building)"
+                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit building"></button>
+                        <button pButton icon="pi pi-trash" (click)="deletebuilding(building)"
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm" pTooltip="Delete building"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="9" class="text-center">
+                    No Building details found.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <p-dialog [header]="header" [(visible)]="buildingDialogVisible" [modal]="true" [style]="{ width: '80vw' }" appendTo="body">
+        <div class="row">
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="buildingName">
+                    Building Name<sup>*</sup>
+                </label>
+                <input id="buildingName" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentBuilding.BuildingName" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Building Name" (ngModelChange)="validateInput('BuildingName')" />
+                <div *ngIf="errors.BuildingName" class="text-danger mt-1 small">{{ errors.BuildingName }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="addressLine1">
+                    Address Line1<sup>*</sup>
+                </label>
+                <input id="addressLine1" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentBuilding.AddressLine1" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Address Line1" (ngModelChange)="validateInput('AddressLine1')" />
+                <div *ngIf="errors.AddressLine1" class="text-danger mt-1 small">{{ errors.AddressLine1 }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="addressLine2">
+                    Address Line2
+                </label>
+                <input id="addressLine2" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentBuilding.AddressLine2" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Address Line2" />                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="addressLine3">
+                    Address Line3
+                </label>
+                <input id="addressLine3" type="text" class="form-control" pInputText
+                    [(ngModel)]="currentBuilding.AddressLine3" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Address Line3" />                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="state">
+                    State<sup>*</sup>
+                </label>
+                <p-select id="state" [(ngModel)]="currentBuilding.StateId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="stateOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select State" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onStateChange()"></p-select>                
+                <div *ngIf="errors.StateId" class="text-danger mt-1 small">{{ errors.StateId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="district">
+                    District<sup>*</sup>
+                </label>
+                <p-select id="district" [(ngModel)]="currentBuilding.DistrictId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="districtOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select District" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onDistrictChange()"></p-select>                
+                <div *ngIf="errors.DistrictId" class="text-danger mt-1 small">{{ errors.DistrictId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="city">
+                    City<sup>*</sup>
+                </label>
+                <p-select id="city" [(ngModel)]="currentBuilding.CityId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="cityOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select City" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onCityChange()"></p-select>                
+                <div *ngIf="errors.CityId" class="text-danger mt-1 small">{{ errors.CityId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="area">
+                    Area<sup>*</sup>
+                </label>
+                <p-select id="area" [(ngModel)]="currentBuilding.AreaId" [ngModelOptions]="{standalone: true}"
+                    [editable]="true" [options]="areaOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select Area" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onAreaChange()"></p-select>                
+                <div *ngIf="errors.AreaId" class="text-danger mt-1 small">{{ errors.AreaId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="isActive">
+                    Status<sup>*</sup>
+                </label>
+                <p-select id="isActive" [(ngModel)]="currentBuilding.IsActive" [ngModelOptions]="{standalone: true}"
+                    [options]="options" optionLabel="label" optionValue="value" placeholder="Select Status" [disabled] = "currentBuilding.BuildingId ==0"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('IsActive')" />
+                <div *ngIf="errors.IsActive" class="text-danger mt-1 small">{{ errors.IsActive }}</div>
+            </div>
+        </div>
+        <ng-template pTemplate="footer">
+            <div class="d-flex justify-content-end align-items-center gap-3">
+                <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="buildingDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveBuilding()"></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>

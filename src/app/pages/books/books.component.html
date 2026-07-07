@@ -30,6 +30,15 @@
             <p-tabPanel header="Manage Language">
                 <app-books-manage-language *ngIf="activeTab === 4"></app-books-manage-language>
             </p-tabPanel>
+            <p-tabPanel header="Manage Buildings" *ngIf="canAccessBuilding_Floor_Rack">
+                <app-manage-building *ngIf="activeTab === 5"></app-manage-building>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Floors" *ngIf="canAccessBuilding_Floor_Rack">
+                <app-manage-floor *ngIf="activeTab === 6"></app-manage-floor>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Racks" *ngIf="canAccessBuilding_Floor_Rack">
+                <app-manage-rack *ngIf="activeTab === 7"></app-manage-rack>
+            </p-tabPanel>
         </p-tabView>
     </div>
 </div>

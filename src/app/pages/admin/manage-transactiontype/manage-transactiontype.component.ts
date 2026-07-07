@@ -151,10 +151,11 @@ export class ManageTransactiontypeComponent {
                             summary: 'Manage TransactionType - Success',
                             detail: 'TransactionType updated successfully.'
                         });
+                        
+                        this.loadTransactionTypeDetails();
+                        this.transactionTypeDialogVisible = false;
                     }
     
-                    this.loadTransactionTypeDetails();
-                    this.transactionTypeDialogVisible = false;
                 },
                 error: () => {
                     this.messageService.add({
@@ -166,5 +167,35 @@ export class ManageTransactiontypeComponent {
             });
         }
 
-    deleteTransactionType(transactionType: TransactionTypeDetails): void { }
+    deleteTransactionType(transactionType: TransactionTypeDetails): void { 
+        
+        transactionType.IsActive = false;
+
+        this.transactionTypeService.deleteTransactionTypeDetails(transactionType).subscribe({
+                next: (res: any) => {
+                    if (!res || !res.Status) {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Manage TransactionType - Failed',
+                            detail: res ? res.Message : 'Failed to delete TransactionType. Please try again.'
+                        });
+                    } else {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Manage TransactionType - Success',
+                            detail: 'TransactionType deleted successfully.'
+                        });
+                        this.loadTransactionTypeDetails();
+                    }
+                    
+                },
+                error: () => {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage TransactionType - Failed',
+                        detail: 'Failed to delete TransactionType. Please try again.'
+                    });
+                }
+            });
+    }
 }

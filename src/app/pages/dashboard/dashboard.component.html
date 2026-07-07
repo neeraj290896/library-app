@@ -292,6 +292,24 @@
                 styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
             <div *ngIf="userErrors.DepartmentId" class="text-danger mt-1 small">{{ userErrors.DepartmentId }}</div>
         </div>
+        <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="admissionNumber">
+                    Admission Number<sup>*</sup>
+                </label>
+                <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    (ngModelChange)="validateUserInput('AdmissionNumber')" />
+                <div *ngIf="userErrors.AdmissionNumber" class="text-danger mt-1 small">{{ userErrors.AdmissionNumber }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove && currentUser.RoleId < studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="staffId">
+                    StaffId<sup>*</sup>
+                </label>
+                <input id="staffId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.StaffId"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId"
+                    (ngModelChange)="validateUserInput('StaffId')" />
+                <div *ngIf="userErrors.StaffId" class="text-danger mt-1 small">{{ userErrors.StaffId }}</div>
+            </div>
         <!-- <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="status">
                 Access Request Status<sup>*</sup>

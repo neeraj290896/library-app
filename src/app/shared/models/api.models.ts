@@ -20,6 +20,7 @@ export interface SettingDetails {
     EnableEmailNotification: boolean;
     EnableWishlistNotification: boolean;
     EnableMobileNotification: boolean;
+    EnableBarcodeScanning: boolean;
     IsActive: boolean;
 }
 
@@ -59,7 +60,7 @@ export interface BookDetails {
     BuildingId?: number | null;
     BuildingName?: string | null;
     FloorId?: number | null;
-    FloorNumber?: number | null;
+    FloorNumber?: string | null;
     FloorName?: string | null;
     RackId?: number | null;
     RackNumber?: number | null;
@@ -107,14 +108,20 @@ export interface BookCirculationDetails {
 export interface BuildingDetails {
     BuildingId: number;
     StateId: number;
+    StateName?: string | null;
     DistrictId: number;
+    DistrictName?: string | null;    
     CityId: number;
+    CityName?: string | null;
     AreaId: number;
+    AreaName?:string | null;
     AddressLine1?: string | null;
     AddressLine2?: string | null;
     AddressLine3?: string | null;
     BuildingName?: string | null;
     IsActive: boolean;
+    CreatedByUserId: number;
+    CreatedByUserName?: string | null
 }
 
 export interface CategoryDetails {
@@ -157,7 +164,7 @@ export interface FloorDetails {
     FloorId: number;
     BuildingId: number;
     BuildingName?: string | null;
-    FloorNumber: number;
+    FloorNumber?: string | null;
     FloorName?: string | null;
     IsActive: boolean;
 }
@@ -214,7 +221,7 @@ export interface RackDetails {
     BuildingId: number;
     BuildingName?: string | null;
     FloorId: number;
-    FloorNumber: number;
+    FloorNumber?: string | null;
     FloorName?: string | null;
     RackNumber: number;
     RackLabel?: string | null;
@@ -290,6 +297,8 @@ export interface UserDetails {
     MailId?: string | null;
     DepartmentId?: number | null;
     DepartmentName?: string | null;
+    AdmissionNumber?: number | null;
+    StaffId?: string | null;
     ProfilePhoto?: string | null;
     Status?: string | null;
     CreatedByUserId?: number | null;

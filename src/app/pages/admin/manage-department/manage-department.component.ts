@@ -153,10 +153,13 @@ private messageService = inject(MessageService);
                         summary: 'Manage Department - Success',
                         detail: 'Department updated successfully.'
                     });
+
+                     this.loadDepartmentDetails();
+                    this.departmentDialogVisible = false;
+
                 }
 
-                this.loadDepartmentDetails();
-                this.departmentDialogVisible = false;
+               
             },
             error: () => {
                 this.messageService.add({
@@ -168,5 +171,39 @@ private messageService = inject(MessageService);
         });
     }
 
-    deleteDepartment(department: DepartmentDetails): void { }
+    deleteDepartment(department: DepartmentDetails): void { 
+
+        department.IsActive = false;
+
+        const payload = [department];
+
+        this.departmentService.deleteDepartmentDetails(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage Department - Failed',
+                        detail: res ? res.Message : 'Failed to delete department. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage Department - Success',
+                        detail: 'Department deleted successfully.'
+                    });
+
+                     this.loadDepartmentDetails();
+                }
+
+               
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage department - Failed',
+                    detail: 'Failed to delete department. Please try again.'
+                });
+            }
+        });
+    }
 }
