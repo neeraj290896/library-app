@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { BookService } from '@services/book.service';
 import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, UserDetails } from '@app/shared/models/api.models';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthorService } from '@app/shared/services/author.service';
 import { PublisherService } from '@app/shared/services/publisher.service';
 import { CategoryService } from '@app/shared/services/category.service';
@@ -34,6 +34,7 @@ import { ManageWishlistComponent } from '../manage-wishlist/manage-wishlist.comp
 import { AddWishlistComponent } from '../add-wishlist/add-wishlist.component';
 import { environment } from '../../../../environments/environment';
 import { UserService } from '@app/shared/services/user.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -43,11 +44,11 @@ type ImportBookDetails = BookDetails & {
     selector: 'app-books-manage-books',
     standalone: true,
     imports: [
-        CommonModule, ButtonModule, TableModule, TagModule,
-        PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
-        SelectModule, FormsModule, DatePickerModule, TooltipModule,
-        TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent, ManageWishlistComponent, AddWishlistComponent
+        CommonModule, ButtonModule, TableModule, TagModule, PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
+        SelectModule, FormsModule, DatePickerModule, TooltipModule, TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent,
+         ManageWishlistComponent, AddWishlistComponent, ConfirmDialogModule
     ],
+    providers: [ConfirmationService],
     templateUrl: './books-manage-books.component.html',
     styleUrl: './books-manage-books.component.scss'
 })
@@ -73,6 +74,7 @@ export class BooksManageBooksComponent implements OnInit {
     private _bcService = inject(BookCirculationService);
     public _authService = inject(AuthService);
     public userService = inject(UserService);
+    private confirmationService = inject(ConfirmationService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
@@ -845,8 +847,28 @@ export class BooksManageBooksComponent implements OnInit {
                         detail: 'Book added successfully.'
                     });
 
-                    this.loadBooks();
-                    this.bookDialogVisible = false;
+                    this.loadBooks();                   
+
+                    this.confirmationService.confirm({
+                    message: "Do you want to print book's barcode?",
+                    header: 'Print Confirmation',
+                    icon: 'pi pi-print',
+                    acceptLabel: 'Yes',
+                    rejectLabel: 'No',
+                    accept: () => {
+                        this.selectedBookDetails = this.books.filter(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
+                            x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
+                            x.PublishedYear == this.currentBook.PublishedYear
+                        );
+                        this.bookDialogVisible = false;
+                        this.onSelectionChange();
+                        this.printBarcode();
+
+                    },
+                    reject: () => {
+                        this.bookDialogVisible = false;
+                    }
+                });
                 }
             },
             error: () => {
@@ -1600,10 +1622,54 @@ export class BooksManageBooksComponent implements OnInit {
                         summary: 'Manage Books - Success',
                         detail: 'Books imported successfully.'
                     });
-                }
 
-                this.loadBooks();
-                this.importDialogVisible = false;
+                    this.loadBooks();
+
+                    // 1. Get the message string
+                    const responseMsg: string = res.Message;
+
+                    // 2. Split by "-" and grab the first element safely using optional chaining
+                    const firstPart: string = responseMsg?.split('-')[0] || '';
+
+                    // 3. Split the first part by "," to get your final array
+                    const finalArray: string[] = firstPart ? firstPart.split(',') : [];
+              
+                    if(finalArray !=null && finalArray.length >0)
+                    {
+                        this.confirmationService.confirm({
+                            message: "Do you want to print imported book's barcode?",
+                            header: 'Print Confirmation',
+                            icon: 'pi pi-print',
+                            acceptLabel: 'Yes',
+                            rejectLabel: 'No',
+                            accept: () => {
+
+                                this.selectedBookDetails = [];
+                                finalArray.forEach(ele => {
+                                    const _importedData = this.books.find(x => x.BookId == parseInt(ele));
+                                        
+                                    if(_importedData !=null)
+                                    {
+                                        this.selectedBookDetails.push(_importedData);
+                                    }
+                                });                            
+
+                                this.importDialogVisible = false;
+                                this.onSelectionChange();
+                                this.printBarcode();
+
+                            },
+                            reject: () => {
+                                this.importDialogVisible = false;
+                            }
+                        });
+                    }
+                    else
+                    {
+                        this.importDialogVisible = false;
+                    }
+                    
+                }                
             },
             error: () => {
                 this.messageService.add({
@@ -1741,5 +1807,9 @@ export class BooksManageBooksComponent implements OnInit {
             }
         }
         
+    }
+
+    printTable(): void {
+        window.print();
     }
 }

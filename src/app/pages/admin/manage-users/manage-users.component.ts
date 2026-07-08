@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { BookCirculationDetails, BookDetails, DepartmentDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
 import * as Xlsx from 'xlsx';
@@ -28,6 +28,7 @@ import { environment } from '../../../../environments/environment';
 import { ManageWishlistComponent } from '@app/pages/books/manage-wishlist/manage-wishlist.component';
 import { DepartmentService } from '@app/shared/services/department.service';
 import { BookService } from '@app/shared/services/book.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -37,7 +38,8 @@ type ImportUserDetails = UserDetails & {
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule,
-        SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent, IssueReturnBooksComponent, ManageWishlistComponent],
+        SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent, IssueReturnBooksComponent, ManageWishlistComponent, ConfirmDialogModule],
+    providers: [ConfirmationService],
     templateUrl: './manage-users.component.html',
     styleUrl: './manage-users.component.scss'
 })
@@ -58,6 +60,7 @@ export class ManageUsersComponent {
     private _bcService = inject(BookCirculationService);
     public _authService = inject(AuthService);
     public departmentService = inject(DepartmentService);
+    private confirmationService = inject(ConfirmationService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
@@ -634,8 +637,27 @@ export class ManageUsersComponent {
                     });
                 }
 
-                this.loadUserDetails();
-                this.userDialogVisible = false;
+                this.loadUserDetails();               
+
+                this.confirmationService.confirm({
+                    message: "Do you want to print user's barcode?",
+                    header: 'Print Confirmation',
+                    icon: 'pi pi-print',
+                    acceptLabel: 'Yes',
+                    rejectLabel: 'No',
+                    accept: () => {
+                        this.selectedUserDetails = this.users.filter(x => x.FullName == this.currentUser.FullName && x.RoleId == this.currentUser.RoleId && x.MobileNo == this.currentUser.MobileNo
+                            && x.MailId == this.currentUser.MailId
+                        );
+                        this.userDialogVisible = false;
+                        this.onSelectionChange();
+                        this.printBarcode();
+
+                    },
+                    reject: () => {
+                        this.userDialogVisible = false;
+                    }
+                });
             },
             error: () => {
                 this.messageService.add({
@@ -1305,7 +1327,7 @@ export class ManageUsersComponent {
                 const responseArray = Array.isArray(res) ? res : [];
 
                 // 2. Filter successes and failures from the array
-                const successes = responseArray.filter(item => item && item.Status);
+                const successes = responseArray.filter(item => item && item.Status).map(item => item.Message).join(' ');;
                 const failures = responseArray.filter(item => !item || !item.Status);
 
                 // 3. Handle the toast messages based on the array results
@@ -1335,6 +1357,42 @@ export class ManageUsersComponent {
                         summary: `Import Partially Failed (${failures.length} failed)`,
                         detail: errorMessages || 'Some users failed to import. Please try again.'
                     });
+
+                    // 5. Refresh view and close dialog
+                    this.loadUserDetails();
+                    this.confirmationService.confirm({
+                        message: "Do you want to print imported user's barcode?",
+                        header: 'Print Confirmation',
+                        icon: 'pi pi-print',
+                        acceptLabel: 'Yes',
+                        rejectLabel: 'No',
+                        accept: () => {
+
+                            this.selectedUserDetails = [];
+                            payload.forEach(ele => {
+                                
+                                if(ele.MobileNo !=null && successes.includes(ele.MobileNo))
+                                {
+                                   const _importedData = this.users.find(x => x.FullName == ele.FullName && x.RoleId == ele.RoleId && x.MobileNo == ele.MobileNo
+                                        && x.MailId == ele.MailId);
+
+                                    if(_importedData !=null)
+                                    {
+                                        this.selectedUserDetails.push(_importedData);
+                                    }                                    
+                                }
+                            });                            
+
+                            this.importDialogVisible = false;
+                            this.onSelectionChange();
+                            this.printBarcode();
+
+                        },
+                        reject: () => {
+                            this.importDialogVisible = false;
+                        }
+                    });
+
                 }
                 else if (successes.length > 0) {
                     this.messageService.add({
@@ -1342,13 +1400,42 @@ export class ManageUsersComponent {
                         summary: 'Manage Users - Success',
                         detail: `${successes.length} user(s) imported successfully.`
                     });
+
+                    // 5. Refresh view and close dialog
+                    this.loadUserDetails();
+                    this.confirmationService.confirm({
+                        message: "Do you want to print imported user's barcode?",
+                        header: 'Print Confirmation',
+                        icon: 'pi pi-print',
+                        acceptLabel: 'Yes',
+                        rejectLabel: 'No',
+                        accept: () => {
+
+                            this.selectedUserDetails = [];
+                            payload.forEach(ele => {
+                                const _importedData = this.users.find(x => x.FullName == ele.FullName && x.RoleId == ele.RoleId && x.MobileNo == ele.MobileNo
+                                    && x.MailId == ele.MailId);
+                                    
+                                if(_importedData !=null)
+                                {
+                                    this.selectedUserDetails.push(_importedData);
+                                }
+                            });                            
+
+                            this.importDialogVisible = false;
+                            this.onSelectionChange();
+                            this.printBarcode();
+
+                        },
+                        reject: () => {
+                            this.importDialogVisible = false;
+                        }
+                    });
                 }
                  
                 
 
-                // 5. Refresh view and close dialog
-                this.loadUserDetails();
-                this.importDialogVisible = false;
+                
             },
             error: () => {
                 this.messageService.add({
@@ -1433,7 +1520,7 @@ export class ManageUsersComponent {
     }
 
     printTable(): void {
-    window.print();
+        window.print();
     }
 
     onBookSearch():void{
