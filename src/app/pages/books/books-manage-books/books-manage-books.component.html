@@ -1057,57 +1057,64 @@
 
     <p-dialog header="Print Books Barcode" [(visible)]="printBarcodeDialogVisible" [modal]="true"
         [style]="{ width: '25vw' }" appendTo="body">
-        <p-table [value]="selectedBookDetails" [autoLayout]="false">
+        <div #printArea>
+            <p-table [value]="selectedBookDetails" [autoLayout]="false">
 
-            <ng-template pTemplate="header">
-                <tr class="border-bottom">
-                    <th class="text-start text-muted fw-medium" style="width: 20%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
-                                S.No
-                                <p-sortIcon field="sno"></p-sortIcon>
+                <ng-template pTemplate="header">
+                    <tr class="border-bottom">
+                        <th class="text-start text-muted fw-medium" style="width: 20%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
+                                    S.No
+                                    <p-sortIcon field="sno"></p-sortIcon>
+                                </div>
                             </div>
-                        </div>
-                    </th>
-                    <!-- <th class="text-start text-muted fw-medium" style="width: 40%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
-                                Book Name
-                                <p-sortIcon field="bookName"></p-sortIcon>
-                            </div>                        
-                        </div>
-                    </th> -->
-                    <th class="text-start text-muted fw-medium" style="width: 40%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
-                                Barcode
+                        </th>
+                        <!-- <th class="text-start text-muted fw-medium" style="width: 40%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                    Book Name
+                                    <p-sortIcon field="bookName"></p-sortIcon>
+                                </div>                        
                             </div>
-                        </div>
-                    </th>
-                </tr>
-            </ng-template>
+                        </th> -->
+                        <th class="text-start text-muted fw-medium" style="width: 40%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                    Barcode
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
 
-            <ng-template pTemplate="body" let-book let-index="rowIndex">
-                <tr class="border-bottom">
-                    <td>{{ index + 1 }}</td>
-                    <!-- <td>{{ book.BookName }}</td> -->
-                    <td>
-                        <ngx-barcode6 [bc-value]="book.BookBarcode" [bc-format]="'CODE128'" [bc-display-value]="false"
-                            [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
-                        <div class="barcode-label"
-                            style="font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; margin-top: -1rem;margin-left: 3rem;">
-                            {{ book.BookName }}
-                        </div>
-                    </td>
-                </tr>
-            </ng-template>
+                <ng-template pTemplate="body" let-book let-index="rowIndex">
+                    <tr class="border-bottom">
+                        <td>{{ index + 1 }}</td>
+                        <!-- <td>{{ book.BookName }}</td> -->
+                        <td>
+                            <ngx-barcode6 [bc-value]="book.BookBarcode" [bc-format]="'CODE128'" [bc-display-value]="false"
+                                [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
+                            <div class="barcode-label"
+                                style="font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; margin-top: -1rem;margin-left: 3rem;">
+                                {{ book.BookName }}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
 
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="3" class="text-center">No book barcode found.</td>
-                </tr>
-            </ng-template>
-        </p-table>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="3" class="text-center">No book barcode found.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <ng-template pTemplate="footer">           
+            <!-- Your Print Button is now moved here -->
+            <button pButton label="Print" icon="pi pi-print" 
+                    class="p-button-raised" (click)="printTable()"></button>
+        </ng-template>
     </p-dialog>
 
     @if (bcDialogVisible) {
@@ -1120,5 +1127,7 @@
         <app-add-wishlist [selectedBookId]="currentBook.BookId" [selectedUserId]="0"  
          (onDialogClose)="addWishlistDialogVisible = false"></app-add-wishlist>
     }
+
+    <p-confirmDialog></p-confirmDialog>
 
 </div>
