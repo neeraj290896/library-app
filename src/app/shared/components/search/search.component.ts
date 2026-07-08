@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { environment } from '../../../../environments/environment';
@@ -20,10 +20,47 @@ import { BooksManageBooksComponent } from '@app/pages/books/books-manage-books/b
     styleUrl: './search.component.scss'
 })
 export class SearchComponent {
+
+    @ViewChild('searchInput', { static: false }) searchInput!: ElementRef<HTMLInputElement>;
+
     public searchTerm: string = '';
 
     public showBookDialog: boolean = false;
     public showUserDialog: boolean = false;
+
+    private inactivityTimer: any;
+    private readonly INACTIVITY_TIME = 3000; // 3 seconds
+
+    ngOnInit(): void {
+        this.startInactivityTimer();
+    }
+
+    // Listen to mouse movements across the document window
+    @HostListener('document:mousemove')
+    @HostListener('document:keydown')
+    onMouseMove(): void {
+        this.resetInactivityTimer();
+    }
+
+    private startInactivityTimer(): void {
+        this.inactivityTimer = setTimeout(() => {
+        this.focusSearchInput();
+        }, this.INACTIVITY_TIME);
+    }
+
+    private resetInactivityTimer(): void {
+        if (this.inactivityTimer) {
+        clearTimeout(this.inactivityTimer);
+        }
+        this.startInactivityTimer();
+    }
+
+    private focusSearchInput(): void {
+        // Check if dialogs are open; you might want to skip focusing if a dialog is active
+        if (!this.showBookDialog && !this.showUserDialog && this.searchInput) {
+        this.searchInput.nativeElement.focus();
+        }
+    }
 
     onSearch(): void {
 
@@ -53,5 +90,13 @@ export class SearchComponent {
         this.searchTerm = '';
         this.showBookDialog = false;
         this.showUserDialog = false;
+        this.resetInactivityTimer(); // Restart timer when a dialog closes
+    }
+
+    // Prevent memory leaks when the component destroys
+    ngOnDestroy(): void {
+        if (this.inactivityTimer) {
+        clearTimeout(this.inactivityTimer);
+        }
     }
 }

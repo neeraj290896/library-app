@@ -1,6 +1,7 @@
 <div class="position-relative">
     <span class="pi pi-search search-icon position-absolute text-muted"></span>
-    <input pInputText type="text" placeholder="Search" [(ngModel)]="searchTerm" (keydown.enter)="onSearch()"
+    <!-- Added #searchInput here -->
+    <input #searchInput pInputText type="text" placeholder="Search" [(ngModel)]="searchTerm" (keydown.enter)="onSearch()"
         class="form-control ps-5" />
 </div>
 

@@ -220,31 +220,31 @@ export class BooksOverdueComponent {
                         
             if(_userBarcode > 0 && _bookBarcode > 0)
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BorrowerId == _userBarcode && x.BookId == _bookBarcode);                
+                this.filteredOdDetails = this._odDetails.filter(x => x.OverDueStatus == 'Pending' && x.BorrowerId == _userBarcode && x.BookId == _bookBarcode);                
             }
             else if(_userBarcode == 0 && _bookBarcode > 0)
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BookId == _bookBarcode);                
+                this.filteredOdDetails = this._odDetails.filter(x => x.OverDueStatus == 'Pending' && x.BookId == _bookBarcode);                
             }
             else if(_userBarcode > 0 && _bookBarcode == 0)
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BorrowerId == _userBarcode);                
+                this.filteredOdDetails = this._odDetails.filter(x => x.OverDueStatus == 'Pending' && x.BorrowerId == _userBarcode);                
             }
             else if(this.searchBookTerm !="" && this.searchUserTerm !="")
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()) && x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));                
+                this.filteredOdDetails = this._odDetails.filter(x => x.OverDueStatus == 'Pending' && x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()) && x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));                
             }
             else if(this.searchBookTerm !="" && this.searchUserTerm =="")
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()));                
+                this.filteredOdDetails = this._odDetails.filter(x => x.OverDueStatus == 'Pending' && x.BookName?.toLowerCase().includes(this.searchBookTerm?.toLowerCase()));                
             }
             else if(this.searchBookTerm =="" && this.searchUserTerm !="")
             {
-                this.filteredOdDetails = this._odDetails.filter(x => x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
+                this.filteredOdDetails = this._odDetails.filter(x => x.OverDueStatus == 'Pending' && x.BorrowerName?.toLowerCase().includes(this.searchUserTerm?.toLowerCase()));
             }
             else
             {
-                this.filteredOdDetails = this._odDetails;
+                this.filteredOdDetails = this._odDetails.filter(x => x.OverDueStatus == 'Pending');
             }
                 
         }
