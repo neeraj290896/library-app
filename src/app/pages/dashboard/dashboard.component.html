@@ -341,3 +341,127 @@
 
 <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="issueBookDialogVisible" [selectedBorrower] = null [isViewOnly]="false"
     (onSuccess)="loadDashboardSummary()" (onDialogClose)="issueBookDialogVisible = false"></app-issue-return-books>
+
+<p-dialog header="Print User's Barcode" [(visible)]="printUserDialogVisible" [modal]="true"
+    [style]="{ width: '30vw' }" appendTo="body">
+    <div #printArea>
+        <p-table [value]="selectedUserDetails" [autoLayout]="false">
+
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th class="text-start text-muted fw-medium" style="width: 20%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
+                                S.No
+                                <p-sortIcon field="sno"></p-sortIcon>
+                            </div>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 40%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                Full Name
+                                <p-sortIcon field="bookName"></p-sortIcon>
+                            </div>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 40%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                Barcode
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-user let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ user.FullName }}</td>
+                    <td>
+                        <!-- <ngx-barcode6 [bc-value]="user.UserBarcode"  [bc-format]="'CODE128'" [bc-display-value]="false" [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6> -->
+                        <qrcode [qrdata]="user.UserBarcode" [width]="100" [errorCorrectionLevel]="'M'"
+                            [elementType]="'svg'"></qrcode>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="3" class="text-center">No user's barcode found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+    <ng-template pTemplate="footer">           
+        <!-- Your Print Button is now moved here -->
+        <button pButton label="Print" icon="pi pi-print" 
+                class="p-button-raised" (click)="printTable()"></button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Print Books Barcode" [(visible)]="printBarcodeDialogVisible" [modal]="true"
+        [style]="{ width: '25vw' }" appendTo="body">
+        <div #printArea>
+            <p-table [value]="selectedBookDetails" [autoLayout]="false">
+
+                <ng-template pTemplate="header">
+                    <tr class="border-bottom">
+                        <th class="text-start text-muted fw-medium" style="width: 20%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
+                                    S.No
+                                    <p-sortIcon field="sno"></p-sortIcon>
+                                </div>
+                            </div>
+                        </th>
+                        <!-- <th class="text-start text-muted fw-medium" style="width: 40%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                    Book Name
+                                    <p-sortIcon field="bookName"></p-sortIcon>
+                                </div>                        
+                            </div>
+                        </th> -->
+                        <th class="text-start text-muted fw-medium" style="width: 40%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                    Barcode
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-book let-index="rowIndex">
+                    <tr class="border-bottom">
+                        <td>{{ index + 1 }}</td>
+                        <!-- <td>{{ book.BookName }}</td> -->
+                        <td>
+                            <ngx-barcode6 [bc-value]="book.BookBarcode" [bc-format]="'CODE128'" [bc-display-value]="false"
+                                [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
+                            <div class="barcode-label"
+                                style="font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; margin-top: -1rem;margin-left: 3rem;">
+                                {{ book.BookName }}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="3" class="text-center">No book barcode found.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <ng-template pTemplate="footer">           
+            <!-- Your Print Button is now moved here -->
+            <button pButton label="Print" icon="pi pi-print" 
+                    class="p-button-raised" (click)="printTable()"></button>
+        </ng-template>
+    </p-dialog>
+
+
+<p-confirmDialog></p-confirmDialog>

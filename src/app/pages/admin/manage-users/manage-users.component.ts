@@ -374,6 +374,15 @@ export class ManageUsersComponent {
 
     editUser(_user: UserDetails | null = null): void {
         if (_user) {
+
+            this.roleOptions = this.roles.map(role => {
+                    return { label: role.RoleName ?? '', value: role.RoleId };
+                });
+
+            this.departmentOptions = this.departments.map(role => {
+                    return { label: role.DepartmentName ?? '', value: role.DepartmentId };
+                });
+
             this.currentUser = { ..._user };
             this.header = 'Edit User';
             this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
@@ -383,6 +392,15 @@ export class ManageUsersComponent {
                 UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', DepartmentId : 0,
                 RoleId: 0, RoleName: '', AdmissionNumber: 0, StaffId:'', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending'
             };
+
+            this.roleOptions = this.roles.filter(x => x.IsActive == true).map(role => {
+                    return { label: role.RoleName ?? '', value: role.RoleId };
+                });
+
+            this.departmentOptions = this.departments.filter(x => x.IsActive == true).map(role => {
+                    return { label: role.DepartmentName ?? '', value: role.DepartmentId };
+                });
+
             this.header = 'Add User';
             this.dobDate = null;
         }
@@ -512,7 +530,16 @@ export class ManageUsersComponent {
                 if (!this.currentUser.MailId?.trim()) {
                     this.errors.MailId = 'MailId is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(this.currentUser.UserId == 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim())){
+                    this.errors.MobileNo = 'MailId already exists.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId !=null && this.currentUser.UserId > 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim() && x.UserId != this.currentUser.UserId)){
+                    this.errors.MobileNo = 'MailId already exists.';
+                    isValid = false;
+                }
+                else {
                     this.errors.MailId = '';
                 }
                 break;
@@ -521,7 +548,16 @@ export class ManageUsersComponent {
                 if (!this.currentUser.MobileNo?.trim()) {
                     this.errors.MobileNo = 'MobileNo is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(this.currentUser.UserId == 0 && this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim())){
+                    this.errors.MobileNo = 'MobileNo already exists.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId !=null && this.currentUser.UserId > 0 && this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim() && x.UserId != this.currentUser.UserId)){
+                    this.errors.MobileNo = 'MobileNo already exists.';
+                    isValid = false;
+                }
+                else {
                     this.errors.MobileNo = '';
                 }
                 break;
@@ -548,6 +584,10 @@ export class ManageUsersComponent {
                 if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber>0)) {
                     this.errors.AdmissionNumber = 'Adminssion Number is required.';
                     isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber>0) && this.users.find(x => x.AdmissionNumber == this.currentUser.AdmissionNumber && x.UserId != this.currentUser.UserId)) {
+                    this.errors.AdmissionNumber = 'Adminssion Number already exists.';
+                    isValid = false;
                 } else {
                     this.errors.AdmissionNumber = '';
                 }
@@ -556,6 +596,10 @@ export class ManageUsersComponent {
             case 'StaffId':
                 if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="")) {
                     this.errors.StaffId = 'StaffId is required.';
+                    isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="") && this.users.find(x => x.StaffId == this.currentUser.StaffId && x.UserId != this.currentUser.UserId)) {
+                    this.errors.StaffId = 'StaffId is already exists.';
                     isValid = false;
                 } else {
                     this.errors.StaffId = '';
@@ -607,6 +651,7 @@ export class ManageUsersComponent {
         if (!this.validateUser()) {
             return;
         }
+
 
         if(this.currentUser.UserId !=null && this.currentUser.UserId >0)
         {

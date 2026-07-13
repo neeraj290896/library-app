@@ -307,7 +307,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.authorService.getAuthorDetails().subscribe({
             next: (data: AuthorDetails[]) => {
                 this.authors = data;
-                this.authorOptions = data.map(author => {
+                this.authorOptions = data.filter(x => x.IsActive == true).map(author => {
                     return { label: author.AuthorName ?? '', value: author.AuthorId };
                 });
             },
@@ -321,7 +321,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.publisherService.getPublisherDetails().subscribe({
             next: (data: PublisherDetails[]) => {
                 this.publishers = data;
-                this.publisherOptions = data.map(publisher => {
+                this.publisherOptions = data.filter(x => x.IsActive == true).map(publisher => {
                     return { label: publisher.PublisherName ?? '', value: publisher.PublisherId };
                 });
             },
@@ -335,7 +335,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.categoryService.getCategoryDetails().subscribe({
             next: (data: CategoryDetails[]) => {
                 this.categories = data;
-                this.categoryOptions = data.map(category => {
+                this.categoryOptions = data.filter(x => x.IsActive == true).map(category => {
                     return { label: category.CategoryName ?? '', value: category.CategoryId };
                 });
             },
@@ -349,7 +349,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.languageService.getLanguageDetails().subscribe({
             next: (data: LanguageDetails[]) => {
                 this.languages = data;
-                this.languageOptions = data.map(language => {
+                this.languageOptions = data.filter(x => x.IsActive == true).map(language => {
                     return { label: language.LanguageName ?? '', value: language.LanguageId };
                 });
             },
@@ -363,7 +363,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.buildingService.getAllBuildingDetails().subscribe({
             next: (data: BuildingDetails[]) => {
                 this.buildings = data;
-                this.buildingOptions = data.map(building => {
+                this.buildingOptions = data.filter(x => x.IsActive == true).map(building => {
                     return { label: building.BuildingName ?? '', value: building.BuildingId };
                 });
             },
@@ -486,6 +486,11 @@ export class BooksManageBooksComponent implements OnInit {
                 .map(rack => {
                     return { label: rack.RackLabel ?? '', value: rack.RackId };
                 });
+
+            if(this.currentBook.Status == "Unavailable")
+            {
+                this.currentBook.Status = "Available";
+            }
         }
         else {
             this.currentBook = {
@@ -631,7 +636,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.currentBook.RackLabel = '';
 
         this.floorOptions = this.floors
-            .filter(floor => floor.BuildingId === this.currentBook.BuildingId)
+            .filter(floor => floor.BuildingId === this.currentBook.BuildingId && floor.IsActive == true)
             .map(floor => {
                 return { label: floor.FloorName ?? '', value: floor.FloorId };
             });
@@ -651,7 +656,7 @@ export class BooksManageBooksComponent implements OnInit {
 
         this.rackOptions = this.racks
             .filter(rack => rack.BuildingId === this.currentBook.BuildingId &&
-                rack.FloorId === this.currentBook.FloorId)
+                rack.FloorId === this.currentBook.FloorId && rack.IsActive == true)
             .map(rack => {
                 return { label: rack.RackLabel ?? '', value: rack.RackId };
             });
@@ -692,7 +697,13 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!this.currentBook.AuthorId) {
                     this.errors.AuthorId = 'Author is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.authorOptions.some(option => option.value === this.currentBook.AuthorId)))
+                {
+                    this.errors.AuthorId = 'Please Select valid Author.';
+                    isValid = false;
+                }
+                else {
                     this.errors.AuthorId = '';
                 }
                 break;
@@ -701,7 +712,13 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!this.currentBook.PublisherId) {
                     this.errors.PublisherId = 'Publisher is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.publisherOptions.some(option => option.value === this.currentBook.PublisherId)))
+                {
+                    this.errors.PublisherId = 'Please Select valid Publisher.';
+                    isValid = false;
+                }
+                else {
                     this.errors.PublisherId = '';
                 }
                 break;
@@ -710,7 +727,13 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!this.currentBook.CategoryId) {
                     this.errors.CategoryId = 'Category is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.categoryOptions.some(option => option.value === this.currentBook.CategoryId)))
+                {
+                    this.errors.CategoryId = 'Please Select valid Category.';
+                    isValid = false;
+                }
+                else {
                     this.errors.CategoryId = '';
                 }
                 break;
@@ -719,7 +742,13 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!this.currentBook.LanguageId) {
                     this.errors.LanguageId = 'Language is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.languageOptions.some(option => option.value === this.currentBook.LanguageId)))
+                {
+                    this.errors.LanguageId = 'Please Select valid Language.';
+                    isValid = false;
+                }
+                else {
                     this.errors.LanguageId = '';
                 }
                 break;
@@ -746,7 +775,13 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!this.currentBook.BuildingId) {
                     this.errors.BuildingId = 'Building is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.buildingOptions.some(option => option.value === this.currentBook.BuildingId)))
+                {
+                    this.errors.BuildingId = 'Please Select valid Building.';
+                    isValid = false;
+                }
+                else {
                     this.errors.BuildingId = '';
                 }
                 break;
@@ -755,7 +790,13 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!this.currentBook.FloorId) {
                     this.errors.FloorId = 'Floor is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.floorOptions.some(option => option.value === this.currentBook.FloorId)))
+                {
+                    this.errors.FloorId = 'Please Select valid Floor.';
+                    isValid = false;
+                }
+                else {
                     this.errors.FloorId = '';
                 }
                 break;
@@ -764,7 +805,13 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!this.currentBook.RackId) {
                     this.errors.RackId = 'Rack is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.rackOptions.some(option => option.value === this.currentBook.RackId)))
+                {
+                    this.errors.RackId = 'Please Select valid Rack.';
+                    isValid = false;
+                }
+                else {
                     this.errors.RackId = '';
                 }
                 break;
@@ -821,13 +868,75 @@ export class BooksManageBooksComponent implements OnInit {
             return;
         }
 
-        const payload = [this.currentBook];
-        if (this.currentBook.BookId > 0) {
-            this.updateBook(payload);
+        if(this.currentBook.BookId == null || this.currentBook.BookId == 0)
+        {
+            const isBookExistsAlready = this.books.find(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
+                            x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
+                            x.PublishedYear == this.currentBook.PublishedYear);
+
+            if(isBookExistsAlready !=null && isBookExistsAlready.BookId >0)
+            {
+                this.errors.BookName = 'Book already exists.';
+                    
+                // this.messageService.add({
+                //         severity: 'success',
+                //         summary: 'Manage Book - Failed',
+                //         detail: '"'+this.currentBook.BookName+'" Book already exists.'
+                //     });
+
+                return;
+            }
         }
-        else {
-            this.addNewBook(payload);
+        else
+        {
+            const isBookExistsAlready = this.books.find(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
+                            x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
+                            x.PublishedYear == this.currentBook.PublishedYear);
+
+            if(isBookExistsAlready !=null && isBookExistsAlready.BookId >0 && isBookExistsAlready.BookId != this.currentBook.BookId)
+            {
+                this.errors.BookName = 'Book already exists.';
+                    
+                // this.messageService.add({
+                //         severity: 'success',
+                //         summary: 'Manage Book - Failed',
+                //         detail: '"'+this.currentBook.BookName+'" Book already exists.'
+                //     });
+
+                return;
+            }
         }
+
+        if(this.currentBook.Status =="Available" && this.currentBook.IsActive == false)
+        {
+            this.confirmationService.confirm({
+                message: "Do you want to activate this book?",
+                header: 'Book Activation Confirmation',
+                icon: 'pi pi-book',
+                acceptLabel: 'Yes',
+                rejectLabel: 'No',
+                accept: () => {
+                    this.currentBook.IsActive = true;
+                    this.initiateUpdateOrAddBook();
+                },
+                reject: () => {                    
+                    return;
+                }
+            });
+        }
+        else{
+           this.initiateUpdateOrAddBook();
+        }        
+    }
+
+    initiateUpdateOrAddBook() : void{
+         const payload = [this.currentBook];
+            if (this.currentBook.BookId > 0) {
+                this.updateBook(payload);
+            }
+            else {
+                this.addNewBook(payload);
+            }
     }
 
     addNewBook(_bookDetails: BookDetails[]): void {
@@ -847,28 +956,46 @@ export class BooksManageBooksComponent implements OnInit {
                         detail: 'Book added successfully.'
                     });
 
-                    this.loadBooks();                   
+                    this.loadBooks();    
+                    
+                    // 1. Get the message string
+                    const responseMsg: string = res.Message;
 
-                    this.confirmationService.confirm({
-                    message: "Do you want to print book's barcode?",
-                    header: 'Print Confirmation',
-                    icon: 'pi pi-print',
-                    acceptLabel: 'Yes',
-                    rejectLabel: 'No',
-                    accept: () => {
-                        this.selectedBookDetails = this.books.filter(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
-                            x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
-                            x.PublishedYear == this.currentBook.PublishedYear
-                        );
-                        this.bookDialogVisible = false;
-                        this.onSelectionChange();
-                        this.printBarcode();
+                    // 2. Split by "-" and grab the first element safely using optional chaining
+                    const firstPart: string = responseMsg?.split('-')[0] || '';
 
-                    },
-                    reject: () => {
-                        this.bookDialogVisible = false;
+                    // 3. Split the first part by "," to get your final array
+                    const finalArray: string[] = firstPart ? firstPart.split(',') : [];
+              
+                    if(finalArray !=null && finalArray.length >0)
+                    {
+
+                        this.confirmationService.confirm({
+                            message: "Do you want to print book's barcode?",
+                            header: 'Print Confirmation',
+                            icon: 'pi pi-print',
+                            acceptLabel: 'Yes',
+                            rejectLabel: 'No',
+                            accept: () => {
+                                this.selectedBookDetails = [];
+                                finalArray.forEach(ele => {
+                                    const _importedData = this.books.find(x => x.BookId == parseInt(ele));
+                                        
+                                    if(_importedData !=null)
+                                    {
+                                        this.selectedBookDetails.push(_importedData);
+                                    }
+                                }); 
+                                this.bookDialogVisible = false;
+                                this.onSelectionChange();
+                                this.printBarcode();
+
+                            },
+                            reject: () => {
+                                this.bookDialogVisible = false;
+                            }
+                        });
                     }
-                });
                 }
             },
             error: () => {
@@ -913,7 +1040,11 @@ export class BooksManageBooksComponent implements OnInit {
     }
 
     deleteBook(book: BookDetails): void {
+
+        book.Status = "Unavailable";
+
         const payload = [book];
+
         this.bookService.deleteBookDetails(payload).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {

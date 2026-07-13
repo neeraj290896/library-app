@@ -38,6 +38,144 @@
                 Don't have an account?
                 <a routerLink="/signup" class="text-primary fw-medium text-decoration-none">Register Now</a>
             </p>
+             <p class="small text-muted mb-0">
+               <a class="forgot-link" (click)="openForgot()">Forgot Password?</a>
+            </p>
         </div>
     </div>
 </div>
+
+<p-dialog
+  [style]="{ width: '33vw' }"
+  header="Reset Password"
+  [dismissableMask]="true"
+  [(visible)]="forgotDialogVisible"
+  [modal]="true"
+  [closable]="true"
+>
+  <form [formGroup]="forgotForm">
+    <div *ngIf="fpStep === 1">
+      <p-floatlabel>
+        <label>Enter your registered email : </label>
+        <br />
+        <br />
+        <input
+          pInputText
+          placeholder="Enter email address"
+          formControlName="fpEmail"
+          style="width: 60vh"
+        />
+      </p-floatlabel>
+      <br />
+      <small
+        class="p-error"
+        *ngIf="
+          forgotForm.get('fpEmail')?.touched &&
+          forgotForm.get('fpEmail')?.invalid
+        "
+      >
+        Please enter a valid email address
+      </small>
+      <br />
+      <p-button
+        label="Send OTP"
+        (click)="sendOtp()"
+        [disabled]="
+          forgotForm.get('fpEmail')?.invalid ||
+          forgotForm.get('fpEmail')?.pristine
+        "
+      ></p-button>
+    </div>
+  </form>
+  <div *ngIf="fpStep === 2">
+    <label>Enter OTP:</label>
+    <br /><br />
+
+    <p-inputOtp
+      [(ngModel)]="otpCode"
+      [length]="6"
+    ></p-inputOtp>
+
+    <br /><br />
+
+    <div
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <p-button
+        label="Resend OTP"
+        *ngIf="showResendOtp"
+        (click)="sendOtp()"
+        icon="pi pi-refresh"
+        severity="secondary"
+        [style]="{ float: 'left' }"
+      ></p-button>
+
+      <p-button
+        label="Verify OTP"
+        (click)="verifyOtp()"
+        [disabled]="!otpCode || otpCode.length !== 6"
+        [style]="{ float: 'right' }"
+      ></p-button>
+    </div>
+  </div>
+
+  <div *ngIf="fpStep === 3">
+  <div class="password-field-with-tooltip">
+    <p-floatlabel>
+      <label>New Password</label>
+      <p-password        
+        name="fpPassword"
+        formControlName="fpPassword"
+        placeholder="Enter New Password"
+        [feedback]="false"
+        toggleMask="true"
+        (input)="onPasswordInput($event)"
+      ></p-password>
+
+      <ul class="password-rules">
+        <li [class.valid]="passwordRules.minLength">
+          Length is between 8 and 45 characters
+        </li>
+        <li [class.valid]="passwordRules.upperCase">
+          Contains at least 1 upper case letter
+        </li>
+        <li [class.valid]="passwordRules.lowerCase">
+          Contains at least 1 lower case letter
+        </li>
+        <li [class.valid]="passwordRules.number">
+          Contains at least 1 number
+        </li>
+        <li [class.valid]="passwordRules.specialChar">
+          Contains at least 1 allowed special character
+        </li>
+      </ul>
+
+      <p style="margin-top: 0.5rem; font-size: 12px">
+        Special characters allowed:<br />
+        <strong>{{ specialChars }}</strong>
+      </p>
+    </p-floatlabel>
+  </div>
+
+  <div class="password-field-with-tooltip">
+    <p-floatlabel>
+      <label>Confirm Password</label>
+      <p-password
+        formControlName="fpConfirmPassword"
+        placeholder="Enter New Password"
+        [feedback]="false"
+        toggleMask="true"
+        (input)="onConfirmPswdInput($event)"
+      ></p-password>
+    </p-floatlabel>
+  </div>
+
+  <br />
+  <br /><br />
+  <p-button
+    label="Reset Password"
+    (click)="resetPassword()"
+  ></p-button>
+</div>
+
+</p-dialog>

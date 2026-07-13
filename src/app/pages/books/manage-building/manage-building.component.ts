@@ -89,7 +89,7 @@ export class ManageBuildingComponent {
       this._stateService.getStateDetails().subscribe({
           next: (data: StateDetails[]) => {
               this.stateDetails = data;
-              this.stateOptions = data.map(author => {
+              this.stateOptions = data.filter(x => x.IsActive == true).map(author => {
                   return { label: author.StateName ?? '', value: author.StateId };
               });
           },
@@ -103,7 +103,7 @@ export class ManageBuildingComponent {
       this._districtService.getDistrictDetailsById(stateId).subscribe({
           next: (data: DistrictDetails[]) => {
               this.districtDetails = data;
-              this.districtOptions = data.map(author => {
+              this.districtOptions = data.filter(x => x.IsActive == true).map(author => {
                   return { label: author.DistrictName ?? '', value: author.DistrictId };
               });
           },
@@ -117,7 +117,7 @@ export class ManageBuildingComponent {
       this._cityService.getCityDetailsById(stateId,districtId).subscribe({
           next: (data: CityDetails[]) => {
               this.cityDetails = data;
-              this.cityOptions = data.map(author => {
+              this.cityOptions = data.filter(x => x.IsActive == true).map(author => {
                   return { label: author.CityName ?? '', value: author.CityId };
               });
           },
@@ -131,7 +131,7 @@ export class ManageBuildingComponent {
       this._areaService.getAreaDetailsById(stateId, districtId, cityId).subscribe({
           next: (data: AreaDetails[]) => {
               this.areaDetails = data;
-              this.areaOptions = data.map(author => {
+              this.areaOptions = data.filter(x => x.IsActive == true).map(author => {
                   return { label: author.AreaName ?? '', value: author.AreaId };
               });
           },

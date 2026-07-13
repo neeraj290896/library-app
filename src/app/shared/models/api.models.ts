@@ -21,6 +21,7 @@ export interface SettingDetails {
     EnableWishlistNotification: boolean;
     EnableMobileNotification: boolean;
     EnableBarcodeScanning: boolean;
+    ReminderMailNotificationInDays: number;
     IsActive: boolean;
 }
 
@@ -306,6 +307,7 @@ export interface UserDetails {
     LastLogInTime?: string | null;
     UserBarcode?: string | null;
     IsActive?: boolean | null;
+    IsFirstTimeLogin?: boolean | null;
     BorrowedBooksCount?: number | null;
     OverDueBooksCount?: number | null;
 }

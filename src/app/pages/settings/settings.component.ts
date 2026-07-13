@@ -38,10 +38,10 @@ export class SettingsComponent {
     public loggedInUserDetails: UserDetails | null = null;
     public settingDetails: SettingDetails = {
         SettingId: 0, CutOffDays: 90, FinePercentage: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
-        EnableMobileNotification: false, EnableBarcodeScanning:false, IsActive: true
+        EnableMobileNotification: false, EnableBarcodeScanning:false, ReminderMailNotificationInDays: 2, IsActive: true
     };
     public finePercentage: string = "";
-    public errors: { CutOffDays: string, FinePercentage: string } = { CutOffDays: '', FinePercentage: '' };
+    public errors: { CutOffDays: string, FinePercentage: string, ReminderMailNotificationInDays: string } = { CutOffDays: '', FinePercentage: '', ReminderMailNotificationInDays:'' };
 
     public dobDate: Date | null = null;
     public currentUser: UserDetails = {
@@ -171,6 +171,15 @@ export class SettingsComponent {
                     this.settingDetails.FinePercentage = Math.round(((parseInt(value) / 100) + Number.EPSILON) * 100) / 100;
                 }
                 break;
+            
+            case 'ReminderMailNotificationInDays':
+                if (!/^\d+$/.test(value?.toString().trim() ?? '') || (Number(value) <= 0 && Number(value) >5)) {
+                    this.errors.ReminderMailNotificationInDays = 'Reminder Mail Notification In Days is required and must be a less than 5 days.';
+                    isValid = false;
+                } else {
+                    this.errors.ReminderMailNotificationInDays = '';
+                }
+                break;
 
             default:
                 break;
@@ -182,8 +191,10 @@ export class SettingsComponent {
     validateAplnSettings(): boolean {
         const isCutOffDays = this.validateInput('CutOffDays', this.settingDetails.CutOffDays);
         const isFinePercentage = this.validateInput('FinePercentage', (this.settingDetails.FinePercentage * 100).toString());
+        const isReminderMailNotificationInDays = this.validateInput('ReminderMailNotificationInDays', this.settingDetails.ReminderMailNotificationInDays);
+        
 
-        return isCutOffDays && isFinePercentage;
+        return isCutOffDays && isFinePercentage && isReminderMailNotificationInDays;
     }
 
     saveAplnSettings(): void {

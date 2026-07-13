@@ -298,7 +298,7 @@ export class IssueReturnBooksComponent implements OnChanges {
             next: (data: BookDetails[]) => {
                 this.lstBookDetails = data;
                 if (this.isIssueNewBook) {
-                    this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
+                    this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available" && x.IsActive == true).map(book => {
                         return { label: book.BookName ?? '', value: book.BookId };
                     });
                 }

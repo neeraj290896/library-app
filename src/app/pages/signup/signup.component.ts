@@ -11,6 +11,7 @@ import { RoleService } from '../../shared/services/role.service';
 import { UserService } from '../../shared/services/user.service';
 import { RoleDetails, UserDetails } from '../../shared/models/api.models';
 import { AuthService } from '@app/shared/services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-signup',
@@ -39,8 +40,34 @@ export class SignupComponent implements OnInit {
         { label: 'Male', value: 'M' },
         { label: 'Female', value: 'F' }
     ];
-
+    public minDate: Date | undefined;
+    public maxDate: Date | undefined;
+    calendarFocusDate!: Date; 
+    
     ngOnInit(): void {
+
+        const today = new Date();
+        let year = today.getFullYear();
+        let minYear = year - 100;
+        let maxYear = year - environment.studentsMinimumAge;
+
+        this.minDate = new Date();
+        this.minDate.setDate(1);
+        this.minDate.setMonth(0);
+        this.minDate.setFullYear(minYear);
+
+        this.maxDate = new Date();        
+        this.maxDate.setMonth(11);
+        this.maxDate.setDate(31);
+        this.maxDate.setFullYear(maxYear);
+
+         this.calendarFocusDate = new Date(this.maxDate.getFullYear(),  today.getMonth(), today.getDate());
+
+
+        this.getRoleDetails();   
+    }
+
+    getRoleDetails(): void{
         this.roleService.getRoleDetails().subscribe({
             next: (data: RoleDetails[] | { data?: RoleDetails[] }) => {
                 const roleList = Array.isArray(data) ? data : (data.data ?? []);

@@ -143,7 +143,7 @@ export class ManageRackComponent {
           this.currentRack.BuildingName = building.label;
       }
 
-      this.floorOptions = this.allFloors.filter(x => x.BuildingId == this.currentRack.BuildingId).map(floor => {
+      this.floorOptions = this.allFloors.filter(x => x.BuildingId == this.currentRack.BuildingId && x.IsActive == true).map(floor => {
           return { label: floor.FloorName ?? '', value: floor.FloorId };
       });
 

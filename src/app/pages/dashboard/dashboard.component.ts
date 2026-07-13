@@ -22,7 +22,7 @@ import { LanguageService } from '@app/shared/services/language.service';
 import { PublisherService } from '@app/shared/services/publisher.service';
 import { RackService } from '@app/shared/services/rack.service';
 import { BookService } from '@app/shared/services/book.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -34,17 +34,21 @@ import { SearchComponent } from '@app/shared/components/search/search.component'
 import { AuthService } from '@app/shared/services/auth.service';
 import { environment } from '../../../environments/environment';
 import { DepartmentService } from '@app/shared/services/department.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { QRCodeComponent } from 'angularx-qrcode';
+import { NgxBarcode6 } from 'ngx-barcode6';
 
 @Component({
     selector: 'app-dashboard',
     standalone: true,
     imports: [CommonModule, CardModule, TableModule, ButtonModule,
-        FormsModule, InputTextModule, PaginatorModule, DialogModule,
-        BooksOverdueComponent, BooksManageBooksComponent,
+        FormsModule, InputTextModule, PaginatorModule, DialogModule, NgxBarcode6,
+        BooksOverdueComponent, BooksManageBooksComponent, QRCodeComponent, 
         ManageIssuedBooksComponent, ManageUsersComponent,
         MultiSelectModule, SelectModule, DatePickerModule, TooltipModule,
-        IssueReturnBooksComponent, SearchComponent
+        IssueReturnBooksComponent, SearchComponent, ConfirmDialogModule
     ],
+    providers: [ConfirmationService],
     templateUrl: './dashboard.component.html',
     styleUrl: './dashboard.component.scss'
 })
@@ -64,6 +68,7 @@ export class DashboardComponent {
     private roleService = inject(RoleService);
     private authService = inject(AuthService);
     public departmentService = inject(DepartmentService);
+    private confirmationService = inject(ConfirmationService);
 
     public currentDate: Date = new Date();
 
@@ -226,6 +231,14 @@ export class DashboardComponent {
     calendarFocusDate!: Date; 
     public dobDate: Date | null = null;
     public studentRoleId: number  = 5;
+    public users: UserDetails[] = [];
+    public books: BookDetails[] = [];
+    public selectedUserDetails: UserDetails[] = [];
+    public selectedUserIds: number[] = [];
+    public printUserDialogVisible: boolean = false;
+    public selectedBookDetails: BookDetails[] = [];
+    public selectedBookIds: number[] = [];
+    public printBarcodeDialogVisible: boolean = false;    
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -265,6 +278,8 @@ export class DashboardComponent {
         this.loadRacks();
         this.loadRoleDetails();
         this.loadDepartmentDetails();
+        this.loadUserDetails();
+        this.loadBooks();
     }
 
     parseCustomDateStringForUI(dateStr: Date): string {
@@ -322,7 +337,7 @@ export class DashboardComponent {
         this.authorService.getAuthorDetails().subscribe({
             next: (data: AuthorDetails[]) => {
                 this.authors = data;
-                this.authorOptions = data.map(author => {
+                this.authorOptions = data.filter(x=> x.IsActive == true).map(author => {
                     return { label: author.AuthorName ?? '', value: author.AuthorId };
                 });
             },
@@ -336,7 +351,7 @@ export class DashboardComponent {
         this.publisherService.getPublisherDetails().subscribe({
             next: (data: PublisherDetails[]) => {
                 this.publishers = data;
-                this.publisherOptions = data.map(publisher => {
+                this.publisherOptions = data.filter(x=> x.IsActive == true).map(publisher => {
                     return { label: publisher.PublisherName ?? '', value: publisher.PublisherId };
                 });
             },
@@ -350,7 +365,7 @@ export class DashboardComponent {
         this.categoryService.getCategoryDetails().subscribe({
             next: (data: CategoryDetails[]) => {
                 this.categories = data;
-                this.categoryOptions = data.map(category => {
+                this.categoryOptions = data.filter(x=> x.IsActive == true).map(category => {
                     return { label: category.CategoryName ?? '', value: category.CategoryId };
                 });
             },
@@ -364,7 +379,7 @@ export class DashboardComponent {
         this.languageService.getLanguageDetails().subscribe({
             next: (data: LanguageDetails[]) => {
                 this.languages = data;
-                this.languageOptions = data.map(language => {
+                this.languageOptions = data.filter(x=> x.IsActive == true).map(language => {
                     return { label: language.LanguageName ?? '', value: language.LanguageId };
                 });
             },
@@ -378,7 +393,7 @@ export class DashboardComponent {
         this.buildingService.getAllBuildingDetails().subscribe({
             next: (data: BuildingDetails[]) => {
                 this.buildings = data;
-                this.buildingOptions = data.map(building => {
+                this.buildingOptions = data.filter(x=> x.IsActive == true).map(building => {
                     return { label: building.BuildingName ?? '', value: building.BuildingId };
                 });
             },
@@ -414,7 +429,7 @@ export class DashboardComponent {
         this.roleService.getRoleDetails().subscribe({
             next: (data: RoleDetails[]) => {
                 this.roles = data.filter(x => x.RoleId >= (this.loggedInUserDetails?.RoleId ?? 0));
-                this.roleOptions = data.map(role => {
+                this.roleOptions = data.filter(x=> x.IsActive == true).map(role => {
                     return { label: role.RoleName ?? '', value: role.RoleId };
                 });
             },
@@ -428,7 +443,7 @@ export class DashboardComponent {
         this.departmentService.getDepartmentDetails().subscribe({
             next: (data: DepartmentDetails[]) => {
                 this.departments = data;
-                this.departmentOptions = data.map(dept => {
+                this.departmentOptions = data.filter(x=> x.IsActive == true).map(dept => {
                 return { label: dept.DepartmentName ?? '', value: dept.DepartmentId };
             });
             },
@@ -555,7 +570,7 @@ export class DashboardComponent {
         this.currentBook.RackLabel = '';
 
         this.floorOptions = this.floors
-            .filter(floor => floor.BuildingId === this.currentBook.BuildingId)
+            .filter(floor => floor.BuildingId === this.currentBook.BuildingId && floor.IsActive == true)
             .map(floor => {
                 return { label: floor.FloorName ?? '', value: floor.FloorId };
             });
@@ -575,7 +590,7 @@ export class DashboardComponent {
 
         this.rackOptions = this.racks
             .filter(rack => rack.BuildingId === this.currentBook.BuildingId &&
-                rack.FloorId === this.currentBook.FloorId)
+                rack.FloorId === this.currentBook.FloorId && rack.IsActive == true)
             .map(rack => {
                 return { label: rack.RackLabel ?? '', value: rack.RackId };
             });
@@ -730,12 +745,13 @@ export class DashboardComponent {
         const isBuildingIdValid = this.validateBookInput('BuildingId');
         const isFloorIdValid = this.validateBookInput('FloorId');
         const isRackIdValid = this.validateBookInput('RackId');
-        const isBookBarcodeValid = this.validateBookInput('BookBarcode');
-        const isStatusValid = this.validateBookInput('IsActive');
+        // const isBookBarcodeValid = this.validateBookInput('BookBarcode');
+        // const isStatusValid = this.validateBookInput('IsActive');
         return isBookNameValid && isAuthorIdValid && isPublisherIdValid &&
             isCategoryIdValid && isLanguageIdValid && isPublishedYearValid &&
             isPriceValid && isBuildingIdValid && isFloorIdValid &&
-            isRackIdValid && isBookBarcodeValid && isStatusValid;
+            isRackIdValid;
+            //  && isBookBarcodeValid && isStatusValid;
     }
 
     saveBook(): void {
@@ -743,8 +759,19 @@ export class DashboardComponent {
             return;
         }
 
+        const isBookExistsAlready = this.books.find(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
+                            x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
+                            x.PublishedYear == this.currentBook.PublishedYear);
+
+        if(isBookExistsAlready !=null && isBookExistsAlready.BookId >0)
+        {
+            this.bookErrors.BookName = 'Book already exists.';           
+
+            return;
+        }
+
         const payload = [this.currentBook];
-        this.bookService.updateBookDetails(payload).subscribe({
+        this.bookService.addBookDetails(payload).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
@@ -759,7 +786,49 @@ export class DashboardComponent {
                         detail: 'Book added successfully.'
                     });
                 
-                    this.addNewBookDialogVisible = false;
+                    this.loadBooks();
+                    
+
+                    // 1. Get the message string
+                    const responseMsg: string = res.Message;
+
+                    // 2. Split by "-" and grab the first element safely using optional chaining
+                    const firstPart: string = responseMsg?.split('-')[0] || '';
+
+                    // 3. Split the first part by "," to get your final array
+                    const finalArray: string[] = firstPart ? firstPart.split(',') : [];
+              
+                    if(finalArray !=null && finalArray.length >0)
+                    {
+
+                        this.confirmationService.confirm({
+                            message: "Do you want to print book's barcode?",
+                            header: 'Print Confirmation',
+                            icon: 'pi pi-print',
+                            acceptLabel: 'Yes',
+                            rejectLabel: 'No',
+                            accept: () => {
+                                this.selectedBookDetails = [];
+
+                                finalArray.forEach(ele => {
+                                    const _importedData = this.books.find(x => x.BookId == parseInt(ele));
+                                        
+                                    if(_importedData !=null)
+                                    {
+                                        this.selectedBookDetails.push(_importedData);
+                                    }
+                                }); 
+                                this.addNewBookDialogVisible = false;
+                                this.onBookSelectionChange();
+                                this.printBookBarcode();
+
+                            },
+                            reject: () => {
+                                this.addNewBookDialogVisible = false;
+                            }
+                        });
+                    }
+
                 }
 
                 
@@ -827,7 +896,7 @@ export class DashboardComponent {
         this.validateUserInput('DepartmentId');
     }
 
-     onDOBChange(): void {
+    onDOBChange(): void {
         if (this.dobDate) {
             // this.dobDate.setHours(0, 0, 0, 0);
              // Reverse the 5 hour 30 min shift (in minutes: 5 * 60 + 30 = 330)
@@ -884,6 +953,10 @@ export class DashboardComponent {
                     this.userErrors.MailId = 'Valid MailId is required.';
                     isValid = false;
                 }
+                else if(this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim())){
+                    this.userErrors.MobileNo = 'MailId already exists.';
+                    isValid = false;
+                }
                 else {
                     this.userErrors.MailId = '';
                 }
@@ -897,7 +970,12 @@ export class DashboardComponent {
                 else if(!(/^[6-9]\d{9}$/.test(this.currentUser.MobileNo?.trim()))){
                     this.userErrors.MobileNo = 'Valid MobileNo is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim())){
+                    this.userErrors.MobileNo = 'MobileNo already exists.';
+                    isValid = false;
+                }
+                else {
                     this.userErrors.MobileNo = '';
                 }
                 break;
@@ -924,7 +1002,12 @@ export class DashboardComponent {
                 if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber > 0)) {
                     this.userErrors.AdmissionNumber = 'Adminssion Number is required.';
                     isValid = false;
-                } else {
+                } 
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber>0) && this.users.find(x => x.AdmissionNumber == this.currentUser.AdmissionNumber && x.UserId != this.currentUser.UserId)) {
+                    this.userErrors.AdmissionNumber = 'Adminssion Number already exists.';
+                    isValid = false;
+                }
+                else {
                     this.userErrors.AdmissionNumber = '';
                 }
                 break;
@@ -933,7 +1016,12 @@ export class DashboardComponent {
                 if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="")) {
                     this.userErrors.StaffId = 'StaffId is required.';
                     isValid = false;
-                } else {
+                } 
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="") && this.users.find(x => x.StaffId == this.currentUser.StaffId && x.UserId != this.currentUser.UserId)) {
+                    this.userErrors.StaffId = 'StaffId is already exists.';
+                    isValid = false;
+                }
+                else {
                     this.userErrors.StaffId = '';
                 }
                 break;
@@ -973,11 +1061,11 @@ export class DashboardComponent {
         const isDepartmentIdValid = this.validateUserInput('DepartmentId');
         const isAdmissionNumberValid = this.validateUserInput('AdmissionNumber');
         const isStaffIdValid = this.validateUserInput('StaffId');
-        const isAccessRequestValid = this.validateUserInput('Status');
-        const isStatusValid = this.validateUserInput('IsActive');
+        // const isAccessRequestValid = this.validateUserInput('Status');
+        // const isStatusValid = this.validateUserInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid &&
-            isAccessRequestValid && isStatusValid;
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid;
+            // && isAccessRequestValid && isStatusValid
     }
 
     saveUser(): void {
@@ -1000,7 +1088,30 @@ export class DashboardComponent {
                         summary: 'Manage User - Success',
                         detail: 'User added successfully.'
                     });
-                    this.registerUserDialogVisible = false;
+
+                    this.loadUserDetails();
+                    
+
+                    this.confirmationService.confirm({
+                        message: "Do you want to print user's barcode?",
+                        header: 'Print Confirmation',
+                        icon: 'pi pi-print',
+                        acceptLabel: 'Yes',
+                        rejectLabel: 'No',
+                        accept: () => {
+                            this.selectedUserDetails = this.users.filter(x => x.FullName == this.currentUser.FullName && x.RoleId == this.currentUser.RoleId && x.MobileNo == this.currentUser.MobileNo
+                                && x.MailId == this.currentUser.MailId
+                            );
+                            this.registerUserDialogVisible = false;
+                            this.onUserSelectionChange();
+                            this.printUserBarcode();
+
+                        },
+                        reject: () => {
+                            this.registerUserDialogVisible = false;
+                        }
+                    });
+
                 }                
             },
             error: () => {
@@ -1030,5 +1141,60 @@ export class DashboardComponent {
         if (!isNumber && !allowedKeys.includes(event.key)) {
             event.preventDefault();
         }
+    }
+
+    loadUserDetails(): void {        
+        this.userService.getAllUserDetails().subscribe({
+            next: (data: UserDetails[]) => {
+                this.users = data.filter(x => x.IsActive == true);                
+            },
+            error: (err) => {
+                console.error('Error loading users:', err);
+            }
+        });        
+    }
+
+    loadBooks(): void {
+
+        this.bookService.getAllBookDetails().subscribe({
+            next: (data: BookDetails[]) => {
+                this.books = data.filter(x => x.IsActive == true);                
+            },
+            error: (err) => {
+                console.error('Error loading books:', err);
+            }
+        });
+        
+    }
+
+    onUserSelectionChange() {
+        this.selectedUserIds = this.selectedUserDetails
+            .map(x => x.UserId)
+            .filter((id): id is number => id !== null && id !== undefined);
+
+        console.log('Selected User IDs:', this.selectedUserIds);
+    }
+
+    printUserBarcode() {
+        if (this.selectedUserIds != null && this.selectedUserIds.length > 0) {
+            this.printUserDialogVisible = true;
+        }
+    }
+
+    onBookSelectionChange() {
+        // Extract only the IDs from the selected objects
+        this.selectedBookIds = this.selectedBookDetails.map(x => x.BookId);
+
+        console.log('Selected Book IDs:', this.selectedBookIds);
+    }
+
+    printBookBarcode() {
+        if (this.selectedBookIds != null && this.selectedBookIds.length > 0) {
+            this.printBarcodeDialogVisible = true;
+        }
+    }
+
+    printTable(): void {
+        window.print();
     }
 }

@@ -584,7 +584,7 @@
                     styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Issued'"
                     (click)="checkInBook(currentBook)" pTooltip="CheckIn"></p-button>
                 <p-button icon="pi pi-sign-out" type="button" label="CheckOut" [style]="{ width: '7rem' }"
-                    styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Available'"
+                    styleClass="btn-main" *ngIf="currentBook.BookId >0 && currentBook.Status =='Available' && currentBook.IsActive == true"
                     (click)="checkOutBook(currentBook)" pTooltip="CheckOut"></p-button>
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     *ngIf="!isViewOnly" styleClass="btn-main-outlined" (click)="bookDialogVisible = false"></p-button>

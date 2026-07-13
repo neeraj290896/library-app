@@ -33,6 +33,14 @@
                         <div *ngIf="errors.FinePercentage" class="text-danger mt-1 small">{{ errors.FinePercentage }}
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <label class="d-block small fw-medium text-secondary mb-1">Reminder Mail Notification In Days</label>
+                        <input id="reminderMailNotificationInDays" type="reminderMailNotificationInDays" placeholder="Enter Reminder Mail Notification In Days" pInputText
+                            class="form-control" [ngModelOptions]="{standalone: true}" [disabled] = "!enableAplnSettingsAccess"
+                            (ngModelChange)="validateInput('ReminderMailNotificationInDays', $event)"
+                            [(ngModel)]="settingDetails.ReminderMailNotificationInDays" />
+                        <div *ngIf="errors.ReminderMailNotificationInDays" class="text-danger mt-1 small">{{ errors.ReminderMailNotificationInDays }}</div>
+                    </div>
                 </div>
                 <div class="d-flex align-items-center gap-3 justify-content-end border-top pt-4">
                     <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main" [disabled] = "!enableAplnSettingsAccess"
