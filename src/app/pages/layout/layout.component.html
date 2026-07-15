@@ -11,7 +11,7 @@
                 <div class="logo-container d-flex align-items-center justify-content-center flex-shrink-0">
                     <div class="logo-inner"></div>
                 </div>
-                <h1 class="fs-6 fw-semibold mb-0 text-nowrap">Library</h1>
+                <h1 class="fs-6 fw-semibold mb-0 text-nowrap">VCN Library</h1>
                 }
             </div>
             <button pButton icon="pi pi-bars" (click)="toggleSidebar()"
@@ -56,7 +56,7 @@
                 <div class="col-4"></div>
                 <div class="col-4 d-flex align-items-center justify-content-center">
                     @if (authService.organizationDetails()) {
-                    <img src="assets/images/logo.png" alt="Logo" class="header-logo me-3" />
+                    <img [src]="organizationImagePath" alt="Logo" class="header-logo me-3" />
                     <h2 class="fs-5 fw-semibold mb-0">{{ authService.organizationDetails()?.OrganizationName}}</h2>
                     }
                 </div>

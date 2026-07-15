@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { TimeAgoPipe } from '@app/shared/pipe/time-ago.pipe';
 import { MessageService } from 'primeng/api';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-layout',
@@ -29,6 +30,7 @@ export class LayoutComponent {
     public loggedInUserDetails: UserDetails | null = null;
     // public _wishlistCount : number = 0;
     public wlDetails : WishlistDetails[] = [];
+    public organizationImagePath: string = '';
 
     public readonly menuItems = [
         { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar' },
@@ -44,6 +46,13 @@ export class LayoutComponent {
         this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
         this.authService.setUserDetails(this.loggedInUserDetails);
         this.getWishlistCountDetails();
+        if(this.authService.organizationDetails()?.ImagePath) {
+            this.organizationImagePath = environment.apiUrl + environment.uploadedFilesPath + this.authService.organizationDetails()?.ImagePath;
+        }
+        else{
+            this.organizationImagePath = 'assets/images/VCN_Image.png';
+        }
+
     }
 
     getWishlistCountDetails(): void {

@@ -43,4 +43,8 @@ export class OrganizationService {
     deleteDepartmentDetails(payload: DepartmentDetails[]): Observable<any> {
         return this.http.post(`${this.baseUrl}/DeleteDepartmentDetails`, payload);
     }
+
+    uploadOrganizationImage(payload: FormData): Observable<any> {
+        return this.http.post(`${this.baseUrl}/UploadOrganizationImage`, payload);
+    }
 }
