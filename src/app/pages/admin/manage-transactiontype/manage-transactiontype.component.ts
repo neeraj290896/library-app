@@ -101,12 +101,21 @@ export class ManageTransactiontypeComponent {
     
             switch (key) {
                 case 'TransactionTypeName':
-                    if (!this.currentTransactionType.TypeName?.trim()) {
+                    const transactionTypeName = this.currentTransactionType.TypeName?.trim();
+                    if (!transactionTypeName) {
                         this.errors.TypeName = 'TransactionType name is required.';
                         isValid = false;
-                    } else {
-                        this.errors.TypeName = '';
                     }
+                    else if(this.transactionTypes.some(tt => 
+                        tt.TypeName?.toLowerCase() === transactionTypeName.toLowerCase() && 
+                        tt.TypeId !== this.currentTransactionType.TypeId)) {
+                        this.errors.TypeName = 'TransactionType already exists.';
+                        isValid = false;
+                    }
+                    else {
+                        this.errors.TypeName = '';
+
+                    }                     
                     break;
     
                 case 'IsActive':

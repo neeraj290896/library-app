@@ -103,10 +103,18 @@ private messageService = inject(MessageService);
 
         switch (key) {
             case 'DepartmentName':
-                if (!this.currentDepartment.DepartmentName?.trim()) {
+                const departmentName = this.currentDepartment.DepartmentName?.trim();
+                if (!departmentName) {
                     this.errors.DepartmentName = 'Department name is required.';
                     isValid = false;
-                } else {
+                } 
+                else if (this.departments.some(dep => 
+                    dep.DepartmentName?.toLowerCase() === departmentName.toLowerCase() && 
+                    dep.DepartmentId !== this.currentDepartment.DepartmentId)) {
+                    this.errors.DepartmentName = 'Department already exists.';
+                    isValid = false;
+                }
+                else {
                     this.errors.DepartmentName = '';
                 }
                 break;

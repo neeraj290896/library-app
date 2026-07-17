@@ -14,6 +14,7 @@ import { ManageBuildingComponent } from './manage-building/manage-building.compo
 import { ManageFloorComponent } from './manage-floor/manage-floor.component';
 import { ManageRackComponent } from './manage-rack/manage-rack.component';
 import { environment } from '../../../environments/environment';
+import { BooksManageSubjectComponent } from './books-manage-subject/books-manage-subject.component';
 
 @Component({
     selector: 'app-books',
@@ -30,7 +31,8 @@ import { environment } from '../../../environments/environment';
         SearchComponent,
         ManageBuildingComponent,
         ManageFloorComponent,
-        ManageRackComponent
+        ManageRackComponent,
+        BooksManageSubjectComponent
     ],
     templateUrl: './books.component.html',
     styleUrl: './books.component.scss'

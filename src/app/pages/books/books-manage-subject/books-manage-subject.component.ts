@@ -1,53 +1,52 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
+import { Component, inject, ViewChild } from '@angular/core';
+import { SubjectDetails } from '@app/shared/models/api.models';
+import { SubjectService } from '@app/shared/services/subject.service';
 import { Table, TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { PaginatorModule } from 'primeng/paginator';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
-import { CategoryService } from '@services/category.service';
-import { CategoryDetails } from '@app/shared/models/api.models';
 import * as Xlsx from 'xlsx';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
 import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
+import { CommonModule } from '@angular/common';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { PaginatorModule } from 'primeng/paginator';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
 
-type ImportCategoryDetails = CategoryDetails & {
+type ImportSubjectDetails = SubjectDetails & {
     Error: string;
 };
 
 @Component({
-    selector: 'app-books-manage-category',
-    standalone: true,
-    imports: [CommonModule, ButtonModule, TableModule, TagModule,
+  selector: 'app-books-manage-subject',
+  imports: [CommonModule, ButtonModule, TableModule, TagModule,
         PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
         SelectModule, FormsModule, TooltipModule],
-    templateUrl: './books-manage-category.component.html',
-    styleUrl: './books-manage-category.component.scss'
+  templateUrl: './books-manage-subject.component.html',
+  styleUrl: './books-manage-subject.component.scss'
 })
-export class BooksManageCategoryComponent implements OnInit {
-    private messageService = inject(MessageService);
-    private categoryService = inject(CategoryService);
+export class BooksManageSubjectComponent {
+  private messageService = inject(MessageService);
+    private subjectService = inject(SubjectService);
 
     @ViewChild('dt') dataTable: Table | undefined;
     @ViewChild('importDt') importDataTable: Table | undefined;
 
-    public categories: CategoryDetails[] = [];
+    public subjects: SubjectDetails[] = [];
     public showFt: boolean = false;
-    public categoryNameList: { label: string, value: string }[] = [];
+    public subjectNameList: { label: string, value: string }[] = [];
     public statusList: { label: string, value: boolean }[] = [];
-    public selectedCategoryNameList: string[] = [];
+    public selectedSubjectNameList: string[] = [];
     public selectedStatusList: boolean[] = [];
-    public categoryDialogVisible = false;
+    public subjectDialogVisible = false;
     public header: string = '';
-    public currentCategory: CategoryDetails = { CategoryId: 0, CategoryName: '', IsActive: null };
-    public errors: { CategoryName: string, IsActive: string } = {
-        CategoryName: '',
+    public currentSubject: SubjectDetails = { SubjectId: 0, SubjectName: '', IsActive: null };
+    public errors: { SubjectName: string, IsActive: string } = {
+        SubjectName: '',
         IsActive: ''
     };
     public options: { label: string; value: boolean; }[] = [
@@ -56,45 +55,45 @@ export class BooksManageCategoryComponent implements OnInit {
     ];
 
     public importDialogVisible: boolean = false;
-    public importPreview: ImportCategoryDetails[] = [];
+    public importPreview: ImportSubjectDetails[] = [];
     public importUploadError: string = '';
     public importShowFt: boolean = false;
-    public importCategoryNameList: { label: string, value: string }[] = [];
+    public importSubjectNameList: { label: string, value: string }[] = [];
     public importStatusList: { label: string, value: boolean }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
-    public importSelectedCategoryNameList: string[] = [];
+    public importSelectedSubjectNameList: string[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
 
     ngOnInit(): void {
-        this.loadCategories();
+        this.loadSubjects();
     }
 
-    loadCategories(): void {
-        this.categoryService.getCategoryDetails().subscribe({
-            next: (data: CategoryDetails[]) => {
-                this.categories = data;
+    loadSubjects(): void {
+        this.subjectService.getSubjectDetails().subscribe({
+            next: (data: SubjectDetails[]) => {
+                this.subjects = data;
                 this.initializeFilterLists();
             },
             error: (err) => {
-                console.error('Error loading categories:', err);
+                console.error('Error loading subjects:', err);
             }
         });
     }
 
     initializeFilterLists(): void {
-        this.categoryNameList = [...new Set(this.categories.map(cat => cat.CategoryName))]
+        this.subjectNameList = [...new Set(this.subjects.map(sub => sub.SubjectName))]
             .map(e => ({ label: e!, value: e! }));
-        this.statusList = [...new Set(this.categories.map(cat => cat.IsActive ?? false))]
+        this.statusList = [...new Set(this.subjects.map(sub => sub.IsActive ?? false))]
             .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
     }
 
     initializeImportFilterLists(): void {
-        this.importCategoryNameList = [...new Set(this.importPreview.map(cat => cat.CategoryName))]
+        this.importSubjectNameList = [...new Set(this.importPreview.map(sub => sub.SubjectName))]
             .map(e => ({ label: e!, value: e! }));
-        this.importStatusList = [...new Set(this.importPreview.map(cat => cat.IsActive ?? false))]
+        this.importStatusList = [...new Set(this.importPreview.map(sub => sub.IsActive ?? false))]
             .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
-        this.importErrorList = [...new Set(this.importPreview.map(cat => cat.Error))]
+        this.importErrorList = [...new Set(this.importPreview.map(sub => sub.Error))]
             .map(e => ({ label: e!, value: e! }));
     }
 
@@ -108,14 +107,14 @@ export class BooksManageCategoryComponent implements OnInit {
 
     clear(): void {
         this.dataTable?.reset();
-        this.selectedCategoryNameList = [];
+        this.selectedSubjectNameList = [];
         this.selectedStatusList = [];
         this.showFt = false;
     }
 
     clearImport(): void {
         this.importDataTable?.reset();
-        this.importSelectedCategoryNameList = [];
+        this.importSelectedSubjectNameList = [];
         this.importSelectedStatusList = [];
         this.importSelectedErrorList = [];
         this.importShowFt = false;
@@ -125,45 +124,44 @@ export class BooksManageCategoryComponent implements OnInit {
         return isActive ? 'success' : 'danger';
     }
 
-    editCategory(category: CategoryDetails | null = null): void {
-        if (category) {
-            this.currentCategory = { ...category };
-            this.header = 'Edit Category';
+    editSubject(subject: SubjectDetails | null = null): void {
+        if (subject) {
+            this.currentSubject = { ...subject };
+            this.header = 'Edit Subject';
         }
         else {
-            this.currentCategory = { CategoryId: 0, CategoryName: '', IsActive: true };
-            this.header = 'Add Category';
+            this.currentSubject = { SubjectId: 0, SubjectName: '', IsActive: true };
+            this.header = 'Add Subject';
         }
-        this.errors = { CategoryName: '', IsActive: '' };
-        this.categoryDialogVisible = true;
+        this.errors = { SubjectName: '', IsActive: '' };
+        this.subjectDialogVisible = true;
     }
 
     validateInput(key: string): boolean {
         let isValid = true;
 
         switch (key) {
-            case 'CategoryName': {
-                const categoryName = this.currentCategory.CategoryName?.trim();
+            case 'SubjectName':
+              const subjectName = this.currentSubject.SubjectName?.trim();
 
-                if (!categoryName) {
-                    this.errors.CategoryName = 'Category is required.';
-                    isValid = false;
-                } else if (
-                    this.categories.some(category =>
-                        category.CategoryName?.trim().toLowerCase() === categoryName.toLowerCase() &&
-                        category.CategoryId !== this.currentCategory.CategoryId
-                    )
-                ) {
-                    this.errors.CategoryName = 'Category already exists.';
-                    isValid = false;
-                } else {
-                    this.errors.CategoryName = '';
-                }
-                break;
-            }
+              if (!subjectName) {
+                  this.errors.SubjectName = 'Subject is required.';
+                  isValid = false;
+              } else if (
+                  this.subjects.some(subject =>
+                      subject.SubjectName?.trim().toLowerCase() === subjectName.toLowerCase() &&
+                      subject.SubjectId !== this.currentSubject.SubjectId
+                  )
+              ) {
+                  this.errors.SubjectName = 'Subject already exists.';
+                  isValid = false;
+              } else {
+                  this.errors.SubjectName = '';
+              }
+              break;
 
             case 'IsActive':
-                if (this.currentCategory.IsActive === null) {
+                if (this.currentSubject.IsActive === null) {
                     this.errors.IsActive = 'Status is required.';
                     isValid = false;
                 } else {
@@ -178,84 +176,86 @@ export class BooksManageCategoryComponent implements OnInit {
         return isValid;
     }
 
-    validateCategory(): boolean {
-        const isNameValid = this.validateInput('CategoryName');
+    validateSubject(): boolean {
+        const isNameValid = this.validateInput('SubjectName');
         const isStatusValid = this.validateInput('IsActive');
         return isNameValid && isStatusValid;
     }
 
-    saveCategory(): void {
-        if (!this.validateCategory()) {
+    saveSubject(): void {
+        if (!this.validateSubject()) {
             return;
         }
 
-        const payload = [this.currentCategory];
-        this.categoryService.updateCategoryDetails(payload).subscribe({
+
+
+        const payload = [this.currentSubject];
+        this.subjectService.updateSubjectDetails(payload).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'Manage Category - Failed',
-                        detail: res ? res.Message : 'Failed to update category. Please try again.'
+                        summary: 'Manage Subject - Failed',
+                        detail: res ? res.Message : 'Failed to update subject. Please try again.'
                     });
                 } else {
                     this.messageService.add({
                         severity: 'success',
-                        summary: 'Manage Category - Success',
-                        detail: 'Category updated successfully.'
+                        summary: 'Manage Subject - Success',
+                        detail: 'Subject updated successfully.'
                     });
                 }
 
-                this.loadCategories();
-                this.categoryDialogVisible = false;
+                this.loadSubjects();
+                this.subjectDialogVisible = false;
             },
             error: () => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Manage Category - Failed',
-                    detail: 'Failed to update category. Please try again.'
+                    summary: 'Manage Subject - Failed',
+                    detail: 'Failed to update subject. Please try again.'
                 });
             }
         });
     }
 
-    deleteCategory(category: CategoryDetails): void {
-        const payload = [category];
-        this.categoryService.deleteCategoryDetails(payload).subscribe({
+    deleteSubject(subject: SubjectDetails): void {
+        const payload = [subject];
+        this.subjectService.deleteSubjectDetails(payload).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'Delete Category - Failed',
-                        detail: res ? res.Message : 'Failed to delete category. Please try again.'
+                        summary: 'Delete Subject - Failed',
+                        detail: res ? res.Message : 'Failed to delete subject. Please try again.'
                     });
                 } else {
                     this.messageService.add({
                         severity: 'success',
-                        summary: 'Delete Category - Success',
-                        detail: 'Category deleted successfully.'
+                        summary: 'Delete Subject - Success',
+                        detail: 'Subject deleted successfully.'
                     });
                 }
 
-                this.loadCategories();
+                this.loadSubjects();
             },
             error: () => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Delete Category - Failed',
-                    detail: 'Failed to delete category. Please try again.'
+                    summary: 'Delete Subject - Failed',
+                    detail: 'Failed to delete subject. Please try again.'
                 });
             }
         });
     }
 
-    importCategory(): void {
+    importSubject(): void {
         this.importDialogVisible = true;
         this.importPreview = [];
         this.importUploadError = '';
     }
 
-    async downloadCategoryTemplate(): Promise<void> {
+    async downloadSubjectTemplate(): Promise<void> {
         const workbook = new ExcelJS.Workbook();
 
         const bodyStyle: Partial<ExcelJS.Style> = {
@@ -274,8 +274,8 @@ export class BooksManageCategoryComponent implements OnInit {
             ...bodyStyle
         };
 
-        const worksheet = workbook.addWorksheet('Categories');
-        worksheet.addRow(['CATEGORY', 'STATUS']);
+        const worksheet = workbook.addWorksheet('Subjects');
+        worksheet.addRow(['SUBJECT', 'STATUS']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -308,7 +308,7 @@ export class BooksManageCategoryComponent implements OnInit {
 
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        saveAs(blob, 'import-category-template.xlsx');
+        saveAs(blob, 'import-subject-template.xlsx');
     }
 
     onImportFileSelected(event: Event): void {
@@ -358,26 +358,26 @@ export class BooksManageCategoryComponent implements OnInit {
                 }
 
                 const headerRow = Object.keys(rows[0] || {});
-                const expectedHeaders = ['CATEGORY', 'STATUS'];
+                const expectedHeaders = ['SUBJECT', 'STATUS'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
                 }
 
                 rows.forEach((row: any) => {
-                    const categoryName = row['CATEGORY']?.toString().trim();
+                    const subjectName = row['SUBJECT']?.toString().trim();
                     const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
 
-                    const importItem: ImportCategoryDetails = {
-                        CategoryId: 0,
-                        CategoryName: categoryName,
+                    const importItem: ImportSubjectDetails = {
+                        SubjectId: 0,
+                        SubjectName: subjectName,
                         IsActive: isActive,
                         Error: ''
                     };
                     this.importPreview.push(importItem);
                 });
 
-                this.validateImportCategory();
+                this.validateImportSubject();
                 this.initializeImportFilterLists();
             }
             catch (error) {
@@ -390,13 +390,13 @@ export class BooksManageCategoryComponent implements OnInit {
         let isValid = true;
 
         switch (key) {
-            case 'CategoryName':
-                if (!this.importPreview[index].CategoryName?.trim()) {
-                    this.importPreview[index].Error = 'Category is required.';
+            case 'SubjectName':
+                if (!this.importPreview[index].SubjectName?.trim()) {
+                    this.importPreview[index].Error = 'Subject is required.';
                     isValid = false;
                 }
-                else if (this.categories.some(cat => cat.CategoryName?.toLowerCase() === this.importPreview[index].CategoryName?.toLowerCase())) {
-                    this.importPreview[index].Error = 'Category already exists.';
+                else if (this.subjects.some(subject => subject.SubjectName?.toLowerCase() === this.importPreview[index].SubjectName?.toLowerCase())) {
+                    this.importPreview[index].Error = 'Subject already exists.';
                     isValid = false;
                 }
                 else {
@@ -421,9 +421,9 @@ export class BooksManageCategoryComponent implements OnInit {
         return isValid;
     }
 
-    validateImportCategory(): boolean {
+    validateImportSubject(): boolean {
         return this.importPreview.every((item, index) => {
-            return this.validateImportInput('CategoryName', index) &&
+            return this.validateImportInput('SubjectName', index) &&
                 this.validateImportInput('IsActive', index);
         });
     }
@@ -434,41 +434,41 @@ export class BooksManageCategoryComponent implements OnInit {
             return;
         }
 
-        if (!this.validateImportCategory()) {
+        if (!this.validateImportSubject()) {
             return;
         }
 
         const payload = this.importPreview.map(item => {
             return {
-                CategoryId: 0,
-                CategoryName: item.CategoryName,
+                SubjectId: 0,
+                SubjectName: item.SubjectName,
                 IsActive: item.IsActive
             };
         });
-        this.categoryService.updateCategoryDetails(payload).subscribe({
+        this.subjectService.updateSubjectDetails(payload).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'Manage Category - Failed',
-                        detail: res ? res.Message : 'Failed to update category. Please try again.'
+                        summary: 'Manage Subject - Failed',
+                        detail: res ? res.Message : 'Failed to update subject. Please try again.'
                     });
                 } else {
                     this.messageService.add({
                         severity: 'success',
-                        summary: 'Manage Category - Success',
-                        detail: 'Category updated successfully.'
+                        summary: 'Manage Subject - Success',
+                        detail: 'Subject updated successfully.'
                     });
                 }
 
-                this.loadCategories();
-                this.categoryDialogVisible = false;
+                this.loadSubjects();
+                this.subjectDialogVisible = false;
             },
             error: () => {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Manage Category - Failed',
-                    detail: 'Failed to update category. Please try again.'
+                    summary: 'Manage Subject - Failed',
+                    detail: 'Failed to update subject. Please try again.'
                 });
             }
         });

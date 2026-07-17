@@ -9,6 +9,7 @@ export const environment = {
     studentsMinimumAge: 16,
     departmentEligibleForRoleIdAbove: 2,
     studentRoleId: 5,
+    batchStartFromYear: 2020,
     uploadedFilesPath: '/UploadedImages/',
     OrganizationDetails: { OrganizationId: 1, OrganizationName: "Vimalalaya College of Nursing", ImagePath: "VCN_Image.png", LogoPath: "VCN_Logo.png", IsActive: true, ValidUpto: null }
 };

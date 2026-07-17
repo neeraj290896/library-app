@@ -57,6 +57,12 @@ export interface BookDetails {
     LanguageName?: string | null;
     PublishedYear?: number | null;
     Price?: number | null;
+    BillNo?: string | null;
+    CallNo?: string | null;
+    AccessionNo?: string | null;
+    Source?: string | null;
+    SubjectId?: number | null;
+    SubjectName?: string | null;
     Status?: string | null;
     BuildingId?: number | null;
     BuildingName?: string | null;
@@ -128,6 +134,12 @@ export interface BuildingDetails {
 export interface CategoryDetails {
     CategoryId: number;
     CategoryName?: string | null;
+    IsActive: boolean | null;
+}
+
+export interface SubjectDetails {
+    SubjectId: number;
+    SubjectName?: string | null;
     IsActive: boolean | null;
 }
 
@@ -307,6 +319,8 @@ export interface UserDetails {
     LastLogInTime?: string | null;
     UserBarcode?: string | null;
     IsActive?: boolean | null;
+    LibraryNo?: string | null;
+    Batch?: string | null;
     IsFirstTimeLogin?: boolean | null;
     BorrowedBooksCount?: number | null;
     OverDueBooksCount?: number | null;

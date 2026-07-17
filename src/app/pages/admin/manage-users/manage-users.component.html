@@ -283,7 +283,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="role">
                     Department<sup>*</sup>
                 </label>
-                <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}"  [editable]="true"
+                <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}"
                     [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
                 <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
@@ -305,6 +305,24 @@
                     [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId"
                     (ngModelChange)="validateInput('StaffId')" />
                 <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
+                    Library No:<sup>*</sup>
+                </label>
+                <input id="libraryNo" type="text" class="form-control" pInputText [(ngModel)]="currentUser.LibraryNo"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter Library No" 
+                    (ngModelChange)="validateInput('LibraryNo')" />
+                <div *ngIf="errors.LibraryNo" class="text-danger mt-1 small">{{ errors.LibraryNo }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="batch">
+                    Batch<sup>*</sup>
+                </label>
+                <p-select id="batch" [(ngModel)]="currentUser.Batch" [ngModelOptions]="{standalone: true}" 
+                    [options]="batchOptions" optionLabel="label" optionValue="value" placeholder="Select Batch"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('Batch')" />
+                <div *ngIf="errors.Batch" class="text-danger mt-1 small">{{ errors.Batch }}</div>
             </div>
             <!-- <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="status">
@@ -395,7 +413,7 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="role">
                             Department<sup>*</sup>
                         </label>
-                        <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" [editable]="true"
+                        <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" 
                             [disabled]="isViewOnly" [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
                             styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
                         <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
@@ -417,6 +435,24 @@
                             [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId" [disabled]="isViewOnly" 
                             (ngModelChange)="validateInput('StaffId')" />
                         <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
+                    </div>
+                    <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
+                            Library No:<sup>*</sup>
+                        </label>
+                        <input id="libraryNo" type="text" class="form-control" pInputText [(ngModel)]="currentUser.LibraryNo"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter Library No" [disabled]="isViewOnly"
+                            (ngModelChange)="validateInput('LibraryNo')" />
+                        <div *ngIf="errors.LibraryNo" class="text-danger mt-1 small">{{ errors.LibraryNo }}</div>
+                    </div>
+                    <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="batch">
+                            Batch<sup>*</sup>
+                        </label>
+                        <p-select id="batch" [(ngModel)]="currentUser.Batch" [ngModelOptions]="{standalone: true}" 
+                            [options]="batchOptions" optionLabel="label" optionValue="value" placeholder="Select Batch" [disabled]="isViewOnly"
+                            styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('Batch')" />
+                        <div *ngIf="errors.Batch" class="text-danger mt-1 small">{{ errors.Batch }}</div>
                     </div>
                     <!-- <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="status">
@@ -474,8 +510,9 @@
             }
         </ng-template>
     </p-dialog>
-
-    <p-dialog header="Import Users" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+<!-- [style]="{ width: '99vw', left:'20px' }" -->
+    <p-dialog header="Import Users" [(visible)]="importDialogVisible" [modal]="true"
+      [style]="{ width: '100vw', maxWidth: '2000px', left: '0px' }"
         appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
@@ -498,294 +535,343 @@
             <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
                 (onClick)="clearImport()"></p-button>
         </div>
+        <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
+             <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10" 
+                [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [style]="{ minWidth: '2800px' }" [scrollable]="true" styleClass="p-datatable-sm">
 
-        <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10"
-            [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
-
-            <ng-template pTemplate="header">
-                <tr class="border-bottom">
-                    <th class="text-start text-muted fw-medium" style="width: 4%;">
-                        <div class="d-flex align-items-center gap-2">
+                <ng-template pTemplate="header">
+                    <tr class="border-bottom">
+                        <th class="text-start text-muted fw-medium" style="width: 4%;">
                             <div class="d-flex align-items-center gap-2">
-                                S.No
+                                <div class="d-flex align-items-center gap-2">
+                                    S.No
+                                </div>
                             </div>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 14%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="FullName">
-                                FullName
-                                <p-sortIcon field="FullName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 20%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="FullName">
+                                    Full Name
+                                    <p-sortIcon field="FullName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 12%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="RoleName">
-                                RoleName
-                                <p-sortIcon field="RoleName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="RoleName">
+                                    Role Name
+                                    <p-sortIcon field="RoleName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedRoleList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedRoleList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 10%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="Gender">
-                                Gender
-                                <p-sortIcon field="Gender"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 10%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="Gender">
+                                    Gender
+                                    <p-sortIcon field="Gender"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedGenderList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedGenderList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 13%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="MobileNo">
-                                MobileNo
-                                <p-sortIcon field="MobileNo"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="MobileNo">
+                                    Mobile No
+                                    <p-sortIcon field="MobileNo"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedMobileNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedMobileNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 18%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="MailId">
-                                MailId
-                                <p-sortIcon field="MailId"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 20%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="MailId">
+                                    MailId
+                                    <p-sortIcon field="MailId"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedMailIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedMailIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 12%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="DepartmentName">
-                                Department
-                                <p-sortIcon field="DepartmentName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="DepartmentName">
+                                    Department
+                                    <p-sortIcon field="DepartmentName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedDepartmentList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedDepartmentList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 13%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="AdmissionNumber">
-                                AdmissionNumber
-                                <p-sortIcon field="AdmissionNumber"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="AdmissionNumber">
+                                    Admission #
+                                    <p-sortIcon field="AdmissionNumber"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedAdmissionNumberList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedAdmissionNumberList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 13%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="StaffId">
-                                StaffId
-                                <p-sortIcon field="StaffId"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="StaffId">
+                                    Staff Id
+                                    <p-sortIcon field="StaffId"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedStaffIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedStaffIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <!-- <th class="text-start text-muted fw-medium" style="width: 10%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
-                                Status
-                                <p-sortIcon field="IsActive"></p-sortIcon>
+                        </th>                    
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="LibraryNo">
+                                    Library No
+                                    <p-sortIcon field="LibraryNo"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedLibraryNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th> -->
-                    <th class="text-start text-muted fw-medium">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
-                                Error (If Any)
-                                <p-sortIcon field="Error"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="Batch">
+                                    Batch
+                                    <p-sortIcon field="Batch"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedBatchList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedErrorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 8%;">
-                        <div class="d-flex align-items-center justify-content-center gap-3">
-                            Actions
-                        </div>
-                    </th>
-                </tr>
-                @if (importShowFt) {
-                <tr>
-                    <th></th>
-                    <th>
-                        <p-columnFilter field="FullName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importUserNameList" [(ngModel)]="importSelectedUserNameList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th><p-columnFilter field="RoleName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importRoleList" [(ngModel)]="importSelectedRoleList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter></th>
-                    <th>
-                        <p-columnFilter field="Gender" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importGenderList" [(ngModel)]="importSelectedGenderList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="MobileNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importMobileNoList" [(ngModel)]="importSelectedMobileNoList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="MailId" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importMailIdList" [(ngModel)]="importSelectedMailIdList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th><p-columnFilter field="DepartmentName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importDepartmentList" [(ngModel)]="importSelectedDepartmentList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter></th>
-                    <th>
-                        <p-columnFilter field="AdmissionNumber" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importAdmissionNumberList" [(ngModel)]="importSelectedAdmissionNumberList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="StaffId" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importStaffIdList" [(ngModel)]="importSelectedStaffIdList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <!-- <th>
-                        <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th> -->
-                    <th>
-                        <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importErrorList" [(ngModel)]="importSelectedErrorList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th></th>
-                </tr>
-                }
-            </ng-template>
+                        </th>
+                        <!-- <th class="text-start text-muted fw-medium" style="width: 10%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                                    Status
+                                    <p-sortIcon field="IsActive"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th> -->
+                        <th class="text-start text-muted fw-medium" style="width: 25%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
+                                    Error (If Any)
+                                    <p-sortIcon field="Error"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedErrorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 8%;">
+                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                Actions
+                            </div>
+                        </th>
+                    </tr>
+                    @if (importShowFt) {
+                    <tr>
+                        <th></th>
+                        <th>
+                            <p-columnFilter field="FullName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importUserNameList" [(ngModel)]="importSelectedUserNameList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th><p-columnFilter field="RoleName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importRoleList" [(ngModel)]="importSelectedRoleList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter></th>
+                        <th>
+                            <p-columnFilter field="Gender" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importGenderList" [(ngModel)]="importSelectedGenderList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="MobileNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importMobileNoList" [(ngModel)]="importSelectedMobileNoList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="MailId" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importMailIdList" [(ngModel)]="importSelectedMailIdList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th><p-columnFilter field="DepartmentName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importDepartmentList" [(ngModel)]="importSelectedDepartmentList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter></th>
+                        <th>
+                            <p-columnFilter field="AdmissionNumber" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importAdmissionNumberList" [(ngModel)]="importSelectedAdmissionNumberList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="StaffId" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importStaffIdList" [(ngModel)]="importSelectedStaffIdList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="LibraryNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importLibraryNoList" [(ngModel)]="importSelectedLibraryNoList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="Batch" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importBatchList" [(ngModel)]="importSelectedBatchList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <!-- <th>
+                            <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th> -->
+                        <th>
+                            <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importErrorList" [(ngModel)]="importSelectedErrorList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th></th>
+                    </tr>
+                    }
+                </ng-template>
 
-            <ng-template pTemplate="body" let-user let-index="rowIndex">
-                <tr class="border-bottom">
-                    <td>{{ index + 1 }}</td>
-                    <td>{{ user.FullName }}</td>
-                    <td>{{ user.RoleName }}</td>
-                    <td>{{ user.Gender }}</td>
-                    <td>{{ user.MobileNo }}</td>
-                    <td>{{ user.MailId }}</td>
-                    <td>{{ user.DepartmentName }}</td>
-                    <td>{{ user.AdmissionNumber }}</td>
-                    <td>{{ user.StaffId }}</td>
-                    <!-- <td>
-                        <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
-                            [severity]="getStatusSeverity(user.IsActive)"></p-tag>
-                    </td> -->
-                    <td>
-                        <span [pTooltip]="user.Error" class="text-danger">
-                            {{ user.Error }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center justify-content-center gap-2">
-                            <button pButton icon="pi pi-eye" (click)="viewImportUser(user)"
-                                class="p-button-rounded p-button-text p-button-sm" pTooltip="View User"></button>
+                <ng-template pTemplate="body" let-user let-index="rowIndex">
+                    <tr class="border-bottom">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ user.FullName }}</td>
+                        <td>{{ user.RoleName }}</td>
+                        <td>{{ user.Gender }}</td>
+                        <td>{{ user.MobileNo }}</td>
+                        <td>{{ user.MailId }}</td>
+                        <td>{{ user.DepartmentName }}</td>
+                        <td>{{ user.AdmissionNumber }}</td>
+                        <td>{{ user.StaffId }}</td>
+                        <td>{{ user.LibraryNo }}</td>
+                        <td>{{ user.Batch }}</td>
+                        <!-- <td>
+                            <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
+                                [severity]="getStatusSeverity(user.IsActive)"></p-tag>
+                        </td> -->
+                        <td>
+                            <span [pTooltip]="user.Error" class="text-danger">
+                                {{ user.Error }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <button pButton icon="pi pi-eye" (click)="viewImportUser(user)"
+                                    class="p-button-rounded p-button-text p-button-sm" pTooltip="View User"></button>
 
-                            <button pButton icon="pi pi-pencil" (click)="editImportUser(user, index)"
-                                class="p-button-rounded p-button-text p-button-sm btn-icon"
-                                pTooltip="Edit User"></button>
-                            <button pButton icon="pi pi-trash" (click)="deleteImportUser(index)" 
-                                class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"
-                                pTooltip="Delete User"></button>
-                        </div>
-                    </td>
-                </tr>
-            </ng-template>
+                                <button pButton icon="pi pi-pencil" (click)="editImportUser(user, index)"
+                                    class="p-button-rounded p-button-text p-button-sm btn-icon"
+                                    pTooltip="Edit User"></button>
+                                <button pButton icon="pi pi-trash" (click)="deleteImportUser(index)" 
+                                    class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"
+                                    pTooltip="Delete User"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
 
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="11" class="text-center">
-                        No Users found.
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="13" class="text-center">
+                            No Users found.
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+       
 
         <ng-template pTemplate="footer">
             <div class="d-flex justify-content-end align-items-center gap-3">
@@ -860,7 +946,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="role">
                     Department<sup>*</sup>
                 </label>
-                <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" [editable]="true"
+                <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" 
                     [disabled]="isViewOnly" [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
                     styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
                 <div *ngIf="errors.DepartmentId" class="text-danger mt-1 small">{{ errors.DepartmentId }}</div>
@@ -882,6 +968,24 @@
                     [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId" [disabled]="isViewOnly"
                     (ngModelChange)="validateInput('StaffId')" />
                 <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
+                    Library No:<sup>*</sup>
+                </label>
+                <input id="libraryNo" type="text" class="form-control" pInputText [(ngModel)]="currentUser.LibraryNo"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter Library No" [disabled]="isViewOnly"
+                    (ngModelChange)="validateInput('LibraryNo')" />
+                <div *ngIf="errors.LibraryNo" class="text-danger mt-1 small">{{ errors.LibraryNo }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="batch">
+                    Batch<sup>*</sup>
+                </label>
+                <p-select id="batch" [(ngModel)]="currentUser.Batch" [ngModelOptions]="{standalone: true}"
+                    [options]="batchOptions" optionLabel="label" optionValue="value" placeholder="Select Batch" [disabled]="isViewOnly"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateInput('Batch')" />
+                <div *ngIf="errors.Batch" class="text-danger mt-1 small">{{ errors.Batch }}</div>
             </div>
             <!-- <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="status">

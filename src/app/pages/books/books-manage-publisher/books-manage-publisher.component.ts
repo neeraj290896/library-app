@@ -143,8 +143,15 @@ export class BooksManagePublisherComponent implements OnInit {
 
         switch (key) {
             case 'PublisherName':
-                if (!this.currentPublisher.PublisherName?.trim()) {
+                const publisherName = this.currentPublisher.PublisherName?.trim();
+                if (!publisherName) {
                     this.errors.PublisherName = 'Publisher is required.';
+                    isValid = false;
+                }
+                else if (this.publishers.some(pub => 
+                    pub.PublisherName?.toLowerCase() === publisherName.toLowerCase() && 
+                    pub.PublisherId !== this.currentPublisher.PublisherId)) {
+                    this.errors.PublisherName = 'Publisher already exists.';
                     isValid = false;
                 }
                 else {

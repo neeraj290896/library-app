@@ -153,8 +153,15 @@ private messageService = inject(MessageService);
 
         switch (key) {
             case 'OrganizationName':
-                if (!this.currentOrganization.OrganizationName?.trim()) {
+                const organizationName = this.currentOrganization.OrganizationName?.trim();
+                if (!organizationName) {
                     this.errors.OrganizationName = 'Organization name is required.';
+                    isValid = false;
+                }
+                else if (this.organizations.some(org => 
+                    org.OrganizationName?.toLowerCase() === organizationName.toLowerCase() && 
+                    org.OrganizationId !== this.currentOrganization.OrganizationId)) {
+                    this.errors.OrganizationName = 'Organization already exists.';
                     isValid = false;
                 }
                 else {

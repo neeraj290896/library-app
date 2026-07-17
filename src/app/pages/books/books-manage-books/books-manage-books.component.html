@@ -324,6 +324,18 @@
                 }
             </div>
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="subjectId">
+                    Subject<sup>*</sup>
+                </label>
+                <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
+                    [options]="subjectOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select subject" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onSubjectChange()"></p-select>  
+                    @if (errors.SubjectId) {
+                        <div class="text-danger mt-1 small">{{ errors.SubjectId }}</div>
+                    }              
+            </div>
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="price">
                     Price(₹)<sup>*</sup>
                 </label>
@@ -370,6 +382,34 @@
                 <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
                 }
             </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
+                    Bill No
+                </label>
+                <input id="billNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.BillNo"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter bill no"/>                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="callNo">
+                    Call No
+                </label>
+                <input id="callNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.CallNo"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter call no"/>                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                    Accession No
+                </label>
+                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="source">
+                    Source
+                </label>
+                <input id="source" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Source"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter source"/>
+            </div>             
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
                     Status<sup>*</sup>
@@ -479,6 +519,18 @@
                         }
                     </div>
                     <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="subjectId">
+                            Subject<sup>*</sup>
+                        </label>
+                        <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
+                            [disabled]="isViewOnly" [options]="subjectOptions" optionLabel="label" optionValue="value"
+                            placeholder="Select subject" styleClass="w-100" appendTo="body"
+                            (ngModelChange)="onSubjectChange()"></p-select>  
+                        @if (errors.SubjectId) {
+                            <div class="text-danger mt-1 small">{{ errors.SubjectId }}</div>
+                        }              
+                    </div> 
+                    <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="price">
                             Price(₹)<sup>*</sup>
                         </label>
@@ -525,6 +577,34 @@
                         <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
                         }
                     </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
+                            Bill No
+                        </label>
+                        <input id="billNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.BillNo"
+                            [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter bill no"/>                
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="callNo">
+                            Call No
+                        </label>
+                        <input id="callNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.CallNo"
+                            [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter call no"/>                
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                            Accession No
+                        </label>
+                        <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                            [disabled]="isViewOnly"  [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>                
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="source">
+                            Source
+                        </label>
+                        <input id="source" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Source"
+                            [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter source"/>
+                    </div>                    
                     <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
                             Status<sup>*</sup>
@@ -595,8 +675,8 @@
         </ng-template>
     </p-dialog>
 
-    <p-dialog header="Import Books" [(visible)]="importDialogVisible" [modal]="true" [style]="{ width: '80vw' }"
-        appendTo="body">
+    <p-dialog header="Import Books" [(visible)]="importDialogVisible" [modal]="true"  
+    [style]="{ width: '100vw', maxWidth: '2000px', left: '0px' }" appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">
@@ -618,269 +698,391 @@
             <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
                 (onClick)="clearImport()"></p-button>
         </div>
+        <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
+            <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10"
+                [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [style]="{ minWidth: '2800px' }" [scrollable]="true" styleClass="p-datatable-sm">
 
-        <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10"
-            [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
-
-            <ng-template pTemplate="header">
-                <tr class="border-bottom">
-                    <th class="text-start text-muted fw-medium" style="width: 5%;">
-                        <div class="d-flex align-items-center gap-2">
+                <ng-template pTemplate="header">
+                    <tr class="border-bottom">
+                        <th class="text-start text-muted fw-medium" style="width: 5%;">
                             <div class="d-flex align-items-center gap-2">
-                                S.No
+                                <div class="d-flex align-items-center gap-2">
+                                    S.No
+                                </div>
                             </div>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 12%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
-                                Book
-                                <p-sortIcon field="BookName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
+                                    Book
+                                    <p-sortIcon field="BookName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 12%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="AuthorName">
-                                Author
-                                <p-sortIcon field="AuthorName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="AuthorName">
+                                    Author
+                                    <p-sortIcon field="AuthorName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedAuthorNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedAuthorNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 12%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="PublisherName">
-                                Publisher
-                                <p-sortIcon field="PublisherName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="PublisherName">
+                                    Publisher
+                                    <p-sortIcon field="PublisherName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedPublisherNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedPublisherNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 12%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="CategoryName">
-                                Category
-                                <p-sortIcon field="CategoryName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="CategoryName">
+                                    Category
+                                    <p-sortIcon field="CategoryName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedCategoryNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedCategoryNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 12%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="LanguageName">
-                                Language
-                                <p-sortIcon field="LanguageName"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="LanguageName">
+                                    Language
+                                    <p-sortIcon field="LanguageName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedLanguageNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedLanguageNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 9%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="PublishedYear">
-                                Year
-                                <p-sortIcon field="PublishedYear"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 9%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="PublishedYear">
+                                    Year
+                                    <p-sortIcon field="PublishedYear"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedPublishedYearList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedPublishedYearList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <!-- <th class="text-start text-muted fw-medium" style="width: 10%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
-                                Status
-                                <p-sortIcon field="IsActive"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="BillNo">
+                                    Bill No
+                                    <p-sortIcon field="BillNo"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedBillNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th> -->
-                    <th class="text-start text-muted fw-medium">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
-                                Error (If Any)
-                                <p-sortIcon field="Error"></p-sortIcon>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="CallNo">
+                                    Call No
+                                    <p-sortIcon field="CallNo"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedCallNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
                             </div>
-                            <span class="pi"
-                                [ngClass]="importSelectedErrorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showImportFilter()"></span>
-                        </div>
-                    </th>
-                    <th class="text-start text-muted fw-medium" style="width: 10%;">
-                        <div class="d-flex align-items-center justify-content-center gap-3">
-                            Actions
-                        </div>
-                    </th>
-                </tr>
-                @if (importShowFt) {
-                <tr>
-                    <th></th>
-                    <th>
-                        <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importBookNameList" [(ngModel)]="importSelectedBookNameList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="AuthorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importAuthorNameList"
-                                    [(ngModel)]="importSelectedAuthorNameList" (onChange)="filter($event.value)"
-                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
-                                    optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="PublisherName" matchMode="in" [showMenu]="false"
-                            [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importPublisherNameList"
-                                    [(ngModel)]="importSelectedPublisherNameList" (onChange)="filter($event.value)"
-                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
-                                    optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="CategoryName" matchMode="in" [showMenu]="false"
-                            [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importCategoryNameList"
-                                    [(ngModel)]="importSelectedCategoryNameList" (onChange)="filter($event.value)"
-                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
-                                    optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="LanguageName" matchMode="in" [showMenu]="false"
-                            [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importLanguageNameList"
-                                    [(ngModel)]="importSelectedLanguageNameList" (onChange)="filter($event.value)"
-                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
-                                    optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th>
-                        <p-columnFilter field="PublishedYear" matchMode="in" [showMenu]="false"
-                            [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importPublishedYearList"
-                                    [(ngModel)]="importSelectedPublishedYearList" (onChange)="filter($event.value)"
-                                    selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
-                                    optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <!-- <th>
-                        <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th> -->
-                    <th>
-                        <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="importErrorList" [(ngModel)]="importSelectedErrorList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All">
-                                </p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
-                    <th></th>
-                </tr>
-                }
-            </ng-template>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="AccessionNo">
+                                    Accession No
+                                    <p-sortIcon field="AccessionNo"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedAccessionNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="Source">
+                                    Source
+                                    <p-sortIcon field="Source"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedSourceList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="SubjectName">
+                                    Subject
+                                    <p-sortIcon field="SubjectName"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedSubjectList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
 
-            <ng-template pTemplate="body" let-book let-index="rowIndex">
-                <tr class="border-bottom">
-                    <td>{{ index + 1 }}</td>
-                    <td>
-                        <span [pTooltip]="book.BookName">
-                            {{ book.BookName }}
-                        </span>
-                    </td>
-                    <td>{{ book.AuthorName }}</td>
-                    <td>
-                        <span [pTooltip]="book.PublisherName">
-                            {{ book.PublisherName }}
-                        </span>
-                    </td>
-                    <td>
-                        <span [pTooltip]="book.CategoryName">
-                            {{ book.CategoryName }}
-                        </span>
-                    </td>
-                    <td>
-                        <span [pTooltip]="book.LanguageName">
-                            {{ book.LanguageName }}
-                        </span>
-                    </td>
-                    <td>{{ book.PublishedYear }}</td>
-                    <!-- <td>
-                        <p-tag [value]="book.IsActive ? 'Active' : 'In-Active'"
-                            [severity]="getStatusSeverity(book.IsActive)"></p-tag>
-                    </td> -->
-                    <td>
-                        <span [pTooltip]="book.Error" class="text-danger">
-                            {{ book.Error }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center justify-content-center gap-2">
-                            <button pButton icon="pi pi-eye" (click)="viewImportBook(book)"
-                                class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
-                            <button pButton icon="pi pi-pencil" (click)="editImportBook(book, index)"
-                                class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Book"></button>
-                            <button pButton icon="pi pi-trash" (click)="deleteImportBook(index)"
-                                class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                                pTooltip="Delete Book"></button>
-                        </div>
-                    </td>
-                </tr>
-            </ng-template>
+                        <!-- <th class="text-start text-muted fw-medium" style="width: 10%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                                    Status
+                                    <p-sortIcon field="IsActive"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th> -->
+                        <th class="text-start text-muted fw-medium" style="width: 25%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="Error">
+                                    Error (If Any)
+                                    <p-sortIcon field="Error"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedErrorList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 10%;">
+                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                Actions
+                            </div>
+                        </th>
+                    </tr>
+                    @if (importShowFt) {
+                    <tr>
+                        <th></th>
+                        <th>
+                            <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importBookNameList" [(ngModel)]="importSelectedBookNameList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="AuthorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importAuthorNameList"
+                                        [(ngModel)]="importSelectedAuthorNameList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="PublisherName" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importPublisherNameList"
+                                        [(ngModel)]="importSelectedPublisherNameList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="CategoryName" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importCategoryNameList"
+                                        [(ngModel)]="importSelectedCategoryNameList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="LanguageName" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importLanguageNameList"
+                                        [(ngModel)]="importSelectedLanguageNameList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="PublishedYear" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importPublishedYearList"
+                                        [(ngModel)]="importSelectedPublishedYearList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="BillNo" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importBillNoList"
+                                        [(ngModel)]="importSelectedBillNoList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="CallNo" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importCallNoList"
+                                        [(ngModel)]="importSelectedCallNoList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="AccessionNo" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importAccessionNoList"
+                                        [(ngModel)]="importSelectedAccessionNoList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="Source" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importSourceList"
+                                        [(ngModel)]="importSelectedSourceList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="SubjectName" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importSubjectList"
+                                        [(ngModel)]="importSelectedSubjectList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <!-- <th>
+                            <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importStatusList" [(ngModel)]="importSelectedStatusList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th> -->
+                        <th>
+                            <p-columnFilter field="Error" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importErrorList" [(ngModel)]="importSelectedErrorList"
+                                        (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                        [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All">
+                                    </p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th></th>
+                    </tr>
+                    }
+                </ng-template>
 
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="9" class="text-center">
-                        No books found.
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
+                <ng-template pTemplate="body" let-book let-index="rowIndex">
+                    <tr class="border-bottom">
+                        <td>{{ index + 1 }}</td>
+                        <td>
+                            <span [pTooltip]="book.BookName">
+                                {{ book.BookName }}
+                            </span>
+                        </td>
+                        <td>{{ book.AuthorName }}</td>
+                        <td>
+                            <span [pTooltip]="book.PublisherName">
+                                {{ book.PublisherName }}
+                            </span>
+                        </td>
+                        <td>
+                            <span [pTooltip]="book.CategoryName">
+                                {{ book.CategoryName }}
+                            </span>
+                        </td>
+                        <td>
+                            <span [pTooltip]="book.LanguageName">
+                                {{ book.LanguageName }}
+                            </span>
+                        </td>
+                        <td>{{ book.PublishedYear }}</td>
+                        <td>{{ book.BillNo }}</td>
+                        <td>{{ book.CallNo }}</td>
+                        <td>{{ book.AccessionNo }}</td>
+                        <td>{{ book.Source }}</td>
+                        <td>{{ book.SubjectName }}</td>
+                        <!-- <td>
+                            <p-tag [value]="book.IsActive ? 'Active' : 'In-Active'"
+                                [severity]="getStatusSeverity(book.IsActive)"></p-tag>
+                        </td> -->
+                        <td>
+                            <span [pTooltip]="book.Error" class="text-danger">
+                                {{ book.Error }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <button pButton icon="pi pi-eye" (click)="viewImportBook(book)"
+                                    class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
+                                <button pButton icon="pi pi-pencil" (click)="editImportBook(book, index)"
+                                    class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Book"></button>
+                                <button pButton icon="pi pi-trash" (click)="deleteImportBook(index)"
+                                    class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                                    pTooltip="Delete Book"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
 
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="14" class="text-center">
+                            No books found.
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
         <ng-template pTemplate="footer">
             <div class="d-flex justify-content-end align-items-center gap-3">
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
@@ -966,6 +1168,18 @@
                 }
             </div>
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="subjectId">
+                    Subject<sup>*</sup>
+                </label>
+                <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
+                     [disabled]="isViewOnly" [options]="subjectOptions" optionLabel="label" optionValue="value"
+                    placeholder="Select subject" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onSubjectChange()"></p-select>   
+                    @if (errors.SubjectId) {
+                        <div class="text-danger mt-1 small">{{ errors.SubjectId }}</div>
+                    }             
+            </div> 
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="price">
                     Price(₹)<sup>*</sup>
                 </label>
@@ -1012,6 +1226,36 @@
                 <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
                 }
             </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
+                    Bill No
+                </label>
+                <input id="billNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.BillNo"
+                    [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter bill no"/>                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="callNo">
+                    Call No
+                </label>
+                <input id="callNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.CallNo"
+                    [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter call no"/>                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                    Accession No
+                </label>
+                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                    [disabled]="isViewOnly"  [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>                
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="source">
+                    Source
+                </label>
+                <input id="source" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Source"
+                    [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter source"/>
+            </div>
+            
+
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
                     Status<sup>*</sup>

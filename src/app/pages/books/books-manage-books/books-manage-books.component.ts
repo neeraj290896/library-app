@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { BookService } from '@services/book.service';
-import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, UserDetails } from '@app/shared/models/api.models';
+import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, SubjectDetails, UserDetails } from '@app/shared/models/api.models';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthorService } from '@app/shared/services/author.service';
 import { PublisherService } from '@app/shared/services/publisher.service';
@@ -35,6 +35,7 @@ import { AddWishlistComponent } from '../add-wishlist/add-wishlist.component';
 import { environment } from '../../../../environments/environment';
 import { UserService } from '@app/shared/services/user.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { SubjectService } from '@app/shared/services/subject.service';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -74,6 +75,7 @@ export class BooksManageBooksComponent implements OnInit {
     private _bcService = inject(BookCirculationService);
     public _authService = inject(AuthService);
     public userService = inject(UserService);
+    public subjectService = inject(SubjectService);
     private confirmationService = inject(ConfirmationService);
 
     @ViewChild('dt') dataTable: Table | undefined;
@@ -83,6 +85,7 @@ export class BooksManageBooksComponent implements OnInit {
     public authors: AuthorDetails[] = [];
     public publishers: PublisherDetails[] = [];
     public categories: CategoryDetails[] = [];
+    public subjects: SubjectDetails[] = [];
     public languages: LanguageDetails[] = [];
     public buildings: BuildingDetails[] = [];
     public floors: FloorDetails[] = [];
@@ -118,6 +121,12 @@ export class BooksManageBooksComponent implements OnInit {
         LanguageName: '',
         PublishedYear: null,
         Price: 0,
+        BillNo: '',
+        CallNo: '',
+        AccessionNo: '',
+        Source: '',
+        SubjectId: 0,
+        SubjectName: '',
         Status: 'Available',
         BuildingId: null,
         BuildingName: '',
@@ -141,6 +150,7 @@ export class BooksManageBooksComponent implements OnInit {
         BuildingId: string,
         FloorId: string,
         RackId: string,
+        SubjectId: string,
         BookBarcode: string,
         IsActive: string
     } = {
@@ -154,12 +164,14 @@ export class BooksManageBooksComponent implements OnInit {
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
             BookBarcode: '',
             IsActive: ''
         };
     public authorOptions: { label: string; value: number; }[] = [];
     public publisherOptions: { label: string; value: number; }[] = [];
     public categoryOptions: { label: string; value: number; }[] = [];
+    public subjectOptions: { label: string; value: number; }[] = [];
     public languageOptions: { label: string; value: number; }[] = [];
     public buildingOptions: { label: string; value: number; }[] = [];
     public floorOptions: { label: string; value: number; }[] = [];
@@ -183,6 +195,12 @@ export class BooksManageBooksComponent implements OnInit {
     public importPublishedYearList: { label: number, value: number }[] = [];
     public importStatusList: { label: string, value: boolean }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
+    public importBillNoList: { label: string, value: string }[] = [];
+    public importCallNoList: { label: string, value: string }[] = [];
+    public importAccessionNoList: { label: string, value: string }[] = [];
+    public importSourceList: { label: string, value: string }[] = [];
+    public importSubjectList: { label: number, value: number }[] = [];
+
     public importSelectedBookNameList: string[] = [];
     public importSelectedAuthorNameList: string[] = [];
     public importSelectedPublisherNameList: string[] = [];
@@ -191,6 +209,11 @@ export class BooksManageBooksComponent implements OnInit {
     public importSelectedPublishedYearList: number[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
+    public importSelectedBillNoList: string[] = [];
+    public importSelectedCallNoList: string[] = [];
+    public importSelectedAccessionNoList: string[] = [];
+    public importSelectedSourceList: string[] = [];
+    public importSelectedSubjectList: number[] = [];
 
     public activeTab: number = 0;
 
@@ -218,6 +241,7 @@ export class BooksManageBooksComponent implements OnInit {
         this.loadAuthors();
         this.loadPublishers();
         this.loadCategories();
+        this.loadSubjects();
         this.loadLanguages();
         this.loadBuildings();
         this.loadFloors();
@@ -341,6 +365,20 @@ export class BooksManageBooksComponent implements OnInit {
             },
             error: (err) => {
                 console.error('Error loading categories:', err);
+            }
+        });
+    }
+
+    loadSubjects(): void {
+        this.subjectService.getSubjectDetails().subscribe({
+            next: (data: SubjectDetails[]) => {
+                this.subjects = data;
+                this.subjectOptions = data.filter(x => x.IsActive == true).map(subject => {
+                    return { label: subject.SubjectName ?? '', value: subject.SubjectId };
+                });
+            },
+            error: (err) => {
+                console.error('Error loading subjects:', err);
             }
         });
     }
@@ -506,6 +544,12 @@ export class BooksManageBooksComponent implements OnInit {
                 LanguageName: '',
                 PublishedYear: null,
                 Price: 0,
+                BillNo: '',
+                CallNo: '',
+                AccessionNo: '',
+                Source: '',
+                SubjectId: 0,
+                SubjectName: '',
                 Status: 'Available',
                 BuildingId: null,
                 BuildingName: '',
@@ -533,6 +577,7 @@ export class BooksManageBooksComponent implements OnInit {
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
             BookBarcode: '',
             IsActive: ''
         };
@@ -572,6 +617,7 @@ export class BooksManageBooksComponent implements OnInit {
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
             BookBarcode: '',
             IsActive: ''
         };
@@ -596,6 +642,19 @@ export class BooksManageBooksComponent implements OnInit {
         }
 
         this.validateInput('CategoryId');
+    }
+
+    onSubjectChange(): void {
+        const subject = this.subjectOptions.find(s => s.value === this.currentBook.SubjectId);
+        if (subject) {
+            this.currentBook.SubjectName = subject.label;
+        }
+        else
+        {
+            this.currentBook.SubjectName = '';
+        }
+
+        this.validateInput('SubjectId');
     }
 
     onPublisherChange(): void {
@@ -815,25 +874,40 @@ export class BooksManageBooksComponent implements OnInit {
                     this.errors.RackId = '';
                 }
                 break;
-
-            case 'BookBarcode':
-                if (!this.currentBook.BookBarcode?.trim()) {
-                    this.errors.BookBarcode = 'Barcode is required.';
+            
+            case 'SubjectId':
+                if (!this.currentBook.SubjectId) {
+                    this.errors.SubjectId = 'Subject is required.';
                     isValid = false;
-                } else {
-                    this.errors.BookBarcode = '';
+                } 
+                else if(!(this.subjectOptions.some(option => option.value === this.currentBook.SubjectId)))
+                {
+                    this.errors.SubjectId = 'Please Select valid Subject.';
+                    isValid = false;
+                }
+                else {
+                    this.errors.SubjectId = '';
                 }
                 break;
 
-            case 'IsActive':
-                if (this.currentBook.IsActive === null) {
-                    this.errors.IsActive = 'Status is required.';
-                    isValid = false;
-                } else {
-                    this.errors.IsActive = '';
+            // case 'BookBarcode':
+            //     if (!this.currentBook.BookBarcode?.trim()) {
+            //         this.errors.BookBarcode = 'Barcode is required.';
+            //         isValid = false;
+            //     } else {
+            //         this.errors.BookBarcode = '';
+            //     }
+            //     break;
 
-                }
-                break;
+            // case 'IsActive':
+            //     if (this.currentBook.IsActive === null) {
+            //         this.errors.IsActive = 'Status is required.';
+            //         isValid = false;
+            //     } else {
+            //         this.errors.IsActive = '';
+
+            //     }
+            //     break;
 
             default:
                 break;
@@ -853,12 +927,13 @@ export class BooksManageBooksComponent implements OnInit {
         const isBuildingIdValid = this.validateInput('BuildingId');
         const isFloorIdValid = this.validateInput('FloorId');
         const isRackIdValid = this.validateInput('RackId');
+        const isSubjectIdValid = this.validateInput('SubjectId');
         // const isBookBarcodeValid = this.validateInput('BookBarcode');
         // const isStatusValid = this.validateInput('IsActive');
         return isBookNameValid && isAuthorIdValid && isPublisherIdValid &&
             isCategoryIdValid && isLanguageIdValid && isPublishedYearValid &&
             isPriceValid && isBuildingIdValid && isFloorIdValid &&
-            isRackIdValid;
+            isRackIdValid && isSubjectIdValid; // && isBookBarcodeValid && isStatusValid;
     }
 
     saveBook(): void {
@@ -1100,8 +1175,8 @@ export class BooksManageBooksComponent implements OnInit {
         };
 
         const worksheet = workbook.addWorksheet('Books');
-        worksheet.addRow(['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)',
-            'BUILDING', 'FLOOR', 'RACK']);
+        worksheet.addRow(['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)', 'BILL NO', 'CALL NO', 
+            'ACCESSION NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -1109,7 +1184,7 @@ export class BooksManageBooksComponent implements OnInit {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'J1'
+            to: 'O1'
         };
 
         const authorsSheet = workbook.addWorksheet('AuthorList');
@@ -1129,6 +1204,12 @@ export class BooksManageBooksComponent implements OnInit {
             categoriesSheet.getCell(idx + 1, 1).value = cat.CategoryName;
         });
         categoriesSheet.state = 'hidden';
+
+        const subjectSheet = workbook.addWorksheet('SubjectList');
+        this.subjects.filter(x => x.IsActive == true).forEach((cat, idx) => {
+            subjectSheet.getCell(idx + 1, 1).value = cat.SubjectName;
+        });
+        subjectSheet.state = 'hidden';
 
         const languagesSheet = workbook.addWorksheet('LanguageList');
         this.languages.filter(x => x.IsActive == true).forEach((lang, idx) => {
@@ -1217,7 +1298,17 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please enter a valid price (greater than 0).'
             };
 
-            const buildingCell = worksheet.getCell(rowIndex, 8);
+            const subjectCell = worksheet.getCell(rowIndex, 12);
+            subjectCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`SubjectList!$A$1:$A$${this.subjects.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Subject',
+                error: 'Please select a valid subject from the list.'
+            };
+
+            const buildingCell = worksheet.getCell(rowIndex, 13);
             buildingCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1227,7 +1318,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid building from the list.'
             };
 
-            const floorCell = worksheet.getCell(rowIndex, 9);
+            const floorCell = worksheet.getCell(rowIndex, 14);
             floorCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1237,7 +1328,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid floor for a selected building.'
             };
 
-            const rackCell = worksheet.getCell(rowIndex, 10);
+            const rackCell = worksheet.getCell(rowIndex, 15);
             rackCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1309,7 +1400,7 @@ export class BooksManageBooksComponent implements OnInit {
 
                 const headerRow = Object.keys(rows[0] || {});
                 const expectedHeaders = ['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR',
-                    'PRICE(₹)', 'BUILDING', 'FLOOR', 'RACK'];
+                    'PRICE(₹)', 'BILL NO', 'CALL NO', 'ACCESSION NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -1326,6 +1417,11 @@ export class BooksManageBooksComponent implements OnInit {
                     const languageName = row['LANGUAGE']?.toString().trim();
                     const publishedYear = Number(row['YEAR']?.toString().trim());
                     const price = Number(row['PRICE(₹)']?.toString().trim());
+                    const billNo = row['BILL NO']?.toString().trim();
+                    const callNo = row['CALL NO']?.toString().trim();
+                    const accessionNo = row['ACCESSION NO']?.toString().trim();
+                    const source = row['SOURCE']?.toString().trim();
+                    const subjectName = row['SUBJECT']?.toString().trim();
                     const buildingName = row['BUILDING']?.toString().trim();
                     const floorName = row['FLOOR']?.toString().trim();
                     const rackLabel = row['RACK']?.toString().trim();
@@ -1347,6 +1443,11 @@ export class BooksManageBooksComponent implements OnInit {
                         LanguageName: languageName,
                         PublishedYear: publishedYear,
                         Price: price,
+                        BillNo: billNo,
+                        CallNo: callNo,
+                        AccessionNo: accessionNo,
+                        Source: source,
+                        SubjectName: subjectName,                        
                         Status: 'Available',
                         BuildingId: null,
                         BuildingName: buildingName,
@@ -1402,6 +1503,7 @@ export class BooksManageBooksComponent implements OnInit {
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
             BookBarcode: '',
             IsActive: ''
         };
@@ -1438,6 +1540,7 @@ export class BooksManageBooksComponent implements OnInit {
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
             BookBarcode: '',
             IsActive: ''
         };
@@ -1658,6 +1761,25 @@ export class BooksManageBooksComponent implements OnInit {
                 }
                 break;
 
+            case 'SubjectName':
+                if (!this.importPreview[index].SubjectName?.trim()) {
+                    this.importPreview[index].Error = 'Subject is required.';
+                    isValid = false;
+                }
+                else if (!this.subjects.some(subject => subject.SubjectName?.toLowerCase() === this.importPreview[index].SubjectName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Subject not enlisted.';
+                    isValid = false;
+                }
+                else {
+                    const subject = this.subjects.find(s => s.SubjectName?.toLowerCase() === this.importPreview[index].SubjectName?.trim().toLowerCase());
+                    if (subject) {
+                        this.importPreview[index].SubjectId = subject.SubjectId;
+                        this.importPreview[index].SubjectName = subject.SubjectName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
             // case 'BookBarcode':
             //     if (!this.importPreview[index].BookBarcode?.trim()) {
             //         this.importPreview[index].Error = 'Barcode is required.';
@@ -1696,7 +1818,8 @@ export class BooksManageBooksComponent implements OnInit {
                 this.validateImportInput('Price', index) &&
                 this.validateImportInput('BuildingName', index) &&
                 this.validateImportInput('FloorName', index) &&
-                this.validateImportInput('RackLabel', index);
+                this.validateImportInput('RackLabel', index) &&
+                this.validateImportInput('SubjectName', index);
             // this.validateImportInput('BookBarcode', index) &&
             // this.validateImportInput('IsActive', index);
         });

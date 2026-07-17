@@ -106,6 +106,8 @@ export class ManageUsersComponent {
         CreatedByUserId: 0,
         CreatedByUserName: '',
         IsActive: true,
+        LibraryNo: '',
+        Batch: '',
         Status: null
     };
     public errors: {
@@ -119,7 +121,8 @@ export class ManageUsersComponent {
         AdmissionNumber: string,
         StaffId: string,
         Status: string,
-        IsActive: string
+        IsActive: string,
+        LibraryNo: string, Batch: string
     } = {
             FullName: '',
             Gender: '',
@@ -131,7 +134,9 @@ export class ManageUsersComponent {
             AdmissionNumber:'',
             StaffId:'',
             Status: '',
-            IsActive: ''
+            IsActive: '',
+            LibraryNo: '',
+            Batch: ''
         };
     public options: { label: string; value: boolean; }[] = [
         { label: 'Active', value: true },
@@ -149,6 +154,7 @@ export class ManageUsersComponent {
         { label: 'Pending', value: 'Pending' }
     ];
     public departmentOptions: { label: string; value: number; }[] = [];
+    public batchOptions: { label: string; value: string; }[] = [];
 
     public importIndex: number = -1;
     public importUserDialogVisible = false;
@@ -165,6 +171,8 @@ export class ManageUsersComponent {
     public importDepartmentList: { label: string, value: string }[] = [];
     public importAdmissionNumberList: { label: number, value: number }[] = [];
     public importStaffIdList: { label: string, value: string }[] = [];
+    public importLibraryNoList: { label: string, value: string }[] = [];
+    public importBatchList: { label: string, value: string }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
     public importSelectedUserNameList: string[] = [];
     public importSelectedRoleList: string[] = [];
@@ -176,6 +184,8 @@ export class ManageUsersComponent {
     public importSelectedStaffIdList: string[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
+    public importSelectedLibraryNoList: string[] = [];
+    public importSelectedBatchList: string[] = [];
 
     public selectedUserDetails: UserDetails[] = [];
     public selectedIds: number[] = [];
@@ -223,6 +233,22 @@ export class ManageUsersComponent {
         this.loadDepartmentDetails();
         this.loadUserDetails();
         this.loadBooks();
+        this.generateBatchOptions();
+    }
+
+    generateBatchOptions(): void {
+        const currentYear = new Date().getFullYear(); // 2026
+        const targetEndYear = environment.batchStartFromYear; // 2000
+        
+        // Dynamically loops from currentYear down to targetEndYear
+        for (let year = currentYear; year >= targetEndYear; year--) {
+            const rangeText = `${year} - ${year + 4}`;
+            
+            this.batchOptions.push({
+            label: rangeText,
+            value: rangeText
+            });
+        }
     }
 
     loadRoleDetails(): void {
@@ -390,7 +416,7 @@ export class ManageUsersComponent {
         else {
             this.currentUser = {
                 UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', DepartmentId : 0,
-                RoleId: 0, RoleName: '', AdmissionNumber: 0, StaffId:'', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending'
+                RoleId: 0, RoleName: '', AdmissionNumber: 0, StaffId:'', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending', LibraryNo: '', Batch: ''
             };
 
             this.roleOptions = this.roles.filter(x => x.IsActive == true).map(role => {
@@ -405,7 +431,7 @@ export class ManageUsersComponent {
             this.dobDate = null;
         }
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', AdmissionNumber: '', StaffId:'', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', AdmissionNumber: '', StaffId:'', Status: '', IsActive: '', LibraryNo: '', Batch: '' };
         this.userDialogVisible = true;
         this.isViewOnly = false;
     }
@@ -417,7 +443,7 @@ export class ManageUsersComponent {
             this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
         }
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId : '', AdmissionNumber: '', StaffId:'', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId : '', AdmissionNumber: '', StaffId:'', Status: '', IsActive: '', LibraryNo: '', Batch: '' };
         this.userDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -439,7 +465,9 @@ export class ManageUsersComponent {
 
         if(this.currentUser.RoleId !=null && this.currentUser.RoleId < this.studentRoleId)
         {
-            this.currentUser.AdmissionNumber = 0;            
+            this.currentUser.AdmissionNumber = 0;
+            this.currentUser.LibraryNo = "";
+            this.currentUser.Batch = "";          
         }
 
         if(this.currentUser.RoleId !=null && this.currentUser.RoleId == this.studentRoleId)
@@ -450,6 +478,8 @@ export class ManageUsersComponent {
         this.validateInput('DepartmentId');
         this.validateInput('AdmissionNumber');
         this.validateInput('StaffId');
+        this.validateInput('LibraryNo');
+        this.validateInput('Batch');
     }
 
     onDOBChange(): void {
@@ -592,6 +622,45 @@ export class ManageUsersComponent {
                     this.errors.AdmissionNumber = '';
                 }
                 break;
+
+            case 'LibraryNo': 
+                const libraryNo = this.currentUser.LibraryNo?.trim();
+                const libraryNoPattern = /^VCN:\d{1,9}$/i;
+
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !libraryNo) {
+                    this.errors.LibraryNo = 'Library Number is required.';
+                    isValid = false;
+                }
+                else if (
+                    (this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) &&
+                    !libraryNoPattern.test(libraryNo ?? '')
+                ) {
+                    this.errors.LibraryNo = 'Library Number should be in VCN:{number} format.';
+                    isValid = false;
+                }
+                else if (
+                    (this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) &&
+                    this.users.some(x => x.LibraryNo?.trim().toLowerCase() === libraryNo?.toLowerCase() && x.UserId != this.currentUser.UserId)
+                ) {
+                    this.errors.LibraryNo = 'Library Number already exists.';
+                    isValid = false;
+                } else {
+                    this.errors.LibraryNo = '';
+                }
+                break;            
+
+            case 'Batch':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.Batch !=null && this.currentUser.Batch.trim() != "")) {
+                    this.errors.Batch = 'Batch is required.';
+                    isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.Batch !=null && this.currentUser.Batch.trim() != "")) {
+                    this.errors.Batch = 'Batch already exists.';
+                    isValid = false;
+                } else {
+                    this.errors.Batch = '';
+                }
+                break;
             
             case 'StaffId':
                 if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="")) {
@@ -641,10 +710,12 @@ export class ManageUsersComponent {
         const isDepartmentIdValid = this.validateInput('DepartmentId');
         const isAdmissionNumberValid = this.validateInput('AdmissionNumber');
         const isStaffIdValid = this.validateInput('StaffId');
+        const isLibraryNoValid = this.validateInput('LibraryNo');
+        const isBatchValid = this.validateInput('Batch');
         // const isAccessRequestValid = this.validateInput('Status');
         // const isStatusValid = this.validateInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid;
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid && isLibraryNoValid && isBatchValid;
     }
 
     saveUser(): void {
@@ -801,7 +872,7 @@ export class ManageUsersComponent {
         };
 
         const worksheet = workbook.addWorksheet('Users');
-        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME', 'ADMISSION NUMBER', 'STAFF ID']);
+        worksheet.addRow(['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME', 'ADMISSION NUMBER', 'STAFF ID', 'LIBRARY NO', 'BATCH']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -809,7 +880,7 @@ export class ManageUsersComponent {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'H1'
+            to: 'J1'
         };
 
         const rolesSheet = workbook.addWorksheet('RoleList');
@@ -822,7 +893,15 @@ export class ManageUsersComponent {
         this.departments.filter(x => x.IsActive == true).forEach((dept, idx) => {
             departmentSheet.getCell(idx + 1, 1).value = dept.DepartmentName;
         });
+
         departmentSheet.state = 'hidden';
+
+        const batchSheet = workbook.addWorksheet('BatchList');
+        this.batchOptions.forEach((batch, idx) => {
+            batchSheet.getCell(idx + 1, 1).value = batch.label;
+        });
+        batchSheet.state = 'hidden';
+        
 
         for (let rowIndex = 2; rowIndex <= 1000; rowIndex++) {
             const roleCell = worksheet.getCell(rowIndex, 2);
@@ -883,6 +962,16 @@ export class ManageUsersComponent {
                 showErrorMessage: true,
                 errorTitle: 'Invalid Admission Number',
                 error: 'Please enter a valid Admission number.'
+            };
+
+            const batchCell = worksheet.getCell(rowIndex, 10);
+            batchCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`BatchList!$A$1:$A$${this.batchOptions.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Batch',
+                error: 'Please select a valid batch from the list.'
             };
 
             // const dobCell = worksheet.getCell(rowIndex, 6);
@@ -977,7 +1066,7 @@ export class ManageUsersComponent {
                 }
 
                 const headerRow = Object.keys(rows[0] || {});
-                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME', 'ADMISSION NUMBER', 'STAFF ID'];
+                const expectedHeaders = ['FULL NAME', 'ROLE NAME', 'GENDER', 'MOBILE NO', 'MAIL ID', 'DEPARTMENT NAME', 'ADMISSION NUMBER', 'STAFF ID', 'LIBRARY NO', 'BATCH'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -992,6 +1081,8 @@ export class ManageUsersComponent {
                     const departmentName = row['DEPARTMENT NAME']?.toString().trim();
                     const admissionNumber = row['ADMISSION NUMBER']?.toString().trim();
                     const staffId = row['STAFF ID']?.toString().trim();
+                    const libraryNo = row['LIBRARY NO']?.toString().trim();
+                    const batch = row['BATCH']?.toString().trim();
                     // const dob = row['DOB']?.toString().trim();
                     // const status = row['ACCESS STATUS']?.toString().trim();
                     // const isActive = row['STATUS']?.toString().trim().toLowerCase() === 'active';
@@ -1014,6 +1105,8 @@ export class ManageUsersComponent {
                         CreatedByUserName: '',
                         IsActive: true,
                         Status: 'Pending',
+                        LibraryNo: libraryNo,
+                        Batch: batch,
                         Error: ''
                     };
                     this.importPreview.push(importItem);
@@ -1054,7 +1147,7 @@ export class ManageUsersComponent {
         this.header = 'Edit User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'', AdmissionNumber:'', StaffId:'', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'', AdmissionNumber:'', StaffId:'', Status: '', IsActive: '', LibraryNo: '', Batch: '' };
         this.importUserDialogVisible = true;
         this.isViewOnly = false;
     }
@@ -1083,7 +1176,7 @@ export class ManageUsersComponent {
         this.header = 'View User';
         this.dobDate = _user.DOB ? new Date(_user.DOB) : null;
 
-        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'',  AdmissionNumber:'', StaffId:'', Status: '', IsActive: '' };
+        this.errors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId:'',  AdmissionNumber:'', StaffId:'', Status: '', IsActive: '', LibraryNo: '', Batch: '' };
         this.importUserDialogVisible = true;
         this.isViewOnly = true;
     }
@@ -1106,6 +1199,8 @@ export class ManageUsersComponent {
         this.validateImportInput('DepartmentName', this.importIndex);
         this.validateImportInput('AdmissionNumber', this.importIndex);
         this.validateImportInput('StaffId', this.importIndex);
+        this.validateImportInput('LibraryNo', this.importIndex);
+        this.validateImportInput('Batch', this.importIndex);
         // this.validateImportInput('DOB', this.importIndex);
 
         this.importIndex = -1;
@@ -1275,7 +1370,39 @@ export class ManageUsersComponent {
                     this.importPreview[index].Error = '';
                 }
                 break;
-            
+
+            case 'LibraryNo': 
+                const libraryNo = this.importPreview[index].LibraryNo?.trim();
+                const libraryNoPattern = /^VCN:\d{1,5}$/i;
+
+                if ((this.importPreview[index].RoleId != null && this.importPreview[index].RoleId > 0 && this.importPreview[index].RoleId == this.studentRoleId)
+                    && !libraryNo) {
+                    this.importPreview[index].Error = 'Library No is required.';
+                    isValid = false;
+                }
+                else if (
+                    (this.importPreview[index].RoleId != null && this.importPreview[index].RoleId > 0 && this.importPreview[index].RoleId == this.studentRoleId)
+                    && !libraryNoPattern.test(libraryNo ?? '')
+                ) {
+                    this.importPreview[index].Error = 'Library No should be in VCN:{number} format.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;            
+
+            case 'Batch':
+                if ((this.importPreview[index].RoleId !=null && this.importPreview[index].RoleId >0 && this.importPreview[index].RoleId == this.studentRoleId) 
+                    &&(!(this.importPreview[index].Batch !=null && this.importPreview[index].Batch.trim() != ""))) {
+                    this.importPreview[index].Error = 'Batch is required.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
             case 'StaffId':
                 if ((this.importPreview[index].RoleId !=null && this.importPreview[index].RoleId >0 && 
                         this.importPreview[index].RoleId > this.departmentEligibleForRoleIdAbove && this.importPreview[index].RoleId < this.studentRoleId) 
@@ -1328,7 +1455,9 @@ export class ManageUsersComponent {
                 this.validateImportInput('MailId', index) &&
                 this.validateImportInput('DepartmentName', index) &&
                 this.validateImportInput('AdmissionNumber', index) &&
-                this.validateImportInput('StaffId', index);
+                this.validateImportInput('StaffId', index) &&
+                this.validateImportInput('LibraryNo', index) &&
+                this.validateImportInput('Batch', index);
                 // this.validateImportInput('DOB', index) &&
                 // this.validateImportInput('Status', index) &&
                 // this.validateImportInput('IsActive', index);
@@ -1364,6 +1493,8 @@ export class ManageUsersComponent {
                 CreatedByUserName: item.CreatedByUserName,
                 IsActive: item.IsActive,
                 Status: item.Status,
+                LibraryNo: item.LibraryNo,
+                Batch: item.Batch
             };
         });
         this.userService.addMultipleUserDetails(payload).subscribe({
