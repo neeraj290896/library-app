@@ -2066,4 +2066,82 @@ export class BooksManageBooksComponent implements OnInit {
     printTable(): void {
         window.print();
     }
+
+   async downloadBooksDetails(): Promise<void> {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Books');
+
+        // 1. Define Column Properties & Styles Globally (Massive Performance Boost)
+        const bodyStyle: Partial<ExcelJS.Style> = {
+            border: {
+                top: { style: 'thin', color: { argb: '00000000' } },
+                left: { style: 'thin', color: { argb: '00000000' } },
+                bottom: { style: 'thin', color: { argb: '00000000' } },
+                right: { style: 'thin', color: { argb: '00000000' } },
+            },
+            alignment: { horizontal: 'center', vertical: 'middle', wrapText: false } // Wrap text slows down rendering
+        };
+
+        // Set fixed widths to avoid heavy auto-fit calculation loops
+        worksheet.columns = [
+            { header: 'BOOK', key: 'bookName', width: 30, style: bodyStyle },
+            { header: 'AUTHOR', key: 'author', width: 25, style: bodyStyle },
+            { header: 'PUBLISHER', key: 'publisher', width: 25, style: bodyStyle },
+            { header: 'CATEGORY', key: 'category', width: 20, style: bodyStyle },
+            { header: 'LANGUAGE', key: 'language', width: 20, style: bodyStyle },
+            { header: 'YEAR', key: 'year', width: 15, style: bodyStyle },
+            { header: 'PRICE(₹)', key: 'price', width: 15, style: bodyStyle },
+            { header: 'BILL NO', key: 'billNo', width: 15, style: bodyStyle },
+            { header: 'CALL NO', key: 'callNo', width: 20, style: bodyStyle },
+            { header: 'ACCESSION NO', key: 'accessionNo', width: 20, style: bodyStyle },
+            { header: 'SOURCE', key: 'source', width: 20, style: bodyStyle },
+            { header: 'SUBJECT', key: 'subject', width: 20, style: bodyStyle },
+            { header: 'BUILDING', key: 'building', width: 20, style: bodyStyle },
+            { header: 'FLOOR', key: 'floor', width: 15, style: bodyStyle },
+            { header: 'RACK', key: 'rack', width: 15, style: bodyStyle },
+            { header: 'STATUS', key: 'status', width: 15, style: bodyStyle }
+        ];
+
+        // 2. Format Header Row directly
+        const headerStyle: Partial<ExcelJS.Style> = {
+            font: { bold: true, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF22C55E' } },
+            ...bodyStyle
+        };
+        
+        worksheet.getRow(1).eachCell(cell => {
+            cell.style = headerStyle;
+        });
+
+        worksheet.autoFilter = { from: 'A1', to: 'P1' };
+
+        // 3. Fast Row Injection using Object Keys
+        // This allows ExcelJS to stream array values efficiently internal to its build process
+        const rowsData = this.books.map( (book : BookDetails) => ({
+            bookName: book.BookName || '',
+            author: book.AuthorName || '',
+            publisher: book.PublisherName || '',
+            category: book.CategoryName || '',
+            language: book.LanguageName || '',
+            year: book.PublishedYear || '',
+            price: book.Price || 0,
+            billNo: book.BillNo || '',
+            callNo: book.CallNo || '',
+            accessionNo: book.AccessionNo || '',
+            source: book.Source || '',
+            subject: book.SubjectName || '',
+            building: book.BuildingName || '',
+            floor: book.FloorName || '',
+            rack: book.RackLabel || '',
+            status: book.Status || ''
+        }));
+
+        worksheet.addRows(rowsData);
+
+        // 4. File Generation
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, 'save-book-details.xlsx');
+    }
+
 }

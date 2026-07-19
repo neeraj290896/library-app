@@ -10,6 +10,8 @@
             <input #userInput autofocus pInputText type="text" placeholder="Search User" [(ngModel)]="searchUserTerm" (keydown.enter)="onUserSearch()"
                 class="form-control ps-5" />
         </div>
+        <p-button type="button" label="Download Book Details" icon="pi pi-download" *ngIf="books.length >0"
+                    styleClass="btn-main-outlined" (click)="downloadBooksDetails()"></p-button>
     </div>
     <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails"
         (selectionChange)="onSelectionChange()" [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top"

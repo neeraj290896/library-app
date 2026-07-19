@@ -205,10 +205,91 @@
                 <div class="row g-3 mt-0">
                     <div class="d-flex gap-2 align-items-center col-md-12">
                         <p-button type="button" label="Reset Password" [style]="{ width: '10rem' }"
-                            styleClass="btn-main-danger"></p-button>
+                            styleClass="btn-main-danger" (click)="resetPassword()"></p-button>
                     </div>
                 </div>
             </p-accordion-content>
         </p-accordion-panel>
     </p-accordion>
 </div>
+
+ <p-dialog header="Reset Password" [(visible)]="resetPwdDialogVisible" [modal]="true"
+        [style]="{ width: '30vw' }" appendTo="body">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="currentPassword">
+                Current Password<sup>*</sup>
+            </label>
+            <div class="position-relative">
+                <input id="currentPassword" [type]="showCurrentPassword ? 'text' : 'password'" class="form-control pe-5" pInputText
+                    [(ngModel)]="resetCredPassword.OldPwd" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Current Password" />
+                <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                    (click)="showCurrentPassword = !showCurrentPassword"
+                    [attr.aria-label]="showCurrentPassword ? 'Hide password' : 'Show password'">
+                    <i class="pi" [ngClass]="showCurrentPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-12 mb-3 password-field-with-tooltip">
+            <label class="d-block small fw-medium text-secondary mb-1" for="newPassword">
+                New Password<sup>*</sup>
+            </label>
+            <div class="position-relative">
+                <input id="newPassword" [type]="showNewPassword ? 'text' : 'password'" class="form-control pe-5" pInputText
+                    [(ngModel)]="resetCredPassword.NewPwd" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter New Password" (input)="onPasswordInput($event)" />
+                <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                    (click)="showNewPassword = !showNewPassword"
+                    [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'">
+                    <i class="pi" [ngClass]="showNewPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-12 mb-3 password-field-with-tooltip">
+            <label class="d-block small fw-medium text-secondary mb-1" for="confirmPassword">
+                Confirm Password<sup>*</sup>
+            </label>
+            <div class="position-relative">
+                <input id="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5" pInputText
+                    [(ngModel)]="confirmPassword" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Confirm Password" />
+                <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                    (click)="showConfirmPassword = !showConfirmPassword"
+                    [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'">
+                    <i class="pi" [ngClass]="showConfirmPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-12 mb-3">
+            <ul class="password-rules">
+                <li [class.valid]="passwordRules.minLength">
+                Length is between 8 and 45 characters
+                </li>
+                <li [class.valid]="passwordRules.upperCase">
+                Contains at least 1 upper case letter
+                </li>
+                <li [class.valid]="passwordRules.lowerCase">
+                Contains at least 1 lower case letter
+                </li>
+                <li [class.valid]="passwordRules.number">
+                Contains at least 1 number
+                </li>
+                <li [class.valid]="passwordRules.specialChar">
+                Contains at least 1 allowed special character
+                </li>
+            </ul>
+
+            <p style="margin-top: 0.5rem; font-size: 12px">
+                Allowed Special characters are:<br />
+                <strong>{{ specialChars }}</strong>
+            </p>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">           
+             <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="resetPwdDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveNewPassword()"></p-button>
+        </ng-template>
+</p-dialog>

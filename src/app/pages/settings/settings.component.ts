@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RoleDetails, SettingDetails, UserDetails } from '@app/shared/models/api.models';
+import { ResetCredPassword, RoleDetails, SettingDetails, UserDetails } from '@app/shared/models/api.models';
 import { AdminService } from '@app/shared/services/admin.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { MessageService } from 'primeng/api';
@@ -16,12 +16,13 @@ import { SelectModule } from 'primeng/select';
 import { environment } from '../../../environments/environment';
 import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
     selector: 'app-settings',
     standalone: true,
     imports: [
-        ButtonModule, FormsModule, InputTextModule, CommonModule, CheckboxModule,
+        ButtonModule, FormsModule, InputTextModule, CommonModule, CheckboxModule, DialogModule,
         InputGroupModule, InputGroupAddonModule, AccordionModule, DatePickerModule,
         SelectModule
     ],
@@ -85,6 +86,21 @@ export class SettingsComponent {
     public maxDate: Date | undefined;
     public calendarFocusDate!: Date;
     public enableAplnSettingsAccess : boolean = false;
+    public resetPwdDialogVisible: boolean = false;
+    public showCurrentPassword = false;
+    public showNewPassword = false;
+    public showConfirmPassword = false;
+    // oldPassword: string = '';
+    confirmPassword: string = '';
+    specialChars: string = '!@#$%^*()_+-=[]{};:,.?~\\|';
+    passwordRules = {
+        minLength: false,
+        upperCase: false,
+        lowerCase: false,
+        number: false,
+        specialChar: false
+    };
+    public resetCredPassword: ResetCredPassword ={};
 
     ngOnInit(): void {
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
@@ -392,4 +408,108 @@ export class SettingsComponent {
                 }
             });
     }
+
+    clearPwdFields(){
+        this.resetCredPassword = { UserId: this.loggedInUserDetails?.UserId ?? 0, OldPwd: '', NewPwd: '' };
+        this.confirmPassword = '';
+        this.passwordRules = {
+            minLength: false,
+            upperCase: false,
+            lowerCase: false,
+            number: false,
+            specialChar: false
+        };
+    }
+
+    resetPassword():void{
+
+       this.clearPwdFields();
+        this.resetPwdDialogVisible = true;
+    }
+
+    saveNewPassword():void{
+        
+
+        const allValid = Object.values(this.passwordRules).every(rule => rule === true);
+
+        if (!allValid) {
+        this.messageService.add({
+            severity: 'warn',
+            summary: 'Invalid Password',
+            detail: 'Password must satisfy all conditions.'
+        });
+        return;
+        }
+
+        if (this.resetCredPassword.NewPwd !== this.confirmPassword) {
+        this.messageService.add({
+            severity: 'error',
+            summary: 'Mismatch',
+            detail: 'Passwords do not match'
+        });
+        return;
+        }
+
+        if (this.resetCredPassword.NewPwd === this.resetCredPassword.OldPwd) {
+        this.messageService.add({
+            severity: 'warn',
+            summary: 'Password Error',
+            detail: 'New password cannot be the same as the old password'
+        });
+        return;
+        }
+
+        const payload : ResetCredPassword = {
+            UserId: this.loggedInUserDetails?.UserId ?? 0,
+            OldPwd: this.resetCredPassword.OldPwd,
+            NewPwd: this.resetCredPassword.NewPwd
+        };
+
+        // this.spinnerService.ShowSpinner();
+
+        this.userService.resetCredPassword(payload).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Password Reset - Failed',
+                        detail: res ? res.Message : 'Failed to reset password. Please try again.'
+                    });
+                }
+                else{
+                    this.messageService.add({
+                    severity: 'success',
+                    summary: 'Password Reset',
+                    detail: 'You can now log in with your new password'
+                    });
+
+                    this.resetPwdDialogVisible = false;
+                    this.clearPwdFields();
+                }
+            },
+            error: (err) => {
+                // this.spinnerService.HideSpinner();
+
+                this.messageService.add({
+                severity: 'error',
+                summary: 'Password Reset Failed',
+                detail: 'Failed to reset password. Please try again.'
+                });
+            }
+        });
+
+    }
+
+    onPasswordInput(event: any) {
+    const password = event?.target?.value || '';
+    this.passwordRules.minLength = password.length >= 8 && password.length <= 45;
+    this.passwordRules.upperCase = /[A-Z]/.test(password);
+    this.passwordRules.lowerCase = /[a-z]/.test(password);
+    this.passwordRules.number = /[0-9]/.test(password);
+    this.passwordRules.specialChar = /[!@#$%^*()_+\-=\[\]{};:,.?~\\|]/.test(password);
+
+    this.resetCredPassword.NewPwd = password;
+
+    console.log('this.resetCredPassword.NewPwd : ', this.resetCredPassword.NewPwd);
+  }
 }

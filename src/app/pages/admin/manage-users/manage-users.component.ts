@@ -465,8 +465,7 @@ export class ManageUsersComponent {
 
         if(this.currentUser.RoleId !=null && this.currentUser.RoleId < this.studentRoleId)
         {
-            this.currentUser.AdmissionNumber = 0;
-            this.currentUser.LibraryNo = "";
+            this.currentUser.AdmissionNumber = 0;            
             this.currentUser.Batch = "";          
         }
 
@@ -477,8 +476,7 @@ export class ManageUsersComponent {
 
         this.validateInput('DepartmentId');
         this.validateInput('AdmissionNumber');
-        this.validateInput('StaffId');
-        this.validateInput('LibraryNo');
+        this.validateInput('StaffId');        
         this.validateInput('Batch');
     }
 
@@ -627,20 +625,16 @@ export class ManageUsersComponent {
                 const libraryNo = this.currentUser.LibraryNo?.trim();
                 const libraryNoPattern = /^VCN:\d{1,9}$/i;
 
-                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !libraryNo) {
+                if (!libraryNo) {
                     this.errors.LibraryNo = 'Library Number is required.';
                     isValid = false;
                 }
-                else if (
-                    (this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) &&
-                    !libraryNoPattern.test(libraryNo ?? '')
+                else if (!libraryNoPattern.test(libraryNo ?? '')
                 ) {
                     this.errors.LibraryNo = 'Library Number should be in VCN:{number} format.';
                     isValid = false;
                 }
-                else if (
-                    (this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) &&
-                    this.users.some(x => x.LibraryNo?.trim().toLowerCase() === libraryNo?.toLowerCase() && x.UserId != this.currentUser.UserId)
+                else if (this.users.some(x => x.LibraryNo?.trim().toLowerCase() === libraryNo?.toLowerCase() && x.UserId != this.currentUser.UserId)
                 ) {
                     this.errors.LibraryNo = 'Library Number already exists.';
                     isValid = false;
@@ -1375,14 +1369,11 @@ export class ManageUsersComponent {
                 const libraryNo = this.importPreview[index].LibraryNo?.trim();
                 const libraryNoPattern = /^VCN:\d{1,5}$/i;
 
-                if ((this.importPreview[index].RoleId != null && this.importPreview[index].RoleId > 0 && this.importPreview[index].RoleId == this.studentRoleId)
-                    && !libraryNo) {
+                if (!libraryNo) {
                     this.importPreview[index].Error = 'Library No is required.';
                     isValid = false;
                 }
-                else if (
-                    (this.importPreview[index].RoleId != null && this.importPreview[index].RoleId > 0 && this.importPreview[index].RoleId == this.studentRoleId)
-                    && !libraryNoPattern.test(libraryNo ?? '')
+                else if (!libraryNoPattern.test(libraryNo ?? '')
                 ) {
                     this.importPreview[index].Error = 'Library No should be in VCN:{number} format.';
                     isValid = false;
@@ -1743,5 +1734,83 @@ export class ManageUsersComponent {
         }
         
     }
+
+    
+
+    async downloadUserDetails(): Promise<void> {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Books');
+
+        // 1. Define Column Properties & Styles Globally (Massive Performance Boost)
+        const bodyStyle: Partial<ExcelJS.Style> = {
+            border: {
+                top: { style: 'thin', color: { argb: '00000000' } },
+                left: { style: 'thin', color: { argb: '00000000' } },
+                bottom: { style: 'thin', color: { argb: '00000000' } },
+                right: { style: 'thin', color: { argb: '00000000' } },
+            },
+            alignment: { horizontal: 'center', vertical: 'middle', wrapText: false } // Wrap text slows down rendering
+        };
+
+        // Set fixed widths to avoid heavy auto-fit calculation loops
+        worksheet.columns = [
+            { header: 'FULL NAME', key: 'userName', width: 30, style: bodyStyle },
+            { header: 'GENDER', key: 'gender', width: 15, style: bodyStyle },
+            { header: 'MOBILE NUMBER', key: 'mobileNo', width: 25, style: bodyStyle },
+            { header: 'EMAIL', key: 'mailId', width: 50, style: bodyStyle },
+            { header: 'ROLE NAME', key: 'roleName', width: 20, style: bodyStyle },
+            { header: 'ACCESS STATUS', key: 'status', width: 20, style: bodyStyle },
+            { header: 'USER ACCOUNT STATUS', key: 'isActive', width: 25, style: bodyStyle },
+            { header: 'DOB', key: 'dob', width: 25, style: bodyStyle },
+            { header: 'DEPARTMENT NAME', key: 'departmentName', width: 20, style: bodyStyle },
+            { header: 'ADMISSION NUMBER', key: 'admissionNumber', width: 20, style: bodyStyle },
+            { header: 'STAFF ID', key: 'staffId', width: 15, style: bodyStyle },
+            { header: 'LIBRARY NUMBER', key: 'libraryNo', width: 20, style: bodyStyle },
+            { header: 'BATCH', key: 'batch', width: 15, style: bodyStyle }
+            
+        ];
+
+        // 2. Format Header Row directly
+        const headerStyle: Partial<ExcelJS.Style> = {
+            font: { bold: true, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF22C55E' } },
+            ...bodyStyle
+        };
+        
+        worksheet.getRow(1).eachCell(cell => {
+            cell.style = headerStyle;
+        });
+
+        worksheet.autoFilter = { from: 'A1', to: 'M1' };
+
+        
+        const rowsData = this.users.map( (user : UserDetails) => ({
+            userName: user.FullName || '',
+            gender: user.Gender || '',
+            mobileNo: user.MobileNo || '',
+            mailId: user.MailId || '',
+            roleName: user.RoleName || '',
+            status: user.Status || '',
+            isActive: user.IsActive ? 'Active' : 'InActive',
+            dob: user.DOB ? new Date(user.DOB).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }) : '',
+            departmentName: user.DepartmentName || '',
+            admissionNumber: user.AdmissionNumber || '',
+            staffId: user.StaffId || '',
+            libraryNo: user.LibraryNo || '',
+            batch: user.Batch || '',
+        }));
+
+        worksheet.addRows(rowsData);
+
+        // 4. File Generation
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, 'save-user-details.xlsx');
+    }
+
 
 }

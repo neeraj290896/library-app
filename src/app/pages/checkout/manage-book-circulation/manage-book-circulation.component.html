@@ -12,9 +12,11 @@
         </div>
     </div>
 
-    <div class="table-clear-filter">
+    <div class="table-clear-filter d-flex align-items-center gap-3">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
+        <p-button type="button" label="Download Book Circulation Details" icon="pi pi-download" *ngIf="filteredBcDetails.length >0"
+                    styleClass="btn-main-outlined" (click)="downloadBookCirculationDetails()"></p-button>
     </div>
     <p-table [value]="filteredBcDetails" [autoLayout]="false" [paginator]="true" [rows]="10"
         [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"

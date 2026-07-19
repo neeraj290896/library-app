@@ -5,6 +5,8 @@
         <p-button [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
             styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print"
             (onClick)="printBarcode()"></p-button>
+        <p-button type="button" label="Download User Details" icon="pi pi-download" *ngIf="users.length >0"
+                    styleClass="btn-main-outlined" (click)="downloadUserDetails()"></p-button>
         <div class="position-relative" *ngIf="isBarcodeSearch">
             <span class="pi pi-search search-icon position-absolute text-muted"></span>
             <input #bookInput autofocus pInputText type="text" placeholder="Search Book" [(ngModel)]="searchBookTerm" (keydown.enter)="onBookSearch()"
@@ -306,7 +308,7 @@
                     (ngModelChange)="validateInput('StaffId')" />
                 <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
             </div>
-            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
                     Library No:<sup>*</sup>
                 </label>
@@ -436,7 +438,7 @@
                             (ngModelChange)="validateInput('StaffId')" />
                         <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
                     </div>
-                    <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                    <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
                             Library No:<sup>*</sup>
                         </label>
@@ -969,7 +971,7 @@
                     (ngModelChange)="validateInput('StaffId')" />
                 <div *ngIf="errors.StaffId" class="text-danger mt-1 small">{{ errors.StaffId }}</div>
             </div>
-            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
                     Library No:<sup>*</sup>
                 </label>
