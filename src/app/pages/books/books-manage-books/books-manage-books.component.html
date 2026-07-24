@@ -225,14 +225,14 @@
                         <button pButton icon="pi pi-sign-in" (click)="checkInBook(book)"
                             *ngIf="(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
                             pTooltip="CheckIn"></button>
-                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book)"
+                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book)" [disabled] = "(book.Status == 'Unavailable')"
                             *ngIf="!(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
                             pTooltip="CheckOut"></button>
                         <button pButton icon="pi pi-eye" (click)="viewBook(book)"
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
                         <button pButton icon="pi pi-pencil" (click)="editBook(book)"
                             class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Book"></button>
-                        <button pButton icon="pi pi-trash" (click)="deleteBook(book)"
+                        <button pButton icon="pi pi-trash" (click)="deleteBook(book)" [disabled] = "book.Status =='Unavailable'"
                             class="p-button-rounded p-button-text p-button-danger p-button-sm"
                             pTooltip="Delete Book"></button>
                     </div>

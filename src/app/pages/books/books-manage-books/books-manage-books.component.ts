@@ -825,7 +825,12 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!/^\d+(\.\d+)?$/.test(this.currentBook.Price?.toString().trim() ?? '')) {
                     this.errors.Price = 'Price is required and must be a valid input.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.currentBook.Price!=null && this.currentBook.Price >0)){
+                    this.errors.Price = 'Price must be a valid input.';
+                    isValid = false;
+                }
+                else {
                     this.errors.Price = '';
                 }
                 break;

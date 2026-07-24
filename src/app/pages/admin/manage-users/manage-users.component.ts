@@ -416,7 +416,7 @@ export class ManageUsersComponent {
         else {
             this.currentUser = {
                 UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', DepartmentId : 0,
-                RoleId: 0, RoleName: '', AdmissionNumber: 0, StaffId:'', CreatedByUserId: 0, CreatedByUserName: '', IsActive: true, Status: 'Pending', LibraryNo: '', Batch: ''
+                RoleId: 0, RoleName: '', AdmissionNumber: 0, StaffId:'', CreatedByUserId: this.loggedInUserDetails?.UserId, CreatedByUserName: this.loggedInUserDetails?.FullName, IsActive: true, Status: 'Pending', LibraryNo: '', Batch: ''
             };
 
             this.roleOptions = this.roles.filter(x => x.IsActive == true).map(role => {
@@ -559,6 +559,10 @@ export class ManageUsersComponent {
                     this.errors.MailId = 'MailId is required.';
                     isValid = false;
                 } 
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.currentUser.MailId?.trim())) {
+                    this.errors.MailId = 'Invalid email.';
+                    isValid = false;
+                }
                 else if(this.currentUser.UserId == 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim())){
                     this.errors.MobileNo = 'MailId already exists.';
                     isValid = false;
@@ -743,7 +747,7 @@ export class ManageUsersComponent {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Manage User - Success',
-                        detail: 'User added successfully.'
+                        detail: 'User details added successfully.'
                     });
                 }
 
@@ -793,7 +797,7 @@ export class ManageUsersComponent {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Manage User - Success',
-                        detail: 'User updated successfully.'
+                        detail: 'User details updated successfully.'
                     });
                 }
 
@@ -1095,8 +1099,8 @@ export class ManageUsersComponent {
                         DepartmentName: departmentName,
                         AdmissionNumber: admissionNumber,
                         StaffId: staffId,
-                        CreatedByUserId: 0,
-                        CreatedByUserName: '',
+                        CreatedByUserId: this.loggedInUserDetails?.UserId,
+                        CreatedByUserName: this.loggedInUserDetails?.FullName,
                         IsActive: true,
                         Status: 'Pending',
                         LibraryNo: libraryNo,
