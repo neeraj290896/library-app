@@ -48,6 +48,10 @@ export class BooksOverdueComponent {
   public borrowerNameList: { label: string, value: string }[] = [];
   public issuedByList: { label: string, value: string }[] = [];
   public statusList: { label: string, value: string }[] = [];
+  public accessionNoList: { label: string, value: string }[] = [];
+  public subjectNameList: { label: string, value: string }[] = [];
+  public selectedAccessionNoList: string[] = [];
+  public selectedSubjectNameList: string[] = [];
   public selectedBookNameList: string[] = [];
   public selectedBorrowerNameList: string[] = [];
   public selectedIssuedByList: string[] = [];
@@ -256,6 +260,8 @@ export class BooksOverdueComponent {
 
     initializeFilterLists(): void {
         this.bookNameList = [...new Set(this._odDetails.map(book => book.BookName))].map(e => ({ label: e ?? "", value: e ?? "" }));
+        this.accessionNoList = [...new Set(this._odDetails.map(book => book.AccessionNo))].map(e => ({ label: e ?? "", value: e ?? "" }));
+        this.subjectNameList = [...new Set(this._odDetails.map(book => book.SubjectName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.borrowerNameList = [...new Set(this._odDetails.map(book => book.BorrowerName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.issuedByList = [...new Set(this._odDetails.map(book => book.IssuedByUserName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.statusList = [...new Set(this._odDetails.map(book => book.OverDueStatus))].map(e => ({ label: e ?? "", value: e ?? "" }));
@@ -271,6 +277,8 @@ export class BooksOverdueComponent {
         this.selectedBorrowerNameList = [];
         this.selectedIssuedByList = [];
         this.selectedStatusList = [];
+        this.selectedAccessionNoList = [];
+        this.selectedSubjectNameList = [];
         this.searchBookTerm = '';
         this.searchUserTerm = '';
         this.onBookSearch('');

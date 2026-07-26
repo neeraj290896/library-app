@@ -33,11 +33,15 @@ export class ManageBookCirculationComponent {
     @ViewChild('dt') dataTable: Table | undefined;
     public showFt: boolean = false;
     public bookNameList: { label: string, value: string }[] = [];
+    public accessionNoList: { label: string, value: string }[] = [];
+    public subjectNameList: { label: string, value: string }[] = [];
     public borrowerNameList: { label: string, value: string }[] = [];
     public issuedByList: { label: string, value: string }[] = [];
     public statusList: { label: string, value: string }[] = [];
     public returnByList: { label: string, value: string }[] = [];
     public selectedBookNameList: string[] = [];
+    public selectedAccessionNoList: string[] = [];
+    public selectedSubjectNameList: string[] = [];
     public selectedBorrowerNameList: string[] = [];
     public selectedIssuedByList: string[] = [];
     public selectedStatusList: string[] = [];
@@ -123,6 +127,8 @@ export class ManageBookCirculationComponent {
 
     initializeFilterLists(): void {
         this.bookNameList = [...new Set(this.bcDetails.map(book => book.BookName))].map(e => ({ label: e ?? "", value: e ?? "" }));
+        this.accessionNoList = [...new Set(this.bcDetails.map(book => book.AccessionNo))].map(e => ({ label: e ?? "", value: e ?? "" }));
+        this.subjectNameList = [...new Set(this.bcDetails.map(book => book.SubjectName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.borrowerNameList = [...new Set(this.bcDetails.map(book => book.BorrowerName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.issuedByList = [...new Set(this.bcDetails.map(book => book.IssuedByUserName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.statusList = [...new Set(this.bcDetails.map(book => book.Status))].map(e => ({ label: e ?? "", value: e ?? "" }));
@@ -140,6 +146,8 @@ export class ManageBookCirculationComponent {
         this.selectedIssuedByList = [];
         this.selectedStatusList = [];
         this.selectedReturnByList = [];
+        this.selectedAccessionNoList = [];
+        this.selectedSubjectNameList = [];
         this.searchBookTerm = '';
         this.searchUserTerm = '';
         this.onBookSearch('');

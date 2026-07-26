@@ -22,26 +22,17 @@
             <p-tabPanel header="Manage Publisher">
                 <app-books-manage-publisher *ngIf="activeTab === 2"></app-books-manage-publisher>
             </p-tabPanel>
-
             <p-tabPanel header="Manage Category">
                 <app-books-manage-category *ngIf="activeTab === 3"></app-books-manage-category>
-            </p-tabPanel>
-
-            <p-tabPanel header="Manage Language">
-                <app-books-manage-language *ngIf="activeTab === 4"></app-books-manage-language>
-            </p-tabPanel>
+            </p-tabPanel>            
             <p-tabPanel header="Manage Subject">
-                <app-books-manage-subject *ngIf="activeTab === 5"></app-books-manage-subject>
+                <app-books-manage-subject *ngIf="activeTab === 4"></app-books-manage-subject>
             </p-tabPanel>
-
-            <p-tabPanel header="Manage Buildings" *ngIf="canAccessBuilding_Floor_Rack">
-                <app-manage-building *ngIf="activeTab === 6"></app-manage-building>
+            <p-tabPanel header="Manage Source">
+                <app-books-manage-source *ngIf="activeTab === 5"></app-books-manage-source>
             </p-tabPanel>
-            <p-tabPanel header="Manage Floors" *ngIf="canAccessBuilding_Floor_Rack">
-                <app-manage-floor *ngIf="activeTab === 7"></app-manage-floor>
-            </p-tabPanel>
-            <p-tabPanel header="Manage Racks" *ngIf="canAccessBuilding_Floor_Rack">
-                <app-manage-rack *ngIf="activeTab === 8"></app-manage-rack>
+            <p-tabPanel header="Manage Language">
+                <app-books-manage-language *ngIf="activeTab === 6"></app-books-manage-language>
             </p-tabPanel>
         </p-tabView>
     </div>

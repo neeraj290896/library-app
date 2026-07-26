@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { expiredGuard } from './shared/guards/expired.guard';
 import { authGuard } from './shared/guards/auth.guard';
+import { OrganizationComponent } from './pages/organization/organization.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -44,6 +45,10 @@ export const routes: Routes = [
             {
                 path: 'admin',
                 loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent)
+            },
+            {
+                path: 'organization',
+                loadComponent: () => import('./pages/organization/organization.component').then(m => OrganizationComponent)
             },
             {
                 path: 'settings',

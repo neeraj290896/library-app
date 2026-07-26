@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { BookService } from '@services/book.service';
-import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, SubjectDetails, UserDetails } from '@app/shared/models/api.models';
+import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, SourceDetails, SubjectDetails, UserDetails } from '@app/shared/models/api.models';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthorService } from '@app/shared/services/author.service';
 import { PublisherService } from '@app/shared/services/publisher.service';
@@ -36,6 +36,7 @@ import { environment } from '../../../../environments/environment';
 import { UserService } from '@app/shared/services/user.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SubjectService } from '@app/shared/services/subject.service';
+import { SourceService } from '@app/shared/services/source.service';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -76,6 +77,7 @@ export class BooksManageBooksComponent implements OnInit {
     public _authService = inject(AuthService);
     public userService = inject(UserService);
     public subjectService = inject(SubjectService);
+    public sourceService = inject(SourceService);
     private confirmationService = inject(ConfirmationService);
 
     @ViewChild('dt') dataTable: Table | undefined;
@@ -86,6 +88,7 @@ export class BooksManageBooksComponent implements OnInit {
     public publishers: PublisherDetails[] = [];
     public categories: CategoryDetails[] = [];
     public subjects: SubjectDetails[] = [];
+    public sources: SourceDetails[] = [];
     public languages: LanguageDetails[] = [];
     public buildings: BuildingDetails[] = [];
     public floors: FloorDetails[] = [];
@@ -95,14 +98,16 @@ export class BooksManageBooksComponent implements OnInit {
     public authorNameList: { label: string, value: string }[] = [];
     public publisherNameList: { label: string, value: string }[] = [];
     public categoryNameList: { label: string, value: string }[] = [];
-    public languageNameList: { label: string, value: string }[] = [];
+    public accessionNoList: { label: string, value: string }[] = [];
+    public subjectList: { label: string, value: string }[] = [];
     public publishedYearList: { label: number, value: number }[] = [];
     public statusList: { label: string, value: boolean }[] = [];
     public selectedBookNameList: string[] = [];
     public selectedAuthorNameList: string[] = [];
     public selectedPublisherNameList: string[] = [];
     public selectedCategoryNameList: string[] = [];
-    public selectedLanguageNameList: string[] = [];
+    public selectedSubjectList: string[] = [];
+    public selectedAccessionNoList: string[] = [];
     public selectedPublishedYearList: number[] = [];
     public selectedStatusList: boolean[] = [];
     public bookDialogVisible = false;
@@ -122,10 +127,13 @@ export class BooksManageBooksComponent implements OnInit {
         PublishedYear: null,
         Price: 0,
         BillNo: '',
+        BillDate:null,
+        TotalPageNo:null,
         CallNo: '',
         AccessionNo: '',
-        Source: '',
-        SubjectId: 0,
+        SourceId: null,
+        SourceName: '',
+        SubjectId: null,
         SubjectName: '',
         Status: 'Available',
         BuildingId: null,
@@ -147,10 +155,12 @@ export class BooksManageBooksComponent implements OnInit {
         LanguageId: string,
         PublishedYear: string,
         Price: string,
+        BillDate: string,
         BuildingId: string,
         FloorId: string,
         RackId: string,
         SubjectId: string,
+        AccessionNo: string,
         BookBarcode: string,
         IsActive: string
     } = {
@@ -161,10 +171,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
             SubjectId: '',
+            AccessionNo: '',
             BookBarcode: '',
             IsActive: ''
         };
@@ -172,6 +184,7 @@ export class BooksManageBooksComponent implements OnInit {
     public publisherOptions: { label: string; value: number; }[] = [];
     public categoryOptions: { label: string; value: number; }[] = [];
     public subjectOptions: { label: string; value: number; }[] = [];
+    public sourceOptions: { label: string; value: number; }[] = [];
     public languageOptions: { label: string; value: number; }[] = [];
     public buildingOptions: { label: string; value: number; }[] = [];
     public floorOptions: { label: string; value: number; }[] = [];
@@ -196,6 +209,8 @@ export class BooksManageBooksComponent implements OnInit {
     public importStatusList: { label: string, value: boolean }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
     public importBillNoList: { label: string, value: string }[] = [];
+    public importBillDateList: { label: string, value: string }[] = [];
+    public importTotalPageNoList: { label: number, value: number }[] = [];
     public importCallNoList: { label: string, value: string }[] = [];
     public importAccessionNoList: { label: string, value: string }[] = [];
     public importSourceList: { label: string, value: string }[] = [];
@@ -210,6 +225,8 @@ export class BooksManageBooksComponent implements OnInit {
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
     public importSelectedBillNoList: string[] = [];
+    public importSelectedBillDateList: string[] = [];
+    public importSelectedTotalPageNoList: string[] = [];
     public importSelectedCallNoList: string[] = [];
     public importSelectedAccessionNoList: string[] = [];
     public importSelectedSourceList: string[] = [];
@@ -231,17 +248,30 @@ export class BooksManageBooksComponent implements OnInit {
     public isBarcodeSearch : boolean = false;
     public searchUserTerm: string = '';
     public lstUserDetails: UserDetails[] = [];
+    public minDate: Date | undefined;
+    public maxDate: Date | undefined;
+    public billDate: Date | null = null;
 
     ngOnInit(): void {
         const today = new Date();
         this.todayDate = this.parseCustomDateStringForUI(today);
 
+        this.maxDate = new Date();  
+
+        this.minDate = new Date();
+        this.minDate.setMonth(today.getMonth() - 1);        
+
+        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+
+               
+        
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
         this.loadBooks();
         this.loadAuthors();
         this.loadPublishers();
         this.loadCategories();
         this.loadSubjects();
+        this.loadSources();
         this.loadLanguages();
         this.loadBuildings();
         this.loadFloors();
@@ -383,6 +413,20 @@ export class BooksManageBooksComponent implements OnInit {
         });
     }
 
+    loadSources(): void {
+        this.sourceService.getSourceDetails().subscribe({
+            next: (data: SourceDetails[]) => {
+                this.sources = data;
+                this.sourceOptions = data.filter(x => x.IsActive == true).map(subject => {
+                    return { label: subject.SourceName ?? '', value: subject.SourceId };
+                });
+            },
+            error: (err) => {
+                console.error('Error loading sources:', err);
+            }
+        });
+    }
+
     loadLanguages(): void {
         this.languageService.getLanguageDetails().subscribe({
             next: (data: LanguageDetails[]) => {
@@ -442,9 +486,11 @@ export class BooksManageBooksComponent implements OnInit {
             .map(e => ({ label: e!, value: e! }));
         this.categoryNameList = [...new Set(this.books.map(book => book.CategoryName))]
             .map(e => ({ label: e!, value: e! }));
-        this.languageNameList = [...new Set(this.books.map(book => book.LanguageName))]
+        this.accessionNoList = [...new Set(this.books.map(book => book.AccessionNo))]
             .map(e => ({ label: e!, value: e! }));
         this.publishedYearList = [...new Set(this.books.map(book => book.PublishedYear))]
+            .map(e => ({ label: e!, value: e! }));
+        this.subjectList = [...new Set(this.books.map(book => book.SubjectName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.books.map(book => book.IsActive ?? false))]
             .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
@@ -483,7 +529,8 @@ export class BooksManageBooksComponent implements OnInit {
         this.selectedAuthorNameList = [];
         this.selectedPublisherNameList = [];
         this.selectedCategoryNameList = [];
-        this.selectedLanguageNameList = [];
+        this.selectedAccessionNoList = [];
+        this.selectedSubjectList = [];
         this.selectedPublishedYearList = [];
         this.selectedStatusList = [];
         this.showFt = false;
@@ -525,6 +572,8 @@ export class BooksManageBooksComponent implements OnInit {
                     return { label: rack.RackLabel ?? '', value: rack.RackId };
                 });
 
+            this.billDate = book.BillDate ? new Date(book.BillDate) : null;
+
             if(this.currentBook.Status == "Unavailable")
             {
                 this.currentBook.Status = "Available";
@@ -545,9 +594,12 @@ export class BooksManageBooksComponent implements OnInit {
                 PublishedYear: null,
                 Price: 0,
                 BillNo: '',
+                BillDate:null,
+                TotalPageNo:null,
                 CallNo: '',
                 AccessionNo: '',
-                Source: '',
+                SourceId:null,
+                SourceName: '',
                 SubjectId: 0,
                 SubjectName: '',
                 Status: 'Available',
@@ -574,10 +626,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
             SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -604,6 +658,8 @@ export class BooksManageBooksComponent implements OnInit {
                 .map(rack => {
                     return { label: rack.RackLabel ?? '', value: rack.RackId };
                 });
+
+            this.billDate = book.BillDate ? new Date(book.BillDate) : null;
         }
 
         this.errors = {
@@ -614,10 +670,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
             SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -655,6 +713,19 @@ export class BooksManageBooksComponent implements OnInit {
         }
 
         this.validateInput('SubjectId');
+    }
+
+    onSourceChange():void{
+        const _source = this.sourceOptions.find(s => s.value === this.currentBook.SourceId);
+        if (_source) {
+            this.currentBook.SourceName = _source.label;
+        }
+        else
+        {
+            this.currentBook.SourceName = '';
+        }
+
+        // this.validateInput('SourceId');
     }
 
     onPublisherChange(): void {
@@ -737,6 +808,22 @@ export class BooksManageBooksComponent implements OnInit {
         }
 
         this.validateInput('RackId');
+    }
+
+    onBillDateChange():void{
+        if (this.billDate) {
+            // this.dobDate.setHours(0, 0, 0, 0);
+             // Reverse the 5 hour 30 min shift (in minutes: 5 * 60 + 30 = 330)
+            const userTimezoneOffset = this.billDate.getTimezoneOffset(); // Will be -330 for India    
+            const correctedDate = new Date(this.billDate.getTime() - (userTimezoneOffset * 60 * 1000));    
+
+            this.currentBook.BillDate = correctedDate.toISOString().split('T')[0] + 'T00:00:00.000Z';
+        }
+        else {
+            this.currentBook.BillDate = null;
+        }
+
+        this.validateInput('BillDate');
     }
 
     validateInput(key: string): boolean {
@@ -894,6 +981,31 @@ export class BooksManageBooksComponent implements OnInit {
                     this.errors.SubjectId = '';
                 }
                 break;
+            case 'AccessionNo':
+                if (!this.currentBook.AccessionNo?.trim()) {
+                    this.errors.AccessionNo = 'AccessionNo is required.';
+                    isValid = false;
+                }
+                else if (!/^\d+$/.test(this.currentBook.AccessionNo.trim())) {
+                    this.errors.AccessionNo = 'AccessionNo must contain numbers only.';
+                    isValid = false;
+                }
+                else if (this.currentBook.AccessionNo.trim().length < 6) {
+                    this.errors.AccessionNo = 'AccessionNo must be at least 6 characters.';
+                    isValid = false;
+                }
+                else {
+                    this.errors.AccessionNo = '';
+                }
+                break;
+            case 'BillDate':
+                if ((this.currentBook.BillDate?.trim()) && !(this.currentBook.BillDate?.trim())) {
+                    this.errors.BillDate = 'BillDate is required.';
+                    isValid = false;
+                } else {
+                    this.errors.BillDate = '';
+                }
+                break;
 
             // case 'BookBarcode':
             //     if (!this.currentBook.BookBarcode?.trim()) {
@@ -933,12 +1045,13 @@ export class BooksManageBooksComponent implements OnInit {
         const isFloorIdValid = this.validateInput('FloorId');
         const isRackIdValid = this.validateInput('RackId');
         const isSubjectIdValid = this.validateInput('SubjectId');
-        // const isBookBarcodeValid = this.validateInput('BookBarcode');
+        const isAccessionNoValid = this.validateInput('AccessionNo');
+        const isBillDateValid = this.validateInput('BillDate');
         // const isStatusValid = this.validateInput('IsActive');
         return isBookNameValid && isAuthorIdValid && isPublisherIdValid &&
             isCategoryIdValid && isLanguageIdValid && isPublishedYearValid &&
             isPriceValid && isBuildingIdValid && isFloorIdValid &&
-            isRackIdValid && isSubjectIdValid; // && isBookBarcodeValid && isStatusValid;
+            isRackIdValid && isSubjectIdValid && isAccessionNoValid && isBillDateValid;// && isStatusValid;
     }
 
     saveBook(): void {
@@ -1180,8 +1293,8 @@ export class BooksManageBooksComponent implements OnInit {
         };
 
         const worksheet = workbook.addWorksheet('Books');
-        worksheet.addRow(['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)', 'BILL NO', 'CALL NO', 
-            'ACCESSION NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK']);
+        worksheet.addRow(['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)', 'BILL NO', 'BILL DATE', 
+                'TOTAL PAGE NO', 'CALL NO', 'ACCESSION NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -1189,7 +1302,7 @@ export class BooksManageBooksComponent implements OnInit {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'O1'
+            to: 'Q1'
         };
 
         const authorsSheet = workbook.addWorksheet('AuthorList');
@@ -1215,6 +1328,12 @@ export class BooksManageBooksComponent implements OnInit {
             subjectSheet.getCell(idx + 1, 1).value = cat.SubjectName;
         });
         subjectSheet.state = 'hidden';
+
+        const sourceSheet = workbook.addWorksheet('SourceList');
+        this.sources.filter(x => x.IsActive == true).forEach((cat, idx) => {
+            sourceSheet.getCell(idx + 1, 1).value = cat.SourceName;
+        });
+        sourceSheet.state = 'hidden';
 
         const languagesSheet = workbook.addWorksheet('LanguageList');
         this.languages.filter(x => x.IsActive == true).forEach((lang, idx) => {
@@ -1303,7 +1422,43 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please enter a valid price (greater than 0).'
             };
 
-            const subjectCell = worksheet.getCell(rowIndex, 12);
+            //8 --> BillNo, 9 --> BillDate
+
+            const pageNoCell = worksheet.getCell(rowIndex, 10);
+            pageNoCell.dataValidation = {
+                type: 'whole',
+                operator: 'greaterThan',
+                formulae: ['0'],
+                allowBlank: true,
+                showErrorMessage: true,
+                errorTitle: 'Invalid Total PageNo',
+                error: 'Please enter a valid total pageNo (greater than 0).'
+            };
+
+            //11 --? CallNo
+
+            const accessionCell = worksheet.getCell(rowIndex, 12);
+            accessionCell.dataValidation = {
+                type: 'whole',
+                operator: 'between',
+                formulae: ['000001', '999999'],
+                allowBlank: true,
+                showErrorMessage: true,
+                errorTitle: 'Invalid AccessionNo',
+                error: 'Please enter a 6-digit accessionNo (e.g., 000001).'
+            };
+
+            const sourceCell = worksheet.getCell(rowIndex, 13);
+            sourceCell.dataValidation = {
+                type: 'list',
+                allowBlank: true,
+                formulae: [`SourceList!$A$1:$A$${this.sources.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Source',
+                error: 'Please select a valid source from the list.'
+            };
+
+            const subjectCell = worksheet.getCell(rowIndex, 14);
             subjectCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1313,7 +1468,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid subject from the list.'
             };
 
-            const buildingCell = worksheet.getCell(rowIndex, 13);
+            const buildingCell = worksheet.getCell(rowIndex, 15);
             buildingCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1323,7 +1478,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid building from the list.'
             };
 
-            const floorCell = worksheet.getCell(rowIndex, 14);
+            const floorCell = worksheet.getCell(rowIndex, 16);
             floorCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1333,7 +1488,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid floor for a selected building.'
             };
 
-            const rackCell = worksheet.getCell(rowIndex, 15);
+            const rackCell = worksheet.getCell(rowIndex, 17);
             rackCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1404,8 +1559,8 @@ export class BooksManageBooksComponent implements OnInit {
                 }
 
                 const headerRow = Object.keys(rows[0] || {});
-                const expectedHeaders = ['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR',
-                    'PRICE(₹)', 'BILL NO', 'CALL NO', 'ACCESSION NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK'];
+                const expectedHeaders = ['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)', 'BILL NO', 'BILL DATE', 
+                'TOTAL PAGE NO', 'CALL NO', 'ACCESSION NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -1423,6 +1578,8 @@ export class BooksManageBooksComponent implements OnInit {
                     const publishedYear = Number(row['YEAR']?.toString().trim());
                     const price = Number(row['PRICE(₹)']?.toString().trim());
                     const billNo = row['BILL NO']?.toString().trim();
+                    const billDate = row['BILL DATE']?.toString().trim();
+                    const totalPageNo = row['TOTAL PAGE NO']?.toString().trim();
                     const callNo = row['CALL NO']?.toString().trim();
                     const accessionNo = row['ACCESSION NO']?.toString().trim();
                     const source = row['SOURCE']?.toString().trim();
@@ -1449,9 +1606,12 @@ export class BooksManageBooksComponent implements OnInit {
                         PublishedYear: publishedYear,
                         Price: price,
                         BillNo: billNo,
+                        BillDate: billDate,
+                        TotalPageNo: totalPageNo,
                         CallNo: callNo,
                         AccessionNo: accessionNo,
-                        Source: source,
+                        SourceId:null,
+                        SourceName: source,
                         SubjectName: subjectName,                        
                         Status: 'Available',
                         BuildingId: null,
@@ -1497,6 +1657,8 @@ export class BooksManageBooksComponent implements OnInit {
                 return { label: rack.RackLabel ?? '', value: rack.RackId };
             });
 
+        this.billDate = book.BillDate ? new Date(book.BillDate) : null;
+
         this.errors = {
             BookName: '',
             AuthorId: '',
@@ -1505,10 +1667,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
             SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -1534,6 +1698,8 @@ export class BooksManageBooksComponent implements OnInit {
                 return { label: rack.RackLabel ?? '', value: rack.RackId };
             });
 
+        this.billDate = book.BillDate ? new Date(book.BillDate) : null;
+
         this.errors = {
             BookName: '',
             AuthorId: '',
@@ -1542,10 +1708,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
             SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -1571,6 +1739,10 @@ export class BooksManageBooksComponent implements OnInit {
         this.validateImportInput('LanguageName', this.importIndex);
         this.validateImportInput('PublishedYear', this.importIndex);
         this.validateImportInput('Price', this.importIndex);
+        this.validateImportInput('BillDate', this.importIndex);
+        this.validateImportInput('SubjectName', this.importIndex);
+        this.validateImportInput('SourceName', this.importIndex);
+        this.validateImportInput('AccessionNo', this.importIndex);
         this.validateImportInput('BuildingName', this.importIndex);
         this.validateImportInput('FloorName', this.importIndex);
         this.validateImportInput('RackLabel', this.importIndex);
@@ -1784,6 +1956,42 @@ export class BooksManageBooksComponent implements OnInit {
                     this.importPreview[index].Error = '';
                 }
                 break;
+                
+            case 'SourceName':
+                if (this.importPreview[index].SourceName?.trim()) {                    
+                    if (!this.sources.some(_src => _src.SourceName?.toLowerCase() === this.importPreview[index].SourceName?.trim().toLowerCase())) {
+                        this.importPreview[index].Error = 'Source not enlisted.';
+                        isValid = false;
+                    }
+                    else {
+                        const _src = this.sources.find(s => s.SourceName?.toLowerCase() === this.importPreview[index].SourceName?.trim().toLowerCase());
+                        if (_src) {
+                            this.importPreview[index].SourceId = _src.SourceId;
+                            this.importPreview[index].SourceName = _src.SourceName;
+                        }                        
+                        this.importPreview[index].Error = '';
+                    }
+                }
+                
+                break;
+
+            case 'AccessionNo':
+                if (!this.importPreview[index].AccessionNo?.trim()) {
+                    this.importPreview[index].Error = 'AccessionNo is required.';
+                    isValid = false;
+                }
+                else if (!/^\d+$/.test(this.importPreview[index].AccessionNo.trim())) {
+                    this.importPreview[index].Error = 'AccessionNo must contain numbers only.';
+                    isValid = false;
+                }
+                else if (this.importPreview[index].AccessionNo.trim().length < 6) {
+                    this.importPreview[index].Error = 'AccessionNo must be at least 6 characters.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
 
             // case 'BookBarcode':
             //     if (!this.importPreview[index].BookBarcode?.trim()) {
@@ -1824,8 +2032,9 @@ export class BooksManageBooksComponent implements OnInit {
                 this.validateImportInput('BuildingName', index) &&
                 this.validateImportInput('FloorName', index) &&
                 this.validateImportInput('RackLabel', index) &&
-                this.validateImportInput('SubjectName', index);
-            // this.validateImportInput('BookBarcode', index) &&
+                this.validateImportInput('SubjectName', index) &&
+                this.validateImportInput('SourceName', index) &&
+                this.validateImportInput('AccessionNo', index);
             // this.validateImportInput('IsActive', index);
         });
     }
@@ -1853,6 +2062,15 @@ export class BooksManageBooksComponent implements OnInit {
                 LanguageId: item.LanguageId,
                 LanguageName: item.LanguageName,
                 PublishedYear: item.PublishedYear,
+                BillNo: item.BillNo,
+                BillDate: item.BillDate,
+                TotalPageNo: item.TotalPageNo,
+                SourceId: item.SourceId,
+                SourceName:item.SourceName,
+                AccessionNo: item.AccessionNo,
+                SubjectId: item.SubjectId,
+                SubjectName: item.SubjectName,
+                CallNo: item.CallNo,
                 Price: item.Price,
                 Status: item.Status,
                 BuildingId: item.BuildingId,
@@ -2097,6 +2315,8 @@ export class BooksManageBooksComponent implements OnInit {
             { header: 'YEAR', key: 'year', width: 15, style: bodyStyle },
             { header: 'PRICE(₹)', key: 'price', width: 15, style: bodyStyle },
             { header: 'BILL NO', key: 'billNo', width: 15, style: bodyStyle },
+            { header: 'BILL DATE', key: 'billDate', width: 15, style: bodyStyle },
+            { header: 'TOTAL PAGE NO', key: 'pageNo', width: 15, style: bodyStyle },
             { header: 'CALL NO', key: 'callNo', width: 20, style: bodyStyle },
             { header: 'ACCESSION NO', key: 'accessionNo', width: 20, style: bodyStyle },
             { header: 'SOURCE', key: 'source', width: 20, style: bodyStyle },
@@ -2118,7 +2338,7 @@ export class BooksManageBooksComponent implements OnInit {
             cell.style = headerStyle;
         });
 
-        worksheet.autoFilter = { from: 'A1', to: 'P1' };
+        worksheet.autoFilter = { from: 'A1', to: 'R1' };
 
         // 3. Fast Row Injection using Object Keys
         // This allows ExcelJS to stream array values efficiently internal to its build process
@@ -2131,9 +2351,11 @@ export class BooksManageBooksComponent implements OnInit {
             year: book.PublishedYear || '',
             price: book.Price || 0,
             billNo: book.BillNo || '',
+            billDate: book.BillDate || '',
+            pageNo: book.TotalPageNo || 0,
             callNo: book.CallNo || '',
             accessionNo: book.AccessionNo || '',
-            source: book.Source || '',
+            source: book.SourceName || '',
             subject: book.SubjectName || '',
             building: book.BuildingName || '',
             floor: book.FloorName || '',
@@ -2148,5 +2370,14 @@ export class BooksManageBooksComponent implements OnInit {
         const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         saveAs(blob, 'save-book-details.xlsx');
     }
+
+    validateNumberInput(event: KeyboardEvent, allowedKeys : string[]): void {    
+        const isNumber = event.key >= '0' && event.key <= '9';
+    
+            // If it's not a number and not in our allowed keys list, block the input
+            if (!isNumber && !allowedKeys.includes(event.key)) {
+            event.preventDefault();
+            }
+        }
 
 }

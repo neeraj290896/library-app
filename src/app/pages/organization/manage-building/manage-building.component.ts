@@ -189,6 +189,32 @@ export class ManageBuildingComponent {
 
     editbuilding(building: BuildingDetails | null = null): void {
         if (building) {
+
+            if(building.StateId!=null && building.StateId>0)
+            {
+                this.loadDistrictDetailsById(building.StateId);
+
+                if(building.DistrictId!=null && building.DistrictId>0)
+                {
+                    this.loadCityDetailsById(building.StateId,building.DistrictId);
+
+                    if(building.CityId!=null && building.CityId>0)
+                    {
+                        this.loadAreaDetailsById(building.StateId,building.DistrictId, building.CityId);
+                    }
+                }
+
+            }
+
+           
+
+            if(building.StateId!=null && building.StateId>0)
+            {
+                this.loadDistrictDetailsById(building.StateId);
+            }
+
+
+
             this.currentBuilding = { ...building };
             this.header = 'Edit Building details';
         } 

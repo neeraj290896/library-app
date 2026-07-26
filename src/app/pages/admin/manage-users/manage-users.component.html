@@ -13,213 +13,216 @@
                 class="form-control ps-5" />
         </div>
     </div>
-    <p-table #dt [value]="users" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedUserDetails"
-        (selectionChange)="onSelectionChange()" [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top"
-        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+    <div style="overflow-x: auto;">
+        <p-table #dt [value]="users" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedUserDetails"
+            (selectionChange)="onSelectionChange()" [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top"
+            [style]="{ minWidth: '2300px' }" [scrollable]="true" styleClass="p-datatable-sm"
+            [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
-        <ng-template pTemplate="header">
-            <tr class="border-bottom">
-                <th style="width: 3.5%">
-                    <!-- Header checkbox for selecting/deselecting all items -->
-                    <p-tableHeaderCheckbox> id="chk-header-all"
-                        [value]="books" </p-tableHeaderCheckbox>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 4%;">
-                    <div class="d-flex align-items-center gap-2">
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th style="width: 3%">
+                        <!-- Header checkbox for selecting/deselecting all items -->
+                        <p-tableHeaderCheckbox> id="chk-header-all"
+                            [value]="books" </p-tableHeaderCheckbox>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 4%;">
                         <div class="d-flex align-items-center gap-2">
-                            S.No
+                            <div class="d-flex align-items-center gap-2">
+                                S.No
+                            </div>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 16%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="FullName">
-                            FullName
-                            <p-sortIcon field="FullName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 15%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="FullName">
+                                FullName
+                                <p-sortIcon field="FullName"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedUserNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 10%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="RoleName">
-                            RoleName
-                            <p-sortIcon field="RoleName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 9%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="RoleName">
+                                RoleName
+                                <p-sortIcon field="RoleName"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedRoleList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedRoleList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 9%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="Gender">
-                            Gender
-                            <p-sortIcon field="Gender"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 8%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="Gender">
+                                Gender
+                                <p-sortIcon field="Gender"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedGenderList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedGenderList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 12%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="MobileNo">
-                            MobileNo
-                            <p-sortIcon field="MobileNo"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="MobileNo">
+                                MobileNo
+                                <p-sortIcon field="MobileNo"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedMobileNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedMobileNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 20%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="MailId">
-                            MailId
-                            <p-sortIcon field="MailId"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 20%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="MailId">
+                                MailId
+                                <p-sortIcon field="MailId"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedMailIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedMailIdList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 9%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
-                            Status
-                            <p-sortIcon field="IsActive"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 9%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                                Status
+                                <p-sortIcon field="IsActive"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 13%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="LastLogInTime">
-                            LastLogInTime
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="LastLogInTime">
+                                LastLogInTime
+                            </div>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 7%;">
-                    <div class="d-flex align-items-center justify-content-center gap-3">
-                        <span class="pi pi-plus-circle" (click)="editUser()" pTooltip="Add User"></span>
-                        <span class="pi pi-upload" (click)="importUser()" pTooltip="Import Users"></span>
-                    </div>
-                </th>
-            </tr>
-            @if (showFt) {
-            <tr>
-                <th></th>
-                <th></th>
-                <th>
-                    <p-columnFilter field="FullName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="userNameList" [(ngModel)]="selectedUserNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th><p-columnFilter field="RoleName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="roleList" [(ngModel)]="selectedRoleList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter></th>
-                <th>
-                    <p-columnFilter field="Gender" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="genderList" [(ngModel)]="selectedGenderList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="MobileNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="mobileNoList" [(ngModel)]="selectedMobileNoList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="MailId" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="mailIdList" [(ngModel)]="selectedMailIdList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th></th>
-                <th></th>
-            </tr>
-            }
-        </ng-template>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 7%;">
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            <span class="pi pi-plus-circle" (click)="editUser()" pTooltip="Add User"></span>
+                            <span class="pi pi-upload" (click)="importUser()" pTooltip="Import Users"></span>
+                        </div>
+                    </th>
+                </tr>
+                @if (showFt) {
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>
+                        <p-columnFilter field="FullName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="userNameList" [(ngModel)]="selectedUserNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th><p-columnFilter field="RoleName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="roleList" [(ngModel)]="selectedRoleList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter></th>
+                    <th>
+                        <p-columnFilter field="Gender" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="genderList" [(ngModel)]="selectedGenderList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="MobileNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="mobileNoList" [(ngModel)]="selectedMobileNoList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="MailId" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="mailIdList" [(ngModel)]="selectedMailIdList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                }
+            </ng-template>
 
-        <ng-template pTemplate="body" let-user let-index="rowIndex">
-            <tr class="border-bottom">
-                <td><p-tableCheckbox [index]="index" [value]="user" id="chk-row-{{user.UserId}}" /></td>
-                <td>{{ index + 1 }}</td>
-                <td>{{ user.FullName }}</td>
-                <td>{{ user.RoleName }}</td>
-                <td>{{ user.Gender }}</td>
-                <td>{{ user.MobileNo }}</td>
-                <td>{{ user.MailId }}</td>
-                <td>
-                    <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
-                        [severity]="getStatusSeverity(user.IsActive)"></p-tag>
-                </td>
-                <td>{{ user.LastLogInTime | date:'MM/dd/yyyy HH:mm:ss' }}</td>
-                <td>
-                    <div class="d-flex align-items-center justify-content-center gap-2">
-                        <button pButton icon="pi pi-sign-in" (click)="checkInBook(user)"
-                            *ngIf="user.BorrowedBooksCount >0" class="p-button-rounded p-button-text p-button-sm"
-                            pTooltip="CheckIn"></button>
-                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(user)"
-                            class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckOut"></button>
-                        <button pButton icon="pi pi-eye" (click)="viewUser(user)"
-                            class="p-button-rounded p-button-text p-button-sm" pTooltip="View User"></button>
-                        <button pButton icon="pi pi-pencil" (click)="editUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails?.RoleId ?? 0)"
-                            class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Edit User"></button>
-                        <button pButton icon="pi pi-trash" (click)="deleteUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails?.RoleId ?? 0)"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"
-                            pTooltip="Delete User"></button>
-                    </div>
-                </td>
-            </tr>
-        </ng-template>
+            <ng-template pTemplate="body" let-user let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td><p-tableCheckbox [index]="index" [value]="user" id="chk-row-{{user.UserId}}" /></td>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ user.FullName }}</td>
+                    <td>{{ user.RoleName }}</td>
+                    <td>{{ user.Gender }}</td>
+                    <td>{{ user.MobileNo }}</td>
+                    <td>{{ user.MailId }}</td>
+                    <td>
+                        <p-tag [value]="user.IsActive ? 'Active' : 'In-Active'"
+                            [severity]="getStatusSeverity(user.IsActive)"></p-tag>
+                    </td>
+                    <td>{{ user.LastLogInTime | date:'MM/dd/yyyy HH:mm:ss' }}</td>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <button pButton icon="pi pi-sign-in" (click)="checkInBook(user)"
+                                *ngIf="user.BorrowedBooksCount >0" class="p-button-rounded p-button-text p-button-sm"
+                                pTooltip="CheckIn"></button>
+                            <button pButton icon="pi pi-sign-out" (click)="checkOutBook(user)"
+                                class="p-button-rounded p-button-text p-button-sm" pTooltip="CheckOut"></button>
+                            <button pButton icon="pi pi-eye" (click)="viewUser(user)"
+                                class="p-button-rounded p-button-text p-button-sm" pTooltip="View User"></button>
+                            <button pButton icon="pi pi-pencil" (click)="editUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails?.RoleId ?? 0)"
+                                class="p-button-rounded p-button-text p-button-sm btn-icon" pTooltip="Edit User"></button>
+                            <button pButton icon="pi pi-trash" (click)="deleteUser(user)" *ngIf = "user.RoleId >= (loggedInUserDetails?.RoleId ?? 0)"
+                                class="p-button-rounded p-button-text p-button-danger p-button-sm btn-icon"
+                                pTooltip="Delete User"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
 
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td colspan="10" class="text-center">
-                    No Users found.
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="10" class="text-center">
+                        No Users found.
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
 
     <p-dialog [header]="currentUser.UserId == null || currentUser.UserId == 0 ? header : ''"
         [(visible)]="userDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body">

@@ -13,241 +13,269 @@
         <p-button type="button" label="Download Book Details" icon="pi pi-download" *ngIf="books.length >0"
                     styleClass="btn-main-outlined" (click)="downloadBooksDetails()"></p-button>
     </div>
-    <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails"
-        (selectionChange)="onSelectionChange()" [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top"
-        [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+    <div style="overflow-x: auto;">
+        <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails"
+            (selectionChange)="onSelectionChange()" [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top"
+            [style]="{ minWidth: '2300px' }" [scrollable]="true" styleClass="p-datatable-sm"
+            [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
-        <ng-template pTemplate="header">
-            <tr class="border-bottom">
-                <th style="width: 4%">
-                    <!-- Header checkbox for selecting/deselecting all items -->
-                    <p-tableHeaderCheckbox> id="chk-header-all"
-                        [value]="books" </p-tableHeaderCheckbox>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 5%;">
-                    <div class="d-flex align-items-center gap-2">
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th style="width: 2%">
+                        <!-- Header checkbox for selecting/deselecting all items -->
+                        <p-tableHeaderCheckbox> id="chk-header-all"
+                            [value]="books" </p-tableHeaderCheckbox>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 3%;">
                         <div class="d-flex align-items-center gap-2">
-                            S.No
+                            <div class="d-flex align-items-center gap-2">
+                                S.No
+                            </div>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
-                            Book
-                            <p-sortIcon field="BookName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 20%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
+                                Book
+                                <p-sortIcon field="BookName"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 11%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="AuthorName">
-                            Author
-                            <p-sortIcon field="AuthorName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="AuthorName">
+                                Author
+                                <p-sortIcon field="AuthorName"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedAuthorNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedAuthorNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 11%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="PublisherName">
-                            Publisher
-                            <p-sortIcon field="PublisherName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 13%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="PublisherName">
+                                Publisher
+                                <p-sortIcon field="PublisherName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="selectedPublisherNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi"
-                            [ngClass]="selectedPublisherNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 11%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="CategoryName">
-                            Category
-                            <p-sortIcon field="CategoryName"></p-sortIcon>
+                    </th>                    
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="AccessionNo">
+                                Accession No
+                                <p-sortIcon field="AccessionNo"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="selectedAccessionNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi"
-                            [ngClass]="selectedCategoryNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 11%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="LanguageName">
-                            Language
-                            <p-sortIcon field="LanguageName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 5%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="PublishedYear">
+                                Year
+                                <p-sortIcon field="PublishedYear"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="selectedPublishedYearList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi"
-                            [ngClass]="selectedLanguageNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 8%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="PublishedYear">
-                            Year
-                            <p-sortIcon field="PublishedYear"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="Subject">
+                                Subject
+                                <p-sortIcon field="Subject"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="selectedSubjectList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi"
-                            [ngClass]="selectedPublishedYearList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 9%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
-                            Status
-                            <p-sortIcon field="IsActive"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="CategoryName">
+                                Category
+                                <p-sortIcon field="CategoryName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="selectedCategoryNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 11%;">
-                    <div class="d-flex align-items-center justify-content-center gap-3">
-                        <span class="pi pi-plus-circle" (click)="editBook()" pTooltip="Add Book"></span>
-                        <span class="pi pi-upload" (click)="importBook()" pTooltip="Import Books"></span>
-                    </div>
-                </th>
-            </tr>
-            @if (showFt) {
-            <tr>
-                <th></th>
-                <th></th>
-                <th>
-                    <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All"></p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="AuthorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="authorNameList" [(ngModel)]="selectedAuthorNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All"></p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="PublisherName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="publisherNameList" [(ngModel)]="selectedPublisherNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All"></p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="CategoryName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="categoryNameList" [(ngModel)]="selectedCategoryNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All"></p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="LanguageName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="languageNameList" [(ngModel)]="selectedLanguageNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All"></p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="PublishedYear" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="publishedYearList" [(ngModel)]="selectedPublishedYearList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All"></p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All"></p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th></th>
-            </tr>
-            }
-        </ng-template>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 8%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="IsActive">
+                                Status
+                                <p-sortIcon field="IsActive"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center justify-content-center gap-3">
+                            <span class="pi pi-plus-circle" (click)="editBook()" pTooltip="Add Book"></span>
+                            <span class="pi pi-upload" (click)="importBook()" pTooltip="Import Books"></span>
+                        </div>
+                    </th>
+                </tr>
+                @if (showFt) {
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>
+                        <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="AuthorName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="authorNameList" [(ngModel)]="selectedAuthorNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="PublisherName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="publisherNameList" [(ngModel)]="selectedPublisherNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>                    
+                    <th>
+                        <p-columnFilter field="AccessionNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="accessionNoList" [(ngModel)]="selectedAccessionNoList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="PublishedYear" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="publishedYearList" [(ngModel)]="selectedPublishedYearList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="Subject" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="subjectList" [(ngModel)]="selectedSubjectList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="CategoryName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="categoryNameList" [(ngModel)]="selectedCategoryNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="IsActive" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th></th>
+                </tr>
+                }
+            </ng-template>
 
-        <ng-template pTemplate="body" let-book let-index="rowIndex">
-            <tr class="border-bottom">
-                <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" /></td>
-                <td>{{ index + 1 }}</td>
-                <td>
-                    <span [pTooltip]="book.BookName">
-                        {{ book.BookName }}
-                    </span>
-                </td>
-                <td>{{ book.AuthorName }}</td>
-                <td>
-                    <span [pTooltip]="book.PublisherName">
-                        {{ book.PublisherName }}
-                    </span>
-                </td>
-                <td>
-                    <span [pTooltip]="book.CategoryName">
-                        {{ book.CategoryName }}
-                    </span>
-                </td>
-                <td>
-                    <span [pTooltip]="book.LanguageName">
-                        {{ book.LanguageName }}
-                    </span>
-                </td>
-                <td>{{ book.PublishedYear }}</td>
-                <td>
-                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status)"></p-tag>
-                </td>
-                <td>
-                    <div class="d-flex align-items-center justify-content-center gap-2">
-                        <button pButton icon="pi pi-sign-in" (click)="checkInBook(book)"
-                            *ngIf="(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
-                            pTooltip="CheckIn"></button>
-                        <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book)" [disabled] = "(book.Status == 'Unavailable')"
-                            *ngIf="!(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
-                            pTooltip="CheckOut"></button>
-                        <button pButton icon="pi pi-eye" (click)="viewBook(book)"
-                            class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
-                        <button pButton icon="pi pi-pencil" (click)="editBook(book)"
-                            class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Book"></button>
-                        <button pButton icon="pi pi-trash" (click)="deleteBook(book)" [disabled] = "book.Status =='Unavailable'"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                            pTooltip="Delete Book"></button>
-                    </div>
-                </td>
-            </tr>
-        </ng-template>
+            <ng-template pTemplate="body" let-book let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" /></td>
+                    <td>{{ index + 1 }}</td>
+                    <td>
+                        <span [pTooltip]="book.BookName">
+                            {{ book.BookName }}
+                        </span>
+                    </td>
+                    <td>{{ book.AuthorName }}</td>
+                    <td>
+                        <span [pTooltip]="book.PublisherName">
+                            {{ book.PublisherName }}
+                        </span>
+                    </td>                    
+                    <td>
+                        <span [pTooltip]="book.AccessionNo">
+                            {{ book.AccessionNo }}
+                        </span>
+                    </td>
+                    <td>{{ book.PublishedYear }}</td>
+                    <td>
+                        <span [pTooltip]="book.Subject">
 
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td colspan="10" class="text-center">
-                    No books found.
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
+                        </span>{{ book.Subject }}</td>
+                    <td>
+                        <span [pTooltip]="book.CategoryName">
+                            {{ book.CategoryName }}
+                        </span>
+                    </td>
+                    <td>
+                        <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status)"></p-tag>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <button pButton icon="pi pi-sign-in" (click)="checkInBook(book)"
+                                *ngIf="(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
+                                pTooltip="CheckIn"></button>
+                            <button pButton icon="pi pi-sign-out" (click)="checkOutBook(book)" [disabled] = "(book.Status == 'Unavailable')"
+                                *ngIf="!(book.Status == 'Issued')" class="p-button-rounded p-button-text p-button-sm"
+                                pTooltip="CheckOut"></button>
+                            <button pButton icon="pi pi-eye" (click)="viewBook(book)"
+                                class="p-button-rounded p-button-text p-button-sm" pTooltip="View Book"></button>
+                            <button pButton icon="pi pi-pencil" (click)="editBook(book)"
+                                class="p-button-rounded p-button-text p-button-sm" pTooltip="Edit Book"></button>
+                            <button pButton icon="pi pi-trash" (click)="deleteBook(book)" [disabled] = "book.Status =='Unavailable'"
+                                class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                                pTooltip="Delete Book"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="11" class="text-center">
+                        No books found.
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
 
     <p-dialog [header]="currentBook.BookId == null || currentBook.BookId == 0 ? header : ''"
         [(visible)]="bookDialogVisible" [modal]="true" [style]="{ width: '90vw' }" appendTo="body"
@@ -385,6 +413,17 @@
                 }
             </div>
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                    Accession No<sup>*</sup>
+                </label>
+                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
+                @if (errors.AccessionNo) {
+                <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
+                }              
+            </div>
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
                     Bill No
                 </label>
@@ -392,25 +431,41 @@
                     [ngModelOptions]="{standalone: true}" placeholder="Enter bill no"/>                
             </div>
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="billDate">
+                    Bill Date
+                </label>
+                <p-datepicker [(ngModel)]="billDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                    [minDate]="minDate" [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select BillDate"
+                    styleClass="w-100" inputStyleClass="w-100" />  
+                @if (errors.BillDate) {
+                <div class="text-danger mt-1 small">{{ errors.BillDate }}</div>
+                }             
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
+                    Total Page No
+                </label>
+                <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo"
+                    (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
+            </div>
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="callNo">
                     Call No
                 </label>
                 <input id="callNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.CallNo"
                     [ngModelOptions]="{standalone: true}" placeholder="Enter call no"/>                
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
-                    Accession No
-                </label>
-                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>                
-            </div>
+            </div>            
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="source">
                     Source
                 </label>
-                <input id="source" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Source"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter source"/>
+                <p-select id="sourceId" [(ngModel)]="currentBook.SourceId" [ngModelOptions]="{standalone: true}"
+                    [options]="sourceOptions" optionLabel="label" optionValue="value" [editable]="true"
+                    placeholder="Select source" styleClass="w-100" appendTo="body"
+                    (ngModelChange)="onSourceChange()"></p-select>  
+                    
             </div>             
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
@@ -580,6 +635,17 @@
                         }
                     </div>
                     <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                            Accession No
+                        </label>
+                        <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                        [disabled] ="isViewOnly" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
+                        @if (errors.AccessionNo) {
+                        <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
+                        }                
+                    </div>
+                    <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
                             Bill No
                         </label>
@@ -587,25 +653,40 @@
                             [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter bill no"/>                
                     </div>
                     <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="billDate">
+                            Bill Date
+                        </label>
+                        <p-datepicker [(ngModel)]="billDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                            [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [disabled]="isViewOnly"
+                            [minDate]="minDate" [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select BillDate"
+                            styleClass="w-100" inputStyleClass="w-100" />  
+                        @if (errors.BillDate) {
+                        <div class="text-danger mt-1 small">{{ errors.BillDate }}</div>
+                        }             
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
+                            Total Page No
+                        </label>
+                        <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"
+                            (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
+                    </div>
+                    <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="callNo">
                             Call No
                         </label>
                         <input id="callNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.CallNo"
                             [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter call no"/>                
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
-                            Accession No
-                        </label>
-                        <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
-                            [disabled]="isViewOnly"  [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>                
-                    </div>
+                    </div>                    
                     <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="source">
                             Source
                         </label>
-                        <input id="source" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Source"
-                            [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter source"/>
+                        <p-select id="sourceId" [(ngModel)]="currentBook.SourceId" [ngModelOptions]="{standalone: true}"
+                            [options]="sourceOptions" optionLabel="label" optionValue="value" [editable]="true"
+                            placeholder="Select source" styleClass="w-100" appendTo="body" [disabled]="isViewOnly"
+                            (ngModelChange)="onSourceChange()"></p-select> 
                     </div>                    
                     <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="bookStatus">
@@ -1236,6 +1317,26 @@
                     [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter bill no"/>                
             </div>
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="billDate">
+                    Bill Date
+                </label>
+                <p-datepicker [(ngModel)]="billDate" [ngModelOptions]="{standalone: true}" appendTo="body" [disabled]="isViewOnly"
+                    [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                    [minDate]="minDate" [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select BillDate"
+                    styleClass="w-100" inputStyleClass="w-100" />  
+                @if (errors.BillDate) {
+                <div class="text-danger mt-1 small">{{ errors.BillDate }}</div>
+                }             
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
+                    Total Page No
+                </label>
+                <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"
+                    (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
+            </div>
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="callNo">
                     Call No
                 </label>
@@ -1247,14 +1348,20 @@
                     Accession No
                 </label>
                 <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
-                    [disabled]="isViewOnly"  [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>                
+                [disabled] = "isViewOnly" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
+                @if (errors.AccessionNo) {
+                <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
+                }                
             </div>
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="source">
                     Source
                 </label>
-                <input id="source" type="text" class="form-control" pInputText [(ngModel)]="currentBook.Source"
-                    [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter source"/>
+                <p-select id="sourceId" [(ngModel)]="currentBook.SourceId" [ngModelOptions]="{standalone: true}"
+                            [options]="sourceOptions" optionLabel="label" optionValue="value" [editable]="true"
+                            placeholder="Select source" styleClass="w-100" appendTo="body" [disabled]="isViewOnly"
+                            (ngModelChange)="onSourceChange()"></p-select>
             </div>
             
 

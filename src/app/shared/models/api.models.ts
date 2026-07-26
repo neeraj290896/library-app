@@ -15,7 +15,7 @@ export interface AccessRequestDetails {
 export interface SettingDetails {
     SettingId: number;
     CutOffDays: number;
-    FinePercentage: number;
+    Fine: number;
     EnableFineRule: boolean;
     EnableEmailNotification: boolean;
     EnableWishlistNotification: boolean;
@@ -58,9 +58,12 @@ export interface BookDetails {
     PublishedYear?: number | null;
     Price?: number | null;
     BillNo?: string | null;
+    BillDate?: string | null;
+    TotalPageNo?: number | null;
     CallNo?: string | null;
     AccessionNo?: string | null;
-    Source?: string | null;
+    SourceId?: number | null;
+    SourceName?: string | null;
     SubjectId?: number | null;
     SubjectName?: string | null;
     Status?: string | null;
@@ -80,6 +83,9 @@ export interface BookCirculationDetails {
     BookCirculationId: number;
     BookId: number;
     BookName?: string | null;
+    AccessionNo?: string | null;
+    SubjectId?: number | null;
+    SubjectName?: string | null;
     BorrowerId?: number | null;
     BorrowerName?: string | null;
     BorrowerMailId?: string | null;
@@ -140,6 +146,12 @@ export interface CategoryDetails {
 export interface SubjectDetails {
     SubjectId: number;
     SubjectName?: string | null;
+    IsActive: boolean | null;
+}
+
+export interface SourceDetails {
+    SourceId: number;
+    SourceName?: string | null;
     IsActive: boolean | null;
 }
 
@@ -345,6 +357,9 @@ export interface OverDueDetails {
     BookCirculationId: number;
     BookId: number;
     BookName?: string | null;
+    AccessionNo?: string | null;    
+    SubjectId?: number | null;
+    SubjectName?: string | null;
     IssuedDate?: string | null;
     IssuedByUserId: number;
     IssuedByUserName?: string | null;

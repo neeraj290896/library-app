@@ -38,11 +38,11 @@ export class SettingsComponent {
 
     public loggedInUserDetails: UserDetails | null = null;
     public settingDetails: SettingDetails = {
-        SettingId: 0, CutOffDays: 90, FinePercentage: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
+        SettingId: 0, CutOffDays: 90, Fine: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
         EnableMobileNotification: false, EnableBarcodeScanning:false, ReminderMailNotificationInDays: 2, IsActive: true
     };
-    public finePercentage: string = "";
-    public errors: { CutOffDays: string, FinePercentage: string, ReminderMailNotificationInDays: string } = { CutOffDays: '', FinePercentage: '', ReminderMailNotificationInDays:'' };
+    // public finePercentage: string = "";
+    public errors: { CutOffDays: string, Fine: string, ReminderMailNotificationInDays: string } = { CutOffDays: '', Fine: '', ReminderMailNotificationInDays:'' };
 
     public dobDate: Date | null = null;
     public currentUser: UserDetails = {
@@ -153,9 +153,9 @@ export class SettingsComponent {
                 if (filteredData != null) {
                     this.settingDetails = filteredData[0];
 
-                    if (this.settingDetails.FinePercentage > 0) {
-                        this.finePercentage = (this.settingDetails.FinePercentage * 100).toString();
-                    }
+                    // if (this.settingDetails.FinePercentage > 0) {
+                    //     this.finePercentage = (this.settingDetails.FinePercentage * 100).toString();
+                    // }
                 }
             },
             error: (err) => {
@@ -177,14 +177,14 @@ export class SettingsComponent {
                 }
                 break;
 
-            case 'FinePercentage':
+            case 'Fine':
                 if (!/^\d+(\.\d+)?$/.test(value?.toString().trim() ?? '') || Number(value) <= 0) {
-                    this.errors.FinePercentage = 'Fine Percentage is required  and must be a valid input.';
-                    this.settingDetails.FinePercentage = 0.00;
+                    this.errors.Fine = 'Fine per day is required and must be a valid input.';
+                    this.settingDetails.Fine = 0.00;
                     isValid = false;
                 } else {
-                    this.errors.FinePercentage = '';
-                    this.settingDetails.FinePercentage = Math.round(((parseInt(value) / 100) + Number.EPSILON) * 100) / 100;
+                    this.errors.Fine = '';
+                    // this.settingDetails.FinePercentage = Math.round(((parseInt(value) / 100) + Number.EPSILON) * 100) / 100;
                 }
                 break;
             
@@ -206,11 +206,11 @@ export class SettingsComponent {
 
     validateAplnSettings(): boolean {
         const isCutOffDays = this.validateInput('CutOffDays', this.settingDetails.CutOffDays);
-        const isFinePercentage = this.validateInput('FinePercentage', (this.settingDetails.FinePercentage * 100).toString());
+        const isFine = this.validateInput('Fine', this.settingDetails.Fine.toString());
         const isReminderMailNotificationInDays = this.validateInput('ReminderMailNotificationInDays', this.settingDetails.ReminderMailNotificationInDays);
         
 
-        return isCutOffDays && isFinePercentage && isReminderMailNotificationInDays;
+        return isCutOffDays && isFine && isReminderMailNotificationInDays;
     }
 
     saveAplnSettings(): void {

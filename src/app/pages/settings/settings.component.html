@@ -21,16 +21,16 @@
                     </div>
                     <div class="col-md-6">
                         <label class="d-block small fw-medium text-secondary mb-1">
-                            Fine Percentage ({{settingDetails.FinePercentage}})
+                            Fine Per Day (In Rupees)
                         </label>
                         <p-inputgroup>
-                            <input id="finePercentage" type="finePercentage" placeholder="Enter fine percentage"
+                            <input id="fine" type="fine" placeholder="Enter fine per day"
                                 pInputText class="form-control" [ngModelOptions]="{standalone: true}" [disabled] = "!enableAplnSettingsAccess"
-                                [(ngModel)]="finePercentage"
-                                (ngModelChange)="validateInput('FinePercentage', $event)" />
-                            <p-inputgroup-addon>%</p-inputgroup-addon>
+                                [(ngModel)]="settingDetails.Fine"
+                                (ngModelChange)="validateInput('Fine', $event)" />
+                            <p-inputgroup-addon>₹</p-inputgroup-addon>
                         </p-inputgroup>
-                        <div *ngIf="errors.FinePercentage" class="text-danger mt-1 small">{{ errors.FinePercentage }}
+                        <div *ngIf="errors.Fine" class="text-danger mt-1 small">{{ errors.Fine }}
                         </div>
                     </div>
                     <div class="col-md-6">
