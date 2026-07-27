@@ -53,6 +53,8 @@ export class IssueReturnBooksComponent implements OnChanges {
     public issueDate: Date | null = null;
     public returnDate: Date | null = null;
     public overdueFrom: Date | null = null;
+    public actualOverDueDate: Date | null = null;
+    public extendedDate: Date | null = null;
 
     public bcDialogVisible = false;
     public isReturnByDifferentUser: boolean = false;
@@ -78,8 +80,8 @@ export class IssueReturnBooksComponent implements OnChanges {
     public selectedBook: BookCirculationDetails = {
         BookCirculationId: 0, BookId: 0, BookName: '',
         BorrowerId: 0, BorrowerName: '', IssuedByUserId: 0,
-        IssuedByUserName: '', IssuedDate: '', OverDueId: 0,
-        FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0,
+        IssuedByUserName: '', IssuedDate: '', ActualOverDueDate:'',
+        ExtendedDate: '', OverDueId: 0, FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0,
         OverDueStatus: '', SytemUpdatedDate: '',
         ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: '',
         Comments: '', Status: '',
@@ -222,6 +224,8 @@ export class IssueReturnBooksComponent implements OnChanges {
             this.issueDate = this.selectedBook.IssuedDate ? new Date(this.selectedBook.IssuedDate) : null;
             this.returnDate = this.selectedBook.ReturnDate ? new Date(this.selectedBook.ReturnDate) : null;
             this.overdueFrom = this.selectedBook.OverDueFrom ? new Date(this.selectedBook.OverDueFrom) : null;
+            this.actualOverDueDate = this.selectedBook.ActualOverDueDate ? new Date(this.selectedBook.ActualOverDueDate) : null;
+            this.extendedDate = this.selectedBook.ExtendedDate ? new Date(this.selectedBook.ExtendedDate) : null;
         }
         else {
             this.isIssueNewBook = true;
@@ -236,7 +240,8 @@ export class IssueReturnBooksComponent implements OnChanges {
             this.selectedBook = {
                 BookCirculationId: 0, BookId: 0, BookName: '',
                 BorrowerId: 0, BorrowerName: '', IssuedByUserId: this.loggedInUserDetails?.UserId,
-                IssuedByUserName: this.loggedInUserDetails?.FullName, IssuedDate: this.todayDate, OverDueId: 0,
+                IssuedByUserName: this.loggedInUserDetails?.FullName, IssuedDate: this.todayDate,
+                ActualOverDueDate : '', ExtendedDate:'', OverDueId: 0,
                 FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0,
                 OverDueStatus: '', SytemUpdatedDate: '',
                 ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: '',
@@ -666,6 +671,15 @@ export class IssueReturnBooksComponent implements OnChanges {
         }
         else {
             this.selectedBook.OverDueFrom = null;
+        }
+    }
+
+    onExtendedDateChange(): void {
+        if (this.extendedDate) {
+            this.selectedBook.ExtendedDate = this.extendedDate.toISOString();
+        }
+        else {
+            this.selectedBook.ExtendedDate = null;
         }
     }
 

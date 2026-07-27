@@ -93,6 +93,8 @@ export interface BookCirculationDetails {
     IssuedByUserName?: string | null;
     IssuedByUserMailId?: string | null;
     IssuedDate?: string | null;
+    ActualOverDueDate?: string | null;
+    ExtendedDate?: string | null;
     OverDueId?: number | null;
     FineAmount?: number | null;
     OverDueFrom?: string | null;
