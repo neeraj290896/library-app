@@ -64,8 +64,12 @@ export class SearchComponent {
 
     onSearch(): void {
 
+        const libraryNoPattern = /^VCN \d{1,9}$/i;
         const isMobile = /^[6-9]\d{9}$/.test(this.searchTerm);
         const isEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this.searchTerm);
+        const isLibraryNo = libraryNoPattern.test(this.searchTerm);
+        const isAccessionNo = /^[0-9]\d{5}$/.test(this.searchTerm);
+       
 
         if (this.searchTerm.includes(environment.usersBarcodeSyntax)) {
             this.showUserDialog = true;
@@ -75,10 +79,15 @@ export class SearchComponent {
             this.showBookDialog = true;
             this.showUserDialog = false;
         }
-        else if(isMobile || isEmail)
+        else if(isMobile || isEmail || isLibraryNo)
         {
             this.showUserDialog = true;
             this.showBookDialog = false;
+        } 
+        else if(isAccessionNo)
+        {
+            this.showUserDialog = false;
+            this.showBookDialog = true;
         }       
         else {
             this.showBookDialog = false;

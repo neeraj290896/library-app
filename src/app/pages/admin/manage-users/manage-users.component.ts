@@ -101,7 +101,7 @@ export class ManageUsersComponent {
         RoleName: '',
         DepartmentId: 0,
         DepartmentName: '',
-        AdmissionNumber: 0,
+        AdmissionNumber: '',
         StaffId:'',
         CreatedByUserId: 0,
         CreatedByUserName: '',
@@ -169,7 +169,7 @@ export class ManageUsersComponent {
     public importMailIdList: { label: string, value: string }[] = [];
     public importStatusList: { label: string, value: boolean }[] = [];
     public importDepartmentList: { label: string, value: string }[] = [];
-    public importAdmissionNumberList: { label: number, value: number }[] = [];
+    public importAdmissionNumberList: { label: string, value: string }[] = [];
     public importStaffIdList: { label: string, value: string }[] = [];
     public importLibraryNoList: { label: string, value: string }[] = [];
     public importBatchList: { label: string, value: string }[] = [];
@@ -180,7 +180,7 @@ export class ManageUsersComponent {
     public importSelectedMobileNoList: number[] = [];
     public importSelectedGenderList: string[] = [];
     public importSelectedMailIdList: string[] = [];
-    public importSelectedAdmissionNumberList: number[] = [];
+    public importSelectedAdmissionNumberList: string[] = [];
     public importSelectedStaffIdList: string[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
@@ -203,6 +203,7 @@ export class ManageUsersComponent {
     public searchBookTerm: string = '';
     public lstBookDetails: BookDetails[] = [];
     public studentRoleId: number  = 5;
+    public nextAvailableLibraryNo : string ="VCN ";
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -289,6 +290,21 @@ export class ManageUsersComponent {
                         this.currentUser = {...this.users[0]};                        
                     }
 
+                    const _nextNum = this.getNextVCNNumber(this.users);
+
+                    if(_nextNum < 10)
+                    {
+                        this.nextAvailableLibraryNo = "VCN 00" + _nextNum;
+                    }
+                    else if(_nextNum >= 10 && _nextNum < 100)
+                    {
+                        this.nextAvailableLibraryNo = "VCN 0" + _nextNum;
+                    }
+                    else
+                    {
+                        this.nextAvailableLibraryNo = "VCN " + _nextNum;
+                    }
+
                 },
                 error: (err) => {
                     console.error('Error loading users:', err);
@@ -300,12 +316,47 @@ export class ManageUsersComponent {
                 next: (data: UserDetails[]) => {
                     this.users = data;
                     this.initializeFilterLists();
+
+                    const _nextNum = this.getNextVCNNumber(this.users);
+
+                    if(_nextNum < 10)
+                    {
+                        this.nextAvailableLibraryNo = "VCN 00" + _nextNum;
+                    }
+                    else if(_nextNum >= 10 && _nextNum < 100)
+                    {
+                        this.nextAvailableLibraryNo = "VCN 0" + _nextNum;
+                    }
+                    else
+                    {
+                        this.nextAvailableLibraryNo = "VCN " + _nextNum;
+                    }   
                 },
                 error: (err) => {
                     console.error('Error loading users:', err);
                 }
             });
         }
+    }
+
+    getNextVCNNumber(_userDetails: UserDetails[]): number {
+        // Guard clause: return 1 if the array is empty or undefined
+        if (!_userDetails || _userDetails.length === 0) {
+            return 1; 
+        }
+
+        // Extract, clean, and map strings to actual numbers
+        const numericValues = _userDetails
+            .map(item => {
+                const cleanString = item.LibraryNo?.replace(/^(VCN\s*|S\s*)/, '') || '0';                 
+                return Number(cleanString.trim()); 
+            })
+            .filter(num => !isNaN(num)); // Safe guard against corrupt string data
+
+        // Find the highest number and add 1 for the next sequential number
+        const highestNum = numericValues.length > 0 ? Math.max(...numericValues) : 0;
+
+        return highestNum + 1; 
     }
 
     loadDepartmentDetails(): void {
@@ -416,7 +467,9 @@ export class ManageUsersComponent {
         else {
             this.currentUser = {
                 UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', DepartmentId : 0,
-                RoleId: 0, RoleName: '', AdmissionNumber: 0, StaffId:'', CreatedByUserId: this.loggedInUserDetails?.UserId, CreatedByUserName: this.loggedInUserDetails?.FullName, IsActive: true, Status: 'Pending', LibraryNo: '', Batch: ''
+                RoleId: 0, RoleName: '', AdmissionNumber: '', StaffId:'', CreatedByUserId: this.loggedInUserDetails?.UserId,
+                CreatedByUserName: this.loggedInUserDetails?.FullName, IsActive: true, Status: 'Pending',
+                LibraryNo: this.nextAvailableLibraryNo, Batch: ''
             };
 
             this.roleOptions = this.roles.filter(x => x.IsActive == true).map(role => {
@@ -465,13 +518,18 @@ export class ManageUsersComponent {
 
         if(this.currentUser.RoleId !=null && this.currentUser.RoleId < this.studentRoleId)
         {
-            this.currentUser.AdmissionNumber = 0;            
-            this.currentUser.Batch = "";          
+            this.currentUser.AdmissionNumber = '';            
+            this.currentUser.Batch = ""; 
+            if(!this.currentUser.LibraryNo?.trim().includes("S"))
+            {
+                this.currentUser.LibraryNo  = this.currentUser.LibraryNo?.trim()+"S";
+            }
         }
 
         if(this.currentUser.RoleId !=null && this.currentUser.RoleId == this.studentRoleId)
         {
-            this.currentUser.StaffId = "";          
+            this.currentUser.StaffId = "";    
+            this.currentUser.LibraryNo  = this.currentUser.LibraryNo?.trim().replace("S", "");
         }
 
         this.validateInput('DepartmentId');
@@ -564,11 +622,11 @@ export class ManageUsersComponent {
                     isValid = false;
                 }
                 else if(this.currentUser.UserId == 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim())){
-                    this.errors.MobileNo = 'MailId already exists.';
+                    this.errors.MailId = 'MailId already exists.';
                     isValid = false;
                 }
                 else if(this.currentUser.UserId !=null && this.currentUser.UserId > 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim() && x.UserId != this.currentUser.UserId)){
-                    this.errors.MobileNo = 'MailId already exists.';
+                    this.errors.MailId = 'MailId already exists.';
                     isValid = false;
                 }
                 else {
@@ -581,6 +639,10 @@ export class ManageUsersComponent {
                     this.errors.MobileNo = 'MobileNo is required.';
                     isValid = false;
                 } 
+                else if (!/^[6-9]\d{9}$/.test(this.currentUser.MobileNo?.trim())) {
+                    this.errors.MobileNo = 'Invalid mobile number.';
+                    isValid = false;
+                }
                 else if(this.currentUser.UserId == 0 && this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim())){
                     this.errors.MobileNo = 'MobileNo already exists.';
                     isValid = false;
@@ -595,12 +657,34 @@ export class ManageUsersComponent {
                 break;
 
             case 'DOB':
-                if (!this.currentUser.DOB?.trim()) {
-                    this.errors.DOB = 'DOB is required.';
-                    isValid = false;
-                } else {
-                    this.errors.DOB = '';
+                // if (!this.currentUser.DOB?.trim()) {
+                //     this.errors.DOB = 'DOB is required.';
+                //     isValid = false;
+                // } else 
+                if (this.currentUser.DOB?.trim()) {
+                    const dob = new Date(this.currentUser.DOB?.trim());
+                    if (dob instanceof Date && !isNaN(dob.getTime())) {
+                        const today = new Date();
+                        let age = today.getFullYear() - dob.getFullYear();
+                        if (today.getMonth() < dob.getMonth() || (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())) {
+                            age--;
+                        }
+
+                        if (age < 0 || age > 150) {
+                            this.errors.DOB = 'Invalid date of birth.';
+                            isValid = false;
+                        }
+                        else {
+                            this.errors.DOB = '';                    
+                        }
+                    }
+                    else {
+                        this.errors.DOB = '';                    
+                    }                
                 }
+                else {
+                    this.errors.DOB = '';                    
+                }                    
                 break;
 
             case 'DepartmentId':
@@ -613,12 +697,12 @@ export class ManageUsersComponent {
                 break;
 
             case 'AdmissionNumber':
-                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber>0)) {
-                    this.errors.AdmissionNumber = 'Adminssion Number is required.';
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber?.trim())) {
+                    this.errors.AdmissionNumber = 'Admission Number is required.';
                     isValid = false;
                 }
-                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber>0) && this.users.find(x => x.AdmissionNumber == this.currentUser.AdmissionNumber && x.UserId != this.currentUser.UserId)) {
-                    this.errors.AdmissionNumber = 'Adminssion Number already exists.';
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber?.trim()) && this.users.find(x => x.AdmissionNumber == this.currentUser.AdmissionNumber && x.UserId != this.currentUser.UserId)) {
+                    this.errors.AdmissionNumber = 'Admission Number already exists.';
                     isValid = false;
                 } else {
                     this.errors.AdmissionNumber = '';
@@ -627,15 +711,20 @@ export class ManageUsersComponent {
 
             case 'LibraryNo': 
                 const libraryNo = this.currentUser.LibraryNo?.trim();
-                const libraryNoPattern = /^VCN:\d{1,9}$/i;
+                const libraryNoPattern = /^VCN \d{1,9}$/i;
+                const libraryNoStaffPattern = /^VCN \d{1,9}S$/i;
+
 
                 if (!libraryNo) {
                     this.errors.LibraryNo = 'Library Number is required.';
                     isValid = false;
                 }
-                else if (!libraryNoPattern.test(libraryNo ?? '')
-                ) {
-                    this.errors.LibraryNo = 'Library Number should be in VCN:{number} format.';
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(libraryNoPattern.test(libraryNo ?? ''))) {
+                    this.errors.LibraryNo = 'Library Number should be in VCN {number} format.';
+                    isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId < this.studentRoleId) && !(libraryNoStaffPattern.test(libraryNo ?? ''))) {
+                    this.errors.LibraryNo = 'Library Number should be in VCN {number}S format.';
                     isValid = false;
                 }
                 else if (this.users.some(x => x.LibraryNo?.trim().toLowerCase() === libraryNo?.toLowerCase() && x.UserId != this.currentUser.UserId)
@@ -643,6 +732,7 @@ export class ManageUsersComponent {
                     this.errors.LibraryNo = 'Library Number already exists.';
                     isValid = false;
                 } else {
+                    this.currentUser.LibraryNo = this.currentUser.LibraryNo?.trim().toUpperCase();
                     this.errors.LibraryNo = '';
                 }
                 break;            
@@ -652,10 +742,7 @@ export class ManageUsersComponent {
                     this.errors.Batch = 'Batch is required.';
                     isValid = false;
                 }
-                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.Batch !=null && this.currentUser.Batch.trim() != "")) {
-                    this.errors.Batch = 'Batch already exists.';
-                    isValid = false;
-                } else {
+                else {
                     this.errors.Batch = '';
                 }
                 break;
@@ -699,6 +786,7 @@ export class ManageUsersComponent {
     }
 
     validateUser(): boolean {
+        debugger;
         const isNameValid = this.validateInput('FullName');
         const isRoleIdValid = this.validateInput('RoleId');
         const isGenderValid = this.validateInput('Gender');
@@ -717,6 +805,7 @@ export class ManageUsersComponent {
     }
 
     saveUser(): void {
+        console.log('saveUser clicked');
         if (!this.validateUser()) {
             return;
         }
@@ -735,6 +824,7 @@ export class ManageUsersComponent {
 
     addNewUser():void{
         const payload = this.currentUser;
+        console.log('payload :', payload);
         this.userService.addUserDetails(payload).subscribe({
             next: (res: any) => {
                 if (!res || !res.Status) {
@@ -1305,11 +1395,12 @@ export class ManageUsersComponent {
                 break;
 
             case 'DOB':
-                if (!this.importPreview[index].DOB?.trim()) {
-                    this.importPreview[index].Error = 'Date of birth is required.';
-                    isValid = false;
-                }
-                else {
+                // if (!this.importPreview[index].DOB?.trim()) {
+                //     this.importPreview[index].Error = 'Date of birth is required.';
+                //     isValid = false;
+                // }
+                // else
+                    if (this.importPreview[index].DOB?.trim()) {
                     const dob = new Date(this.importPreview[index].DOB?.trim());
                     if (dob instanceof Date && !isNaN(dob.getTime())) {
                         const today = new Date();
@@ -1360,7 +1451,7 @@ export class ManageUsersComponent {
 
             case 'AdmissionNumber':
                 if ((this.importPreview[index].RoleId !=null && this.importPreview[index].RoleId >0 && this.importPreview[index].RoleId == this.studentRoleId) 
-                    &&(!(this.importPreview[index].AdmissionNumber !=null && this.importPreview[index].AdmissionNumber >0))) {
+                    &&(!(this.importPreview[index].AdmissionNumber?.trim()))) {
                     this.importPreview[index].Error = 'AdmissionNumber is required.';
                     isValid = false;
                 }
@@ -1371,18 +1462,28 @@ export class ManageUsersComponent {
 
             case 'LibraryNo': 
                 const libraryNo = this.importPreview[index].LibraryNo?.trim();
-                const libraryNoPattern = /^VCN:\d{1,5}$/i;
+                const libraryNoPattern = /^VCN \d{1,5}$/i;
+                const libraryNoStaffPattern = /^VCN \d{1,9}S$/i;
 
                 if (!libraryNo) {
                     this.importPreview[index].Error = 'Library No is required.';
                     isValid = false;
                 }
-                else if (!libraryNoPattern.test(libraryNo ?? '')
+                else if ((this.importPreview[index].RoleId != null && this.importPreview[index].RoleId == this.studentRoleId) && !(libraryNoPattern.test(libraryNo ?? ''))) {
+                    this.importPreview[index].Error = 'Library Number should be in VCN {number} format.';
+                    isValid = false;
+                }
+                else if ((this.importPreview[index].RoleId != null && this.importPreview[index].RoleId< this.studentRoleId) && !(libraryNoStaffPattern.test(libraryNo ?? ''))) {
+                    this.importPreview[index].Error = 'Library Number should be in VCN {number}S format.';
+                    isValid = false;
+                }
+                else if (this.users.some(x => x.LibraryNo?.trim().toLowerCase() === libraryNo?.toLowerCase() && x.UserId != this.currentUser.UserId)
                 ) {
-                    this.importPreview[index].Error = 'Library No should be in VCN:{number} format.';
+                    this.importPreview[index].Error = 'Library Number already exists.';
                     isValid = false;
                 }
                 else {
+                    this.importPreview[index].LibraryNo = this.importPreview[index].LibraryNo?.trim().toUpperCase();
                     this.importPreview[index].Error = '';
                 }
                 break;            
@@ -1484,8 +1585,8 @@ export class ManageUsersComponent {
                 DepartmentName: item.DepartmentName,
                 AdmissionNumber: item.AdmissionNumber,
                 StaffId: item.StaffId,
-                CreatedByUserId: item.CreatedByUserId,
-                CreatedByUserName: item.CreatedByUserName,
+                CreatedByUserId: this.loggedInUserDetails?.UserId,
+                CreatedByUserName: this.loggedInUserDetails?.FullName,
                 IsActive: item.IsActive,
                 Status: item.Status,
                 LibraryNo: item.LibraryNo,

@@ -8,7 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { DashboardService } from '@app/shared/services/dashboard.service';
-import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, DashboardSummaryDetails, DepartmentDetails, FloorDetails, LanguageDetails, OverDueDetails, PublisherDetails, RackDetails, RoleDetails, UserDetails } from '@app/shared/models/api.models';
+import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, DashboardSummaryDetails, DepartmentDetails, FloorDetails, LanguageDetails, OverDueDetails, PublisherDetails, RackDetails, RoleDetails, SourceDetails, SubjectDetails, UserDetails } from '@app/shared/models/api.models';
 import { OverDueService } from '@app/shared/services/overdue.service';
 import { BooksOverdueComponent } from '../checkout/books-overdue/books-overdue.component';
 import { BooksManageBooksComponent } from '../books/books-manage-books/books-manage-books.component';
@@ -37,6 +37,8 @@ import { DepartmentService } from '@app/shared/services/department.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { NgxBarcode6 } from 'ngx-barcode6';
+import { SubjectService } from '@app/shared/services/subject.service';
+import { SourceService } from '@app/shared/services/source.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -69,6 +71,8 @@ export class DashboardComponent {
     private authService = inject(AuthService);
     public departmentService = inject(DepartmentService);
     private confirmationService = inject(ConfirmationService);
+    public subjectService = inject(SubjectService);
+    public sourceService = inject(SourceService);
 
     public currentDate: Date = new Date();
 
@@ -96,6 +100,8 @@ export class DashboardComponent {
     public buildings: BuildingDetails[] = [];
     public floors: FloorDetails[] = [];
     public racks: RackDetails[] = [];
+    public subjects: SubjectDetails[] = [];
+    public sources: SourceDetails[] = [];
     public publishedDate: Date | null = null;
     public currentBook: BookDetails = {
         BookId: 0,
@@ -130,9 +136,12 @@ export class DashboardComponent {
         LanguageId: string,
         PublishedYear: string,
         Price: string,
+        BillDate: string,
         BuildingId: string,
         FloorId: string,
         RackId: string,
+        SubjectId: string,
+        AccessionNo: string,
         BookBarcode: string,
         IsActive: string
     } = {
@@ -143,9 +152,12 @@ export class DashboardComponent {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
+            AccessionNo: '',
             BookBarcode: '',
             IsActive: ''
         };
@@ -156,10 +168,13 @@ export class DashboardComponent {
     public buildingOptions: { label: string; value: number; }[] = [];
     public floorOptions: { label: string; value: number; }[] = [];
     public rackOptions: { label: string; value: number; }[] = [];
+    public subjectOptions: { label: string; value: number; }[] = [];
+    public sourceOptions: { label: string; value: number; }[] = [];
     public options: { label: string; value: boolean; }[] = [
         { label: 'Active', value: true },
         { label: 'In-Active', value: false }
     ];
+    public batchOptions: { label: string; value: string; }[] = [];
 
     public roles: RoleDetails[] = [];
     public currentUser: UserDetails = {
@@ -174,11 +189,13 @@ export class DashboardComponent {
         RoleName: '',
         DepartmentId: 0,
         DepartmentName: '',
-        AdmissionNumber: 0,
+        AdmissionNumber: '',
         StaffId: '',
         CreatedByUserId: 0,
         CreatedByUserName: '',
         IsActive: true,
+        LibraryNo: '',
+        Batch: '',
         Status: 'Pending'
     };
     public userErrors: {
@@ -192,7 +209,9 @@ export class DashboardComponent {
         AdmissionNumber: string,
         StaffId: string,
         Status: string,
-        IsActive: string
+        IsActive: string,
+        LibraryNo: string, 
+        Batch: string
     } = {
             FullName: '',
             Gender: '',
@@ -201,10 +220,12 @@ export class DashboardComponent {
             MobileNo: '',
             RoleId: '',
             DepartmentId: '',
-            AdmissionNumber: '',
+            AdmissionNumber:'',
             StaffId:'',
             Status: '',
-            IsActive: ''
+            IsActive: '',
+            LibraryNo: '',
+            Batch: ''
         };
     public roleOptions: { label: string; value: number; }[] = [];
     public genderOptions: { label: string; value: string; }[] = [
@@ -238,7 +259,11 @@ export class DashboardComponent {
     public printUserDialogVisible: boolean = false;
     public selectedBookDetails: BookDetails[] = [];
     public selectedBookIds: number[] = [];
-    public printBarcodeDialogVisible: boolean = false;    
+    public printBarcodeDialogVisible: boolean = false;
+    public billDate: Date | null = null; 
+    public minDate: Date | undefined;
+    public maxDate: Date | undefined;
+    public nextAvailableLibraryNo : string ="VCN ";
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -263,6 +288,11 @@ export class DashboardComponent {
 
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
+
+        //For Bill date
+        this.maxDate = new Date(); 
+        this.minDate = new Date();
+        this.minDate.setMonth(today.getMonth() - 1);      
      
 
         this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
@@ -274,12 +304,15 @@ export class DashboardComponent {
         this.loadCategories();
         this.loadLanguages();
         this.loadBuildings();
+        this.loadSubjects();
+        this.loadSources();
         this.loadFloors();
         this.loadRacks();
         this.loadRoleDetails();
         this.loadDepartmentDetails();
         this.loadUserDetails();
         this.loadBooks();
+        this.generateBatchOptions();
     }
 
     parseCustomDateStringForUI(dateStr: Date): string {
@@ -303,6 +336,22 @@ export class DashboardComponent {
         const nativeDate = new Date(year, month, day);
         return nativeDate.toISOString();
     }
+
+    generateBatchOptions(): void {
+        const currentYear = new Date().getFullYear(); // 2026
+        const targetEndYear = environment.batchStartFromYear; // 2000
+        
+        // Dynamically loops from currentYear down to targetEndYear
+        for (let year = currentYear; year >= targetEndYear; year--) {
+            const rangeText = `${year} - ${year + 4}`;
+            
+            this.batchOptions.push({
+            label: rangeText,
+            value: rangeText
+            });
+        }
+    }
+
 
     loadDashboardSummary(): void {
         this.dashboardService.getDashboardSummary().subscribe({
@@ -385,6 +434,34 @@ export class DashboardComponent {
             },
             error: (err) => {
                 console.error('Error loading languages:', err);
+            }
+        });
+    }
+
+    loadSubjects(): void {
+        this.subjectService.getSubjectDetails().subscribe({
+            next: (data: SubjectDetails[]) => {
+                this.subjects = data;
+                this.subjectOptions = data.filter(x => x.IsActive == true).map(subject => {
+                    return { label: subject.SubjectName ?? '', value: subject.SubjectId };
+                });
+            },
+            error: (err) => {
+                console.error('Error loading subjects:', err);
+            }
+        });
+    }
+
+    loadSources(): void {
+        this.sourceService.getSourceDetails().subscribe({
+            next: (data: SourceDetails[]) => {
+                this.sources = data;
+                this.sourceOptions = data.filter(x => x.IsActive == true).map(subject => {
+                    return { label: subject.SourceName ?? '', value: subject.SourceId };
+                });
+            },
+            error: (err) => {
+                console.error('Error loading sources:', err);
             }
         });
     }
@@ -494,6 +571,11 @@ export class DashboardComponent {
             RackNumber: 0,
             RackLabel: '',
             BookBarcode: '',
+            AccessionNo:'',
+            BillDate:null,
+            BillNo:'',
+            CallNo:'',
+            CreatedDate: null,
             IsActive: true
         };
         this.publishedDate = null;
@@ -505,9 +587,12 @@ export class DashboardComponent {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
+            AccessionNo: '',
             BookBarcode: '',
             IsActive: ''
         };
@@ -614,10 +699,73 @@ export class DashboardComponent {
         this.validateBookInput('RackId');
     }
 
+    onBillDateChange():void{
+        if (this.billDate) {
+            // this.dobDate.setHours(0, 0, 0, 0);
+             // Reverse the 5 hour 30 min shift (in minutes: 5 * 60 + 30 = 330)
+            const userTimezoneOffset = this.billDate.getTimezoneOffset(); // Will be -330 for India    
+            const correctedDate = new Date(this.billDate.getTime() - (userTimezoneOffset * 60 * 1000));    
+
+            this.currentBook.BillDate = correctedDate.toISOString().split('T')[0] + 'T00:00:00.000Z';
+        }
+        else {
+            this.currentBook.BillDate = null;
+        }
+
+        this.validateBookInput('BillDate');
+    }
+
+    onSubjectChange(): void {
+        const subject = this.subjectOptions.find(s => s.value === this.currentBook.SubjectId);
+        if (subject) {
+            this.currentBook.SubjectName = subject.label;
+        }
+        else
+        {
+            this.currentBook.SubjectName = '';
+        }
+
+        this.validateBookInput('SubjectId');
+    }
+
+    onSourceChange():void{
+        const _source = this.sourceOptions.find(s => s.value === this.currentBook.SourceId);
+        if (_source) {
+            this.currentBook.SourceName = _source.label;
+        }
+        else
+        {
+            this.currentBook.SourceName = '';
+        }
+
+        // this.validateInput('SourceId');
+    }
+
     validateBookInput(key: string): boolean {
         let isValid = true;
 
         switch (key) {
+            case 'AccessionNo':
+                if (!this.currentBook.AccessionNo?.trim()) {
+                    this.bookErrors.AccessionNo = 'AccessionNo is required.';
+                    isValid = false;
+                }
+                else if (!/^\d+$/.test(this.currentBook.AccessionNo.trim())) {
+                    this.bookErrors.AccessionNo = 'AccessionNo must contain numbers only.';
+                    isValid = false;
+                }
+                else if (this.currentBook.AccessionNo.trim().length < 6) {
+                    this.bookErrors.AccessionNo = 'AccessionNo must be at least 6 characters.';
+                    isValid = false;
+                }
+                else if (this.currentBook.BookId == 0 && this.books.find(x => x.AccessionNo == this.currentBook.AccessionNo?.trim())) {
+                    this.bookErrors.AccessionNo = 'AccessionNo already exists.';
+                    isValid = false;
+                }
+                else {
+                    this.bookErrors.AccessionNo = '';
+                }
+                break;
             case 'BookName':
                 if (!this.currentBook.BookName?.trim()) {
                     this.bookErrors.BookName = 'Book is required.';
@@ -631,7 +779,13 @@ export class DashboardComponent {
                 if (!this.currentBook.AuthorId) {
                     this.bookErrors.AuthorId = 'Author is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.authorOptions.some(option => option.value === this.currentBook.AuthorId)))
+                {
+                    this.bookErrors.AuthorId = 'Please Select valid Author.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.AuthorId = '';
                 }
                 break;
@@ -640,7 +794,13 @@ export class DashboardComponent {
                 if (!this.currentBook.PublisherId) {
                     this.bookErrors.PublisherId = 'Publisher is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.publisherOptions.some(option => option.value === this.currentBook.PublisherId)))
+                {
+                    this.bookErrors.PublisherId = 'Please Select valid Publisher.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.PublisherId = '';
                 }
                 break;
@@ -649,7 +809,13 @@ export class DashboardComponent {
                 if (!this.currentBook.CategoryId) {
                     this.bookErrors.CategoryId = 'Category is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.categoryOptions.some(option => option.value === this.currentBook.CategoryId)))
+                {
+                    this.bookErrors.CategoryId = 'Please Select valid Category.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.CategoryId = '';
                 }
                 break;
@@ -658,7 +824,13 @@ export class DashboardComponent {
                 if (!this.currentBook.LanguageId) {
                     this.bookErrors.LanguageId = 'Language is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.languageOptions.some(option => option.value === this.currentBook.LanguageId)))
+                {
+                    this.bookErrors.LanguageId = 'Please Select valid Language.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.LanguageId = '';
                 }
                 break;
@@ -676,7 +848,12 @@ export class DashboardComponent {
                 if (!/^\d+(\.\d+)?$/.test(this.currentBook.Price?.toString().trim() ?? '')) {
                     this.bookErrors.Price = 'Price is required and must be a valid input.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.currentBook.Price!=null && this.currentBook.Price >0)){
+                    this.bookErrors.Price = 'Price must be a valid input.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.Price = '';
                 }
                 break;
@@ -685,7 +862,13 @@ export class DashboardComponent {
                 if (!this.currentBook.BuildingId) {
                     this.bookErrors.BuildingId = 'Building is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.buildingOptions.some(option => option.value === this.currentBook.BuildingId)))
+                {
+                    this.bookErrors.BuildingId = 'Please Select valid Building.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.BuildingId = '';
                 }
                 break;
@@ -694,7 +877,13 @@ export class DashboardComponent {
                 if (!this.currentBook.FloorId) {
                     this.bookErrors.FloorId = 'Floor is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.floorOptions.some(option => option.value === this.currentBook.FloorId)))
+                {
+                    this.bookErrors.FloorId = 'Please Select valid Floor.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.FloorId = '';
                 }
                 break;
@@ -703,17 +892,38 @@ export class DashboardComponent {
                 if (!this.currentBook.RackId) {
                     this.bookErrors.RackId = 'Rack is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.rackOptions.some(option => option.value === this.currentBook.RackId)))
+                {
+                    this.bookErrors.RackId = 'Please Select valid Rack.';
+                    isValid = false;
+                }
+                else {
                     this.bookErrors.RackId = '';
                 }
                 break;
-
-            case 'BookBarcode':
-                if (!this.currentBook.BookBarcode?.trim()) {
-                    this.bookErrors.BookBarcode = 'Barcode is required.';
+            
+            case 'SubjectId':
+                if (!this.currentBook.SubjectId) {
+                    this.bookErrors.SubjectId = 'Subject is required.';
+                    isValid = false;
+                } 
+                else if(!(this.subjectOptions.some(option => option.value === this.currentBook.SubjectId)))
+                {
+                    this.bookErrors.SubjectId = 'Please Select valid Subject.';
+                    isValid = false;
+                }
+                else {
+                    this.bookErrors.SubjectId = '';
+                }
+                break;
+            
+            case 'BillDate':
+                if ((this.currentBook.BillDate?.trim()) && !(this.currentBook.BillDate?.trim())) {
+                    this.bookErrors.BillDate = 'BillDate is required.';
                     isValid = false;
                 } else {
-                    this.bookErrors.BookBarcode = '';
+                    this.bookErrors.BillDate = '';
                 }
                 break;
 
@@ -745,13 +955,14 @@ export class DashboardComponent {
         const isBuildingIdValid = this.validateBookInput('BuildingId');
         const isFloorIdValid = this.validateBookInput('FloorId');
         const isRackIdValid = this.validateBookInput('RackId');
-        // const isBookBarcodeValid = this.validateBookInput('BookBarcode');
+        const isSubjectIdValid = this.validateBookInput('SubjectId');
+        const isAccessionNoValid = this.validateBookInput('AccessionNo');
+        const isBillDateValid = this.validateBookInput('BillDate');
         // const isStatusValid = this.validateBookInput('IsActive');
         return isBookNameValid && isAuthorIdValid && isPublisherIdValid &&
             isCategoryIdValid && isLanguageIdValid && isPublishedYearValid &&
             isPriceValid && isBuildingIdValid && isFloorIdValid &&
-            isRackIdValid;
-            //  && isBookBarcodeValid && isStatusValid;
+            isRackIdValid && isSubjectIdValid && isAccessionNoValid && isBillDateValid;// && isStatusValid;
     }
 
     saveBook(): void {
@@ -759,7 +970,7 @@ export class DashboardComponent {
             return;
         }
 
-        const isBookExistsAlready = this.books.find(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
+        const isBookExistsAlready = this.books.find(x => x.AccessionNo == this.currentBook.AccessionNo?.trim() && x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
                             x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
                             x.PublishedYear == this.currentBook.PublishedYear);
 
@@ -844,14 +1055,19 @@ export class DashboardComponent {
     }
 
     openRegisterUserDialog(): void {
+
+        this.loadUserDetails();
+
         this.currentUser = {
             UserId: 0, FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', ProfilePhoto: '', RoleId: 0, RoleName: '', DepartmentId:0, DepartmentName:'',
-            CreatedByUserId: this.loggedInUserDetails?.UserId, CreatedByUserName: this.loggedInUserDetails?.FullName, IsActive: true, Status: 'Pending'
+            CreatedByUserId: this.loggedInUserDetails?.UserId, CreatedByUserName: this.loggedInUserDetails?.FullName, IsActive: true, 
+            AdmissionNumber:'', Batch:'',LibraryNo: this.nextAvailableLibraryNo, StaffId: null,  Status: 'Pending'
         };
 
         this.dobDate = null;
 
-        this.userErrors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', AdmissionNumber:'', StaffId:'', Status: '', IsActive: '' };
+        this.userErrors = { FullName: '', Gender: '', DOB: '', MailId: '', MobileNo: '', RoleId: '', DepartmentId: '', 
+            AdmissionNumber:'', StaffId:'', Status: '', Batch:'', LibraryNo:'', IsActive: '' };
         this.registerUserDialogVisible = true;
     }
 
@@ -873,12 +1089,17 @@ export class DashboardComponent {
 
         if(this.currentUser.RoleId !=null && this.currentUser.RoleId < this.studentRoleId)
         {
-            this.currentUser.AdmissionNumber = 0;            
+            this.currentUser.AdmissionNumber = '';    
+            if(!this.currentUser.LibraryNo?.trim().includes("S"))
+            {
+                this.currentUser.LibraryNo  = this.currentUser.LibraryNo?.trim()+"S";
+            }        
         }
 
         if(this.currentUser.RoleId !=null && this.currentUser.RoleId == this.studentRoleId)
         {
-            this.currentUser.StaffId = "";          
+            this.currentUser.StaffId = "";   
+            this.currentUser.LibraryNo  = this.currentUser.LibraryNo?.trim().replace("S", "");       
         }
 
         this.validateUserInput('DepartmentId');
@@ -948,13 +1169,16 @@ export class DashboardComponent {
                     this.userErrors.MailId = 'MailId is required.';
                     isValid = false;
                 } 
-                else if(!(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this.currentUser.MailId?.trim())))
-                {
-                    this.userErrors.MailId = 'Valid MailId is required.';
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.currentUser.MailId?.trim())) {
+                    this.userErrors.MailId = 'Invalid email.';
                     isValid = false;
                 }
-                else if(this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim())){
-                    this.userErrors.MobileNo = 'MailId already exists.';
+                else if(this.currentUser.UserId == 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim())){
+                    this.userErrors.MailId = 'MailId already exists.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId !=null && this.currentUser.UserId > 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim() && x.UserId != this.currentUser.UserId)){
+                    this.userErrors.MailId = 'MailId already exists.';
                     isValid = false;
                 }
                 else {
@@ -966,12 +1190,16 @@ export class DashboardComponent {
                 if (!this.currentUser.MobileNo?.trim()) {
                     this.userErrors.MobileNo = 'MobileNo is required.';
                     isValid = false;
-                }
-                else if(!(/^[6-9]\d{9}$/.test(this.currentUser.MobileNo?.trim()))){
-                    this.userErrors.MobileNo = 'Valid MobileNo is required.';
-                    isValid = false;
                 } 
-                else if(this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim())){
+                else if (!/^[6-9]\d{9}$/.test(this.currentUser.MobileNo?.trim())) {
+                    this.userErrors.MobileNo = 'Invalid mobile number.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId == 0 && this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim())){
+                    this.userErrors.MobileNo = 'MobileNo already exists.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId !=null && this.currentUser.UserId > 0 && this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim() && x.UserId != this.currentUser.UserId)){
                     this.userErrors.MobileNo = 'MobileNo already exists.';
                     isValid = false;
                 }
@@ -988,7 +1216,7 @@ export class DashboardComponent {
                     this.userErrors.DOB = '';
                 }
                 break;
-                
+
             case 'DepartmentId':
                 if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove) && !(this.currentUser.DepartmentId != null && this.currentUser.DepartmentId > 0)) {
                     this.userErrors.DepartmentId = 'Please select Department.';
@@ -997,18 +1225,54 @@ export class DashboardComponent {
                     this.userErrors.DepartmentId = '';
                 }
                 break;
-            
+
             case 'AdmissionNumber':
-                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber > 0)) {
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber?.trim())) {
                     this.userErrors.AdmissionNumber = 'Adminssion Number is required.';
                     isValid = false;
-                } 
-                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber !=null && this.currentUser.AdmissionNumber>0) && this.users.find(x => x.AdmissionNumber == this.currentUser.AdmissionNumber && x.UserId != this.currentUser.UserId)) {
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber?.trim()) && this.users.find(x => x.AdmissionNumber == this.currentUser.AdmissionNumber && x.UserId != this.currentUser.UserId)) {
                     this.userErrors.AdmissionNumber = 'Adminssion Number already exists.';
+                    isValid = false;
+                } else {
+                    this.userErrors.AdmissionNumber = '';
+                }
+                break;
+
+            case 'LibraryNo': 
+                const libraryNo = this.currentUser.LibraryNo?.trim();
+                const libraryNoPattern = /^VCN \d{1,9}$/i;
+                const libraryNoStaffPattern = /^VCN \d{1,9}S$/i;
+
+                if (!libraryNo) {
+                    this.userErrors.LibraryNo = 'Library Number is required.';
+                    isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(libraryNoPattern.test(libraryNo ?? ''))) {
+                    this.userErrors.LibraryNo = 'Library Number should be in VCN {number} format.';
+                    isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId < this.studentRoleId) && !(libraryNoStaffPattern.test(libraryNo ?? ''))) {
+                    this.userErrors.LibraryNo = 'Library Number should be in VCN {number}S format.';
+                    isValid = false;
+                }
+                else if (this.users.some(x => x.LibraryNo?.trim().toLowerCase() === libraryNo?.toLowerCase() && x.UserId != this.currentUser.UserId)
+                ) {
+                    this.userErrors.LibraryNo = 'Library Number already exists.';
+                    isValid = false;
+                } else {
+                    this.currentUser.LibraryNo = this.currentUser.LibraryNo?.trim().toUpperCase();
+                    this.userErrors.LibraryNo = '';
+                }
+                break;            
+
+            case 'Batch':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.Batch !=null && this.currentUser.Batch.trim() != "")) {
+                    this.userErrors.Batch = 'Batch is required.';
                     isValid = false;
                 }
                 else {
-                    this.userErrors.AdmissionNumber = '';
+                    this.userErrors.Batch = '';
                 }
                 break;
             
@@ -1016,16 +1280,15 @@ export class DashboardComponent {
                 if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="")) {
                     this.userErrors.StaffId = 'StaffId is required.';
                     isValid = false;
-                } 
+                }
                 else if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="") && this.users.find(x => x.StaffId == this.currentUser.StaffId && x.UserId != this.currentUser.UserId)) {
                     this.userErrors.StaffId = 'StaffId is already exists.';
                     isValid = false;
-                }
-                else {
+                } else {
                     this.userErrors.StaffId = '';
                 }
                 break;
-            
+
             case 'Status':
                 if (this.currentUser.Status === null) {
                     this.userErrors.Status = 'Access Request Status is required.';
@@ -1061,10 +1324,12 @@ export class DashboardComponent {
         const isDepartmentIdValid = this.validateUserInput('DepartmentId');
         const isAdmissionNumberValid = this.validateUserInput('AdmissionNumber');
         const isStaffIdValid = this.validateUserInput('StaffId');
+        const isLibraryNoValid = this.validateUserInput('LibraryNo');
+        const isBatchValid = this.validateUserInput('Batch');
         // const isAccessRequestValid = this.validateUserInput('Status');
         // const isStatusValid = this.validateUserInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid;
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid && isLibraryNoValid && isBatchValid;
             // && isAccessRequestValid && isStatusValid
     }
 
@@ -1146,13 +1411,51 @@ export class DashboardComponent {
     loadUserDetails(): void {        
         this.userService.getAllUserDetails().subscribe({
             next: (data: UserDetails[]) => {
-                this.users = data.filter(x => x.IsActive == true);                
+                this.users = data.filter(x => x.IsActive == true);   
+                
+                const _nextNum = this.getNextVCNNumber(this.users);
+
+                if(_nextNum < 10)
+                {
+                    this.nextAvailableLibraryNo = "VCN 00" + _nextNum;
+                }
+                else if(_nextNum >= 10 && _nextNum < 100)
+                {
+                    this.nextAvailableLibraryNo = "VCN 0" + _nextNum;
+                }
+                else
+                {
+                    this.nextAvailableLibraryNo = "VCN " + _nextNum;
+                }
+
+                
             },
             error: (err) => {
                 console.error('Error loading users:', err);
             }
         });        
     }
+
+    getNextVCNNumber(_userDetails: UserDetails[]): number {
+        // Guard clause: return 1 if the array is empty or undefined
+        if (!_userDetails || _userDetails.length === 0) {
+            return 1; 
+        }
+
+        // Extract, clean, and map strings to actual numbers
+        const numericValues = _userDetails
+            .map(item => {
+            const cleanString = item.LibraryNo?.replace('VCN ', '') || '0'; 
+            return Number(cleanString); 
+            })
+            .filter(num => !isNaN(num)); // Safe guard against corrupt string data
+
+        // Find the highest number and add 1 for the next sequential number
+        const highestNum = numericValues.length > 0 ? Math.max(...numericValues) : 0;
+
+        return highestNum + 1; 
+    }
+
 
     loadBooks(): void {
 

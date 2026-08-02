@@ -270,7 +270,7 @@
                     MobileNo<sup>*</sup>
                 </label>
                 <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                     (ngModelChange)="validateInput('MobileNo')" />
                 <div *ngIf="errors.MobileNo" class="text-danger mt-1 small">{{ errors.MobileNo }}</div>
             </div>
@@ -298,7 +298,7 @@
                     Admission Number<sup>*</sup>
                 </label>
                 <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber"
                     (ngModelChange)="validateInput('AdmissionNumber')" />
                 <div *ngIf="errors.AdmissionNumber" class="text-danger mt-1 small">{{ errors.AdmissionNumber }}</div>
             </div>
@@ -397,7 +397,8 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="mobile">
                             MobileNo<sup>*</sup>
                         </label>
-                        <input id="mobile" type="text" class="form-control" pInputText maxlength="10" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                        <input id="mobile" type="text" class="form-control" pInputText maxlength="10" 
+                        (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                             [(ngModel)]="currentUser.MobileNo" [ngModelOptions]="{standalone: true}"
                             placeholder="Enter MobileNo" [disabled]="isViewOnly"
                             (ngModelChange)="validateInput('MobileNo')" />
@@ -428,7 +429,7 @@
                             Admission Number<sup>*</sup>
                         </label>
                         <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber" [disabled]="isViewOnly" 
-                            [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" 
                             (ngModelChange)="validateInput('AdmissionNumber')" />
                         <div *ngIf="errors.AdmissionNumber" class="text-danger mt-1 small">{{ errors.AdmissionNumber }}</div>
                     </div>
@@ -520,9 +521,12 @@
       [style]="{ width: '100vw', maxWidth: '2000px', left: '0px' }"
         appendTo="body">
         <div class="row">
-            <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
+            <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">                
+
                 <div class="d-flex align-items-center gap-3">
-                    <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                    <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+                        (onClick)="clearImport()"></p-button>
+                    <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main" [style]="{ marginLeft: '0.5rem' }"
                         (click)="fileInput.click()"></p-button>
                     <input type="file" #fileInput
                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
@@ -536,14 +540,11 @@
             </div>
         </div>
 
-        <div class="table-clear-filter">
-            <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
-                (onClick)="clearImport()"></p-button>
-        </div>
-        <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
-             <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10" 
-                [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        <!-- <div class="table-clear-filter">
+           
+        </div> -->
+        <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh; margin-top: 1rem !important;">
+             <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="false" [scrollable]="true" 
                 [style]="{ minWidth: '2800px' }" [scrollable]="true" styleClass="p-datatable-sm">
 
                 <ng-template pTemplate="header">
@@ -933,13 +934,14 @@
                     MobileNo<sup>*</sup>
                 </label>
                 <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo" maxlength="10"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" [disabled]="isViewOnly" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" [disabled]="isViewOnly" 
+                    (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                     (ngModelChange)="validateInput('MobileNo')" />
                 <div *ngIf="errors.MobileNo" class="text-danger mt-1 small">{{ errors.MobileNo }}</div>
             </div>
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="dob">
-                    DOB<sup>*</sup>
+                    DOB
                 </label>
                 <p-datepicker [(ngModel)]="dobDate" [ngModelOptions]="{standalone: true}" appendTo="body"
                     [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [defaultDate]="calendarFocusDate"
@@ -961,7 +963,7 @@
                     Admission Number<sup>*</sup>
                 </label>
                 <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber" [disabled]="isViewOnly"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber"
                     (ngModelChange)="validateInput('AdmissionNumber')" />
                 <div *ngIf="errors.AdmissionNumber" class="text-danger mt-1 small">{{ errors.AdmissionNumber }}</div>
             </div>

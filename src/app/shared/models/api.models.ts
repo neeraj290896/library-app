@@ -77,6 +77,7 @@ export interface BookDetails {
     RackLabel?: string | null;
     BookBarcode?: string | null;
     IsActive: boolean | null;
+    CreatedDate?: string | null;
 }
 
 export interface BookCirculationDetails {
@@ -324,7 +325,7 @@ export interface UserDetails {
     MailId?: string | null;
     DepartmentId?: number | null;
     DepartmentName?: string | null;
-    AdmissionNumber?: number | null;
+    AdmissionNumber?: string | null;
     StaffId?: string | null;
     ProfilePhoto?: string | null;
     Status?: string | null;
@@ -367,6 +368,8 @@ export interface OverDueDetails {
     IssuedByUserName?: string | null;
     BorrowerId: number;
     BorrowerName?: string | null;
+    ActualOverDueDate?: string | null;
+    ExtendedDate?: string | null;
     FineAmount?: number | null;
     OverDueFrom?: string | null;
     OverDueDays?: number | null;

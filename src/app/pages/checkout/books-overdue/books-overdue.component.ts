@@ -353,12 +353,16 @@ export class BooksOverdueComponent {
        
     }
 
-    editBook(_odD: OverDueDetails, type: string): void {
+    editBook(_odD: OverDueDetails, _type: string): void {
         
-        _odD.ReturnDate = this.todayDate;
+        if(_type == "CheckIn")
+        {
+            _odD.ReturnDate = this.todayDate;
+        }
+        
 
         this.bc = {..._odD};              
-        this.type = "CheckIn";
+        this.type = _type;
         this.bcDialogVisible = true;
         console.log('this.bc :', this.bc);
     }

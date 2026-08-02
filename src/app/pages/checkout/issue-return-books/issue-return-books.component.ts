@@ -50,12 +50,13 @@ export class IssueReturnBooksComponent implements OnChanges {
     public todayDate: string | undefined;
     public minDate: Date | undefined;
     public maxDate: Date | undefined;
+    public extendedMaxDate: Date | undefined;
     public issueDate: Date | null = null;
     public returnDate: Date | null = null;
     public overdueFrom: Date | null = null;
     public actualOverDueDate: Date | null = null;
     public extendedDate: Date | null = null;
-
+    public extendedMinDate: Date | null =null;
     public bcDialogVisible = false;
     public isReturnByDifferentUser: boolean = false;
     public isReturnBook: boolean = true;
@@ -104,11 +105,16 @@ export class IssueReturnBooksComponent implements OnChanges {
     private lastKeyTime: number = Date.now();
 
     constructor() {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        this.minDate = new Date();
-        this.maxDate = new Date();
-        this.todayDate = today.toISOString();
+        const today = this.normalizeDate(new Date());
+        this.minDate = today ?? undefined;
+        this.maxDate = undefined;
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 7);
+
+        this.extendedMaxDate = futureDate;
+        this.extendedMinDate = new Date();
+
+        this.todayDate = today?.toISOString() ?? new Date().toISOString();
         this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
 
         this.loadBooks();
@@ -122,6 +128,21 @@ export class IssueReturnBooksComponent implements OnChanges {
         if (changes['showDialog'] && changes['showDialog'].currentValue) {
             this.openDialog();
         }
+    }
+
+    private normalizeDate(value: Date | string | null | undefined): Date | null {
+        if (!value) {
+            return null;
+        }
+
+        const parsedDate = value instanceof Date ? new Date(value) : new Date(value);
+
+        if (Number.isNaN(parsedDate.getTime())) {
+            return null;
+        }
+
+        parsedDate.setHours(0, 0, 0, 0);
+        return parsedDate;
     }
 
 //     ngAfterViewInit() {
@@ -186,9 +207,20 @@ export class IssueReturnBooksComponent implements OnChanges {
                 this.selectedBook.ReturnDate = this.todayDate;
             }
 
-            if (this.selectedBook.IssuedDate && this.selectedBook.ReturnDate) {
-                this.minDate = new Date(this.selectedBook.IssuedDate);
-                this.maxDate = new Date(this.selectedBook.ReturnDate);
+            const issuedDate = this.normalizeDate(this.selectedBook.IssuedDate);
+            const returnDate = this.normalizeDate(this.selectedBook.ReturnDate);
+
+            if (issuedDate) {
+                this.minDate = issuedDate;
+            }
+            else {
+                this.minDate = this.normalizeDate(new Date()) ?? undefined;
+            }
+
+            this.maxDate = returnDate ?? undefined;
+
+            if (this.maxDate && this.minDate && this.maxDate < this.minDate) {
+                this.maxDate = undefined;
             }
 
             this.returnByDifferentUser();
@@ -221,11 +253,23 @@ export class IssueReturnBooksComponent implements OnChanges {
 
             this.bindOnlyActiveDetails();
 
-            this.issueDate = this.selectedBook.IssuedDate ? new Date(this.selectedBook.IssuedDate) : null;
-            this.returnDate = this.selectedBook.ReturnDate ? new Date(this.selectedBook.ReturnDate) : null;
-            this.overdueFrom = this.selectedBook.OverDueFrom ? new Date(this.selectedBook.OverDueFrom) : null;
-            this.actualOverDueDate = this.selectedBook.ActualOverDueDate ? new Date(this.selectedBook.ActualOverDueDate) : null;
-            this.extendedDate = this.selectedBook.ExtendedDate ? new Date(this.selectedBook.ExtendedDate) : null;
+            this.issueDate = this.normalizeDate(this.selectedBook.IssuedDate);
+            this.returnDate = this.normalizeDate(this.selectedBook.ReturnDate);
+            this.overdueFrom = this.normalizeDate(this.selectedBook.OverDueFrom);
+            this.actualOverDueDate = this.normalizeDate(this.selectedBook.ActualOverDueDate);
+            this.extendedDate = this.normalizeDate(this.selectedBook.ExtendedDate);
+
+            if(this.actualOverDueDate && !this.isViewOnly)
+            {
+                this.extendedMinDate = new Date(this.actualOverDueDate);
+
+                const futureDate = new Date(this.actualOverDueDate);
+                futureDate.setDate(futureDate.getDate() + 7);
+                this.extendedMaxDate = futureDate;
+                
+            }
+            
+
         }
         else {
             this.isIssueNewBook = true;
@@ -235,18 +279,20 @@ export class IssueReturnBooksComponent implements OnChanges {
             this.bindOnlyActiveDetails();
 
             this.minDate = new Date();
-            this.maxDate = new Date();
+            this.maxDate = new Date();    
+            
+            this.issueDate = this.normalizeDate(this.todayDate);
 
             this.selectedBook = {
                 BookCirculationId: 0, BookId: 0, BookName: '',
                 BorrowerId: 0, BorrowerName: '', IssuedByUserId: this.loggedInUserDetails?.UserId,
                 IssuedByUserName: this.loggedInUserDetails?.FullName, IssuedDate: this.todayDate,
-                ActualOverDueDate : '', ExtendedDate:'', OverDueId: 0,
-                FineAmount: 0.0, OverDueFrom: '', OverDueDays: 0,
-                OverDueStatus: '', SytemUpdatedDate: '',
-                ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: '',
+                ActualOverDueDate : null, ExtendedDate: null, OverDueId: 0,
+                FineAmount: 0.0, OverDueFrom: null, OverDueDays: 0,
+                OverDueStatus: '', SytemUpdatedDate: null,
+                ReturnByUserId: 0, ReturnByUserName: '', ReturnDate: null,
                 Comments: '', Status: 'Issued',
-                UpdatedByUserId: 0, UpdatedByUserName: '', UpdatedDate: '',
+                UpdatedByUserId: 0, UpdatedByUserName: '', UpdatedDate: null,
                 BorrowerMailId: '', IssuedByUserMailId: '', ReturnByUserMailId: '',
                 UpdatedByUserMailId: '', PaidAmount: 0, PaymentTypeId: 0
             };
@@ -282,8 +328,17 @@ export class IssueReturnBooksComponent implements OnChanges {
             });
 
             this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Available").map(book => {
-                return { label: book.BookName ?? '', value: book.BookId };
-            });
+                                // 1. Keep bookName fallback clean
+                                const bookName = book.BookName || 'Unnamed Book';
+                                
+                                // 2. Conditionally build the prefix with the pipe included
+                                const prefix = book.AccessionNo ? `(${book.AccessionNo}) | ` : '';
+
+                                return { 
+                                    label: `${prefix}${bookName}`, 
+                                    value: book.BookId 
+                                };
+                            });  
         }
         else {
             this.userOptions = this.lstUserDetails.filter(x => x.FullName?.trim() != '').map(usr => {
@@ -291,8 +346,17 @@ export class IssueReturnBooksComponent implements OnChanges {
             });
 
             this.bookOptions = this.lstBookDetails.map(book => {
-                return { label: book.BookName ?? '', value: book.BookId };
-            });
+                                // 1. Keep bookName fallback clean
+                                const bookName = book.BookName || 'Unnamed Book';
+                                
+                                // 2. Conditionally build the prefix with the pipe included
+                                const prefix = book.AccessionNo ? `(${book.AccessionNo}) | ` : '';
+
+                                return { 
+                                    label: `${prefix}${bookName}`, 
+                                    value: book.BookId 
+                                };
+                            });  
         }
 
         console.log('bindOnlyActiveDetails() --> this.bookOptions :', this.bookOptions);
@@ -302,24 +366,40 @@ export class IssueReturnBooksComponent implements OnChanges {
         this.bookService.getAllBookDetails().subscribe({
             next: (data: BookDetails[]) => {
                 this.lstBookDetails = data;
+                
                 if (this.isIssueNewBook) {
                     this.bookOptions = this.lstBookDetails
                             .filter(x => x.Status === "Available" && x.IsActive === true)
                             .map(book => {
-                                const bookName = book.BookName ?? '';
-                                const accessionNo = book.AccessionNo ? `(${book.AccessionNo})` : '';
-        
-        return { 
-            label: `${bookName}${accessionNo}` || 'Unnamed Book', 
-            value: book.BookId 
-        };
-    });
+                                // 1. Keep bookName fallback clean
+                                const bookName = book.BookName || 'Unnamed Book';
+                                
+                                // 2. Conditionally build the prefix with the pipe included
+                                const prefix = book.AccessionNo ? `(${book.AccessionNo}) | ` : '';
+
+                                return { 
+                                    label: `${prefix}${bookName}`, 
+                                    value: book.BookId 
+                                };
+                            });                   
 
                 }
                 else {
                     this.bookOptions = data.map(book => {
-                        return { label: book.BookName ?? '', value: book.BookId };
+                        // 1. Keep bookName fallback clean
+                        const bookName = book.BookName || 'Unnamed Book';
+                        
+                        // 2. Conditionally build the prefix with the pipe included
+                        const prefix = book.AccessionNo ? `(${book.AccessionNo}) | ` : '';
+
+                        return { 
+                            label: `${prefix}${bookName}`, 
+                            value: book.BookId 
+                        };
                     });
+
+
+                    
                 }
             },
             error: (err) => {
@@ -649,7 +729,8 @@ export class IssueReturnBooksComponent implements OnChanges {
 
     onIssueDateChange(): void {
         if (this.issueDate) {
-            this.selectedBook.IssuedDate = this.issueDate.toISOString();
+            const dateObj = new Date(this.issueDate);
+            this.selectedBook.IssuedDate = dateObj.toISOString();
         }
         else {
             this.selectedBook.IssuedDate = null;
@@ -657,8 +738,10 @@ export class IssueReturnBooksComponent implements OnChanges {
     }
 
     onReturnDateChange(): void {
+        console.log('this.returnDate :', this.returnDate);
         if (this.returnDate) {
-            this.selectedBook.ReturnDate = this.returnDate.toISOString();
+            const dateObj = new Date(this.returnDate);
+            this.selectedBook.ReturnDate = dateObj.toISOString();
         }
         else {
             this.selectedBook.ReturnDate = null;
@@ -667,7 +750,8 @@ export class IssueReturnBooksComponent implements OnChanges {
 
     onOverdueFromChange(): void {
         if (this.overdueFrom) {
-            this.selectedBook.OverDueFrom = this.overdueFrom.toISOString();
+            const dateObj = new Date(this.overdueFrom);
+            this.selectedBook.OverDueFrom = dateObj.toISOString();
         }
         else {
             this.selectedBook.OverDueFrom = null;
@@ -675,8 +759,10 @@ export class IssueReturnBooksComponent implements OnChanges {
     }
 
     onExtendedDateChange(): void {
+        console.log('this.extendedDate :', this.extendedDate);
         if (this.extendedDate) {
-            this.selectedBook.ExtendedDate = this.extendedDate.toISOString();
+            const dateObj = new Date(this.extendedDate);
+            this.selectedBook.ExtendedDate = dateObj.toISOString();
         }
         else {
             this.selectedBook.ExtendedDate = null;

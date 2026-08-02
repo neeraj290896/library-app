@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ResetCredPassword, RoleDetails, SettingDetails, UserDetails } from '@app/shared/models/api.models';
+import { DepartmentDetails, ResetCredPassword, RoleDetails, SettingDetails, UserDetails } from '@app/shared/models/api.models';
 import { AdminService } from '@app/shared/services/admin.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { MessageService } from 'primeng/api';
@@ -17,6 +17,7 @@ import { environment } from '../../../environments/environment';
 import { RoleService } from '@app/shared/services/role.service';
 import { UserService } from '@app/shared/services/user.service';
 import { DialogModule } from 'primeng/dialog';
+import { DepartmentService } from '@app/shared/services/department.service';
 
 @Component({
     selector: 'app-settings',
@@ -35,8 +36,11 @@ export class SettingsComponent {
     private _adminService = inject(AdminService);
     private roleService = inject(RoleService);
     private userService = inject(UserService);
+    public departmentService = inject(DepartmentService);
 
+    public users: UserDetails[] = [];
     public loggedInUserDetails: UserDetails | null = null;
+    public departments: DepartmentDetails[] = [];
     public settingDetails: SettingDetails = {
         SettingId: 0, CutOffDays: 90, Fine: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
         EnableMobileNotification: false, EnableBarcodeScanning:false, ReminderMailNotificationInDays: 2, IsActive: true
@@ -55,9 +59,15 @@ export class SettingsComponent {
         ProfilePhoto: '',
         RoleId: 0,
         RoleName: '',
+        DepartmentId: 0,
+        DepartmentName: '',
+        AdmissionNumber: '',
+        StaffId:'',
         CreatedByUserId: 0,
         CreatedByUserName: '',
         IsActive: true,
+        LibraryNo: '',
+        Batch: '',
         Status: null
     };
     public userErrors: {
@@ -66,14 +76,27 @@ export class SettingsComponent {
         DOB: string,
         MailId: string,
         MobileNo: string,
-        RoleId: string
+        RoleId: string,
+        DepartmentId: string,
+        AdmissionNumber: string,
+        StaffId: string,
+        Status: string,
+        IsActive: string,
+        LibraryNo: string, Batch: string
     } = {
             FullName: '',
             Gender: '',
             DOB: '',
             MailId: '',
             MobileNo: '',
-            RoleId: ''
+            RoleId: '',
+            DepartmentId: '',
+            AdmissionNumber:'',
+            StaffId:'',
+            Status: '',
+            IsActive: '',
+            LibraryNo: '',
+            Batch: ''
         };
     public roleOptions: { label: string; value: number; }[] = [];
     public genderOptions: { label: string; value: string; }[] = [
@@ -86,6 +109,7 @@ export class SettingsComponent {
     public maxDate: Date | undefined;
     public calendarFocusDate!: Date;
     public enableAplnSettingsAccess : boolean = false;
+    public enableUserSettingsAccess : boolean = false;
     public resetPwdDialogVisible: boolean = false;
     public showCurrentPassword = false;
     public showNewPassword = false;
@@ -101,15 +125,28 @@ export class SettingsComponent {
         specialChar: false
     };
     public resetCredPassword: ResetCredPassword ={};
+    public departmentOptions: { label: string; value: number; }[] = [];
+    public batchOptions: { label: string; value: string; }[] = [];
+    public studentRoleId: number  = 5;
+    public departmentEligibleForRoleIdAbove: number  = 1;
 
     ngOnInit(): void {
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+        this.studentRoleId = environment.studentRoleId;
+        this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
         const today = new Date();
 
         if(this.loggedInUserDetails?.RoleId && this.loggedInUserDetails.RoleId <= 2)
         {
             this.enableAplnSettingsAccess = true;
         }
+
+        if(this.loggedInUserDetails?.RoleId && this.loggedInUserDetails.RoleId <= 3)
+        {
+            this.enableUserSettingsAccess = true;
+        }
+
+        
 
         let year = today.getFullYear();
         let minYear = year - 100;
@@ -131,6 +168,24 @@ export class SettingsComponent {
 
         this.currentUser = { ...this.loggedInUserDetails };
         this.dobDate = this.currentUser.DOB ? new Date(this.currentUser.DOB) : null;
+        this.loadDepartmentDetails();
+        this.generateBatchOptions();
+        this.loadUserDetails();
+    }
+
+     generateBatchOptions(): void {
+        const currentYear = new Date().getFullYear(); // 2026
+        const targetEndYear = environment.batchStartFromYear; // 2000
+        
+        // Dynamically loops from currentYear down to targetEndYear
+        for (let year = currentYear; year >= targetEndYear; year--) {
+            const rangeText = `${year} - ${year + 4}`;
+            
+            this.batchOptions.push({
+            label: rangeText,
+            value: rangeText
+            });
+        }
     }
 
     loadRoleDetails(): void {
@@ -144,6 +199,20 @@ export class SettingsComponent {
                 console.error('Error loading role:', err);
             }
         });
+    }
+
+    loadDepartmentDetails(): void {
+                this.departmentService.getDepartmentDetails().subscribe({
+                    next: (data: DepartmentDetails[]) => {
+                        this.departments = data;
+                        this.departmentOptions = data.map(dept => {
+                        return { label: dept.DepartmentName ?? '', value: dept.DepartmentId };
+                    });
+                    },
+                    error: (err :any) => {
+                        console.error('Error loading departments:', err);
+                    }
+                });
     }
 
     loadSettingDetails(): void {
@@ -162,6 +231,26 @@ export class SettingsComponent {
                 console.error('Error loading role:', err);
             }
         });
+    }
+
+    loadUserDetails(): void {
+        
+        this.userService.getAllUserDetails().subscribe({
+            next: (data: UserDetails[]) => {
+                this.users = data || []; 
+
+                const matchedUser = this.users.find(x => x.UserId === this.loggedInUserDetails?.UserId);
+
+                if (matchedUser) {
+                    this.currentUser = { ...matchedUser };
+                    this.dobDate = this.currentUser.DOB ? new Date(this.currentUser.DOB) : null;
+                }
+            },
+            error: (err) => {
+                console.error('Error loading users:', err);
+            }
+        });
+        
     }
 
     validateInput(key: string, value: any): boolean {
@@ -314,7 +403,20 @@ export class SettingsComponent {
                 if (!this.currentUser.MailId?.trim()) {
                     this.userErrors.MailId = 'MailId is required.';
                     isValid = false;
-                } else {
+                } 
+                else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.currentUser.MailId?.trim())) {
+                    this.userErrors.MailId = 'Invalid email.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId == 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim())){
+                    this.userErrors.MobileNo = 'MailId already exists.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId !=null && this.currentUser.UserId > 0 && this.users.find(x => x.MailId?.trim() == this.currentUser.MailId?.trim() && x.UserId != this.currentUser.UserId)){
+                    this.userErrors.MobileNo = 'MailId already exists.';
+                    isValid = false;
+                }
+                else {
                     this.userErrors.MailId = '';
                 }
                 break;
@@ -323,7 +425,16 @@ export class SettingsComponent {
                 if (!this.currentUser.MobileNo?.trim()) {
                     this.userErrors.MobileNo = 'MobileNo is required.';
                     isValid = false;
-                } else {
+                } 
+                else if(this.currentUser.UserId == 0 && this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim())){
+                    this.userErrors.MobileNo = 'MobileNo already exists.';
+                    isValid = false;
+                }
+                else if(this.currentUser.UserId !=null && this.currentUser.UserId > 0 && this.users.find(x => x.MobileNo == this.currentUser.MobileNo?.trim() && x.UserId != this.currentUser.UserId)){
+                    this.userErrors.MobileNo = 'MobileNo already exists.';
+                    isValid = false;
+                }
+                else {
                     this.userErrors.MobileNo = '';
                 }
                 break;
@@ -337,11 +448,105 @@ export class SettingsComponent {
                 }
                 break;
 
+            case 'DepartmentId':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove) && !(this.currentUser.DepartmentId != null && this.currentUser.DepartmentId > 0)) {
+                    this.userErrors.DepartmentId = 'Please select Department.';
+                    isValid = false;
+                } else {
+                    this.userErrors.DepartmentId = '';
+                }
+                break;
+
+            case 'AdmissionNumber':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber?.trim())) {
+                    this.userErrors.AdmissionNumber = 'Admission Number is required.';
+                    isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.AdmissionNumber?.trim()) && this.users.find(x => x.AdmissionNumber == this.currentUser.AdmissionNumber && x.UserId != this.currentUser.UserId)) {
+                    this.userErrors.AdmissionNumber = 'Admission Number already exists.';
+                    isValid = false;
+                } else {
+                    this.userErrors.AdmissionNumber = '';
+                }
+                break;
+
+            case 'LibraryNo': 
+                const libraryNo = this.currentUser.LibraryNo?.trim();
+                const libraryNoPattern = /^VCN \d{1,9}$/i;
+
+                if (!libraryNo) {
+                    this.userErrors.LibraryNo = 'Library Number is required.';
+                    isValid = false;
+                }
+                else if (!libraryNoPattern.test(libraryNo ?? '')
+                ) {
+                    this.userErrors.LibraryNo = 'Library Number should be in VCN {number} format.';
+                    isValid = false;
+                }
+                else if (this.users.some(x => x.LibraryNo?.trim().toLowerCase() === libraryNo?.toLowerCase() && x.UserId != this.currentUser.UserId)
+                ) {
+                    this.userErrors.LibraryNo = 'Library Number already exists.';
+                    isValid = false;
+                } else {
+                    this.userErrors.LibraryNo = '';
+                }
+                break;            
+
+            case 'Batch':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId == this.studentRoleId) && !(this.currentUser.Batch !=null && this.currentUser.Batch.trim() != "")) {
+                    this.userErrors.Batch = 'Batch is required.';
+                    isValid = false;
+                }
+                else {
+                    this.userErrors.Batch = '';
+                }
+                break;
+            
+            case 'StaffId':
+                if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="")) {
+                    this.userErrors.StaffId = 'StaffId is required.';
+                    isValid = false;
+                }
+                else if ((this.currentUser.RoleId != null && this.currentUser.RoleId > this.departmentEligibleForRoleIdAbove && this.currentUser.RoleId < this.studentRoleId) && !(this.currentUser.StaffId !=null && this.currentUser.StaffId.trim() !="") && this.users.find(x => x.StaffId == this.currentUser.StaffId && x.UserId != this.currentUser.UserId)) {
+                    this.userErrors.StaffId = 'StaffId is already exists.';
+                    isValid = false;
+                } else {
+                    this.userErrors.StaffId = '';
+                }
+                break;
+
+            case 'Status':
+                if (this.currentUser.Status === null) {
+                    this.userErrors.Status = 'Access Request Status is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.Status = '';
+                }
+                break;
+
+            case 'IsActive':
+                if (this.currentUser.IsActive === null) {
+                    this.userErrors.IsActive = 'Status is required.';
+                    isValid = false;
+                } else {
+                    this.userErrors.IsActive = '';
+                }
+                break;
+
             default:
                 break;
         }
 
         return isValid;
+    }
+
+    onDepartmentChange(): void{
+        const department = this.departmentOptions.find(l => l.value === this.currentUser.DepartmentId);
+        if (department) {
+            this.currentUser.DepartmentName = department.label;
+        }
+
+        this.validateUserInput('DepartmentId');
     }
 
     validateUser(): boolean {
@@ -351,8 +556,15 @@ export class SettingsComponent {
         const isMailIdValid = this.validateUserInput('MailId');
         const isMobileNoValid = this.validateUserInput('MobileNo');
         const isDOBValid = this.validateUserInput('DOB');
+        const isDepartmentIdValid = this.validateUserInput('DepartmentId');
+        const isAdmissionNumberValid = this.validateUserInput('AdmissionNumber');
+        const isStaffIdValid = this.validateUserInput('StaffId');
+        const isLibraryNoValid = this.validateUserInput('LibraryNo');
+        const isBatchValid = this.validateUserInput('Batch');
+        // const isAccessRequestValid = this.validateInput('Status');
+        // const isStatusValid = this.validateInput('IsActive');
         return isNameValid && isRoleIdValid && isGenderValid &&
-            isMailIdValid && isMobileNoValid && isDOBValid;
+            isMailIdValid && isMobileNoValid && isDOBValid && isDepartmentIdValid && isAdmissionNumberValid && isStaffIdValid && isLibraryNoValid && isBatchValid;
     }
 
     saveUser(): void {
@@ -377,7 +589,7 @@ export class SettingsComponent {
                     });
                 }
 
-                this.loadUserDetails();
+                this.loadSaveUserDetails();
             },
             error: () => {
                 this.messageService.add({
@@ -389,7 +601,7 @@ export class SettingsComponent {
         });
     }
 
-    loadUserDetails(): void {
+    loadSaveUserDetails(): void {
         this.userService.getLoggedInUserDetails(this.loggedInUserDetails?.MobileNo ?? undefined, this.loggedInUserDetails?.MailId ?? undefined)
             .subscribe({
                 next: (detailsRes: any) => {

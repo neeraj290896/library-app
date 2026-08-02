@@ -21,7 +21,7 @@
 
             <ng-template pTemplate="header">
                 <tr class="border-bottom">
-                    <th style="width: 2%">
+                    <th style="width: 3%">
                         <!-- Header checkbox for selecting/deselecting all items -->
                         <p-tableHeaderCheckbox> id="chk-header-all"
                             [value]="books" </p-tableHeaderCheckbox>
@@ -33,10 +33,21 @@
                             </div>
                         </div>
                     </th>
-                    <th class="text-start text-muted fw-medium" style="width: 20%;">
+                    <th class="text-start text-muted fw-medium" style="width: 9%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="AccessionNo">
+                                Accession No
+                                <p-sortIcon field="AccessionNo"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="selectedAccessionNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 22%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
-                                Book
+                                Book Title
                                 <p-sortIcon field="BookName"></p-sortIcon>
                             </div>
                             <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
@@ -63,18 +74,7 @@
                                 [ngClass]="selectedPublisherNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                                 (click)="showFilter()"></span>
                         </div>
-                    </th>                    
-                    <th class="text-start text-muted fw-medium" style="width: 10%;">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="d-flex align-items-center gap-2" pSortableColumn="AccessionNo">
-                                Accession No
-                                <p-sortIcon field="AccessionNo"></p-sortIcon>
-                            </div>
-                            <span class="pi"
-                                [ngClass]="selectedAccessionNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                (click)="showFilter()"></span>
-                        </div>
-                    </th>
+                    </th> 
                     <th class="text-start text-muted fw-medium" style="width: 5%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="PublishedYear">
@@ -130,6 +130,16 @@
                     <th></th>
                     <th></th>
                     <th>
+                        <p-columnFilter field="AccessionNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="accessionNoList" [(ngModel)]="selectedAccessionNoList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All"></p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
                         <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                 <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
@@ -158,17 +168,7 @@
                                     placeholder="All"></p-multiSelect>
                             </ng-template>
                         </p-columnFilter>
-                    </th>                    
-                    <th>
-                        <p-columnFilter field="AccessionNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                <p-multiSelect [options]="accessionNoList" [(ngModel)]="selectedAccessionNoList"
-                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                    placeholder="All"></p-multiSelect>
-                            </ng-template>
-                        </p-columnFilter>
-                    </th>
+                    </th> 
                     <th>
                         <p-columnFilter field="PublishedYear" matchMode="in" [showMenu]="false" [showClearButton]="false">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -219,6 +219,11 @@
                     <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" /></td>
                     <td>{{ index + 1 }}</td>
                     <td>
+                        <span [pTooltip]="book.AccessionNo">
+                            {{ book.AccessionNo }}
+                        </span>
+                    </td>
+                    <td>
                         <span [pTooltip]="book.BookName">
                             {{ book.BookName }}
                         </span>
@@ -228,17 +233,12 @@
                         <span [pTooltip]="book.PublisherName">
                             {{ book.PublisherName }}
                         </span>
-                    </td>                    
-                    <td>
-                        <span [pTooltip]="book.AccessionNo">
-                            {{ book.AccessionNo }}
-                        </span>
-                    </td>
+                    </td> 
                     <td>{{ book.PublishedYear }}</td>
                     <td>
                         <span [pTooltip]="book.Subject">
 
-                        </span>{{ book.Subject }}</td>
+                        </span>{{ book.SubjectName }}</td>
                     <td>
                         <span [pTooltip]="book.CategoryName">
                             {{ book.CategoryName }}
@@ -283,8 +283,19 @@
         @if (header === 'Add Book') {
         <div class="row">
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                    Accession No<sup>*</sup>
+                </label>
+                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                 maxlength="6" [ngModelOptions]="{standalone: true}" placeholder="Enter accession no" (ngModelChange)="validateInput('AccessionNo')"/>  
+                @if (errors.AccessionNo) {
+                <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
+                }              
+            </div>
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
-                    Book<sup>*</sup>
+                    Book Title<sup>*</sup>
                 </label>
                 <input id="bookName" type="text" class="form-control" pInputText [(ngModel)]="currentBook.BookName"
                     [ngModelOptions]="{standalone: true}" placeholder="Enter book"
@@ -411,18 +422,7 @@
                 @if (errors.RackId) {
                 <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
                 }
-            </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
-                    Accession No<sup>*</sup>
-                </label>
-                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
-                (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
-                @if (errors.AccessionNo) {
-                <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
-                }              
-            </div>
+            </div>            
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
                     Bill No
@@ -436,7 +436,7 @@
                 </label>
                 <p-datepicker [(ngModel)]="billDate" [ngModelOptions]="{standalone: true}" appendTo="body"
                     [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
-                    [minDate]="minDate" [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select BillDate"
+                    [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select Bill Date"
                     styleClass="w-100" inputStyleClass="w-100" />  
                 @if (errors.BillDate) {
                 <div class="text-danger mt-1 small">{{ errors.BillDate }}</div>
@@ -447,7 +447,7 @@
                     Total Page No
                 </label>
                 <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo"
-                    (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                     [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
             </div>
             <div class="col-6 mb-3">
@@ -505,8 +505,20 @@
                 @if (activeTab === 0) {
                 <div class="row">
                     <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                            Accession No<sup>*</sup>
+                        </label>
+                        <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                        [disabled] ="isViewOnly" 
+                        (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
+                        @if (errors.AccessionNo) {
+                        <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
+                        }                
+                    </div>
+                    <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
-                            Book<sup>*</sup>
+                            Book Title<sup>*</sup>
                         </label>
                         <input id="bookName" type="text" class="form-control" pInputText [disabled]="isViewOnly"
                             [(ngModel)]="currentBook.BookName" [ngModelOptions]="{standalone: true}"
@@ -633,18 +645,7 @@
                         @if (errors.RackId) {
                         <div class="text-danger mt-1 small">{{ errors.RackId }}</div>
                         }
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
-                            Accession No
-                        </label>
-                        <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
-                        [disabled] ="isViewOnly" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
-                            [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
-                        @if (errors.AccessionNo) {
-                        <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
-                        }                
-                    </div>
+                    </div>                    
                     <div class="col-6 mb-3">
                         <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
                             Bill No
@@ -658,7 +659,7 @@
                         </label>
                         <p-datepicker [(ngModel)]="billDate" [ngModelOptions]="{standalone: true}" appendTo="body"
                             [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy" [disabled]="isViewOnly"
-                            [minDate]="minDate" [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select BillDate"
+                            [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select Bill Date"
                             styleClass="w-100" inputStyleClass="w-100" />  
                         @if (errors.BillDate) {
                         <div class="text-danger mt-1 small">{{ errors.BillDate }}</div>
@@ -669,7 +670,7 @@
                             Total Page No
                         </label>
                         <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"
-                            (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                            (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                             [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
                     </div>
                     <div class="col-6 mb-3">
@@ -762,6 +763,10 @@
     [style]="{ width: '100vw', maxWidth: '2000px', left: '0px' }" appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
+                <div class="table-clear-filter">
+                    <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
+                        (onClick)="clearImport()"></p-button>
+                </div>
                 <div class="d-flex align-items-center gap-3">
                     <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
                         (click)="fileInput.click()"></p-button>
@@ -775,16 +780,9 @@
                 <p-button type="button" label="Download Excel Template" icon="pi pi-download"
                     styleClass="btn-main-outlined" (click)="downloadBookTemplate()"></p-button>
             </div>
-        </div>
-
-        <div class="table-clear-filter">
-            <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
-                (onClick)="clearImport()"></p-button>
-        </div>
+        </div>        
         <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
-            <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="true" [rows]="10"
-                [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="false" [scrollable]="true" 
                 [style]="{ minWidth: '2800px' }" [scrollable]="true" styleClass="p-datatable-sm">
 
                 <ng-template pTemplate="header">
@@ -796,10 +794,21 @@
                                 </div>
                             </div>
                         </th>
-                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <th class="text-start text-muted fw-medium" style="width: 9%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="AccessionNo">
+                                    Accession No
+                                    <p-sortIcon field="AccessionNo"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedAccessionNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 20%;">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="d-flex align-items-center gap-2" pSortableColumn="BookName">
-                                    Book
+                                    Book Title
                                     <p-sortIcon field="BookName"></p-sortIcon>
                                 </div>
                                 <span class="pi"
@@ -883,18 +892,7 @@
                                     [ngClass]="importSelectedCallNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                                     (click)="showImportFilter()"></span>
                             </div>
-                        </th>
-                        <th class="text-start text-muted fw-medium" style="width: 12%;">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="d-flex align-items-center gap-2" pSortableColumn="AccessionNo">
-                                    Accession No
-                                    <p-sortIcon field="AccessionNo"></p-sortIcon>
-                                </div>
-                                <span class="pi"
-                                    [ngClass]="importSelectedAccessionNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                                    (click)="showImportFilter()"></span>
-                            </div>
-                        </th>
+                        </th>                        
                         <th class="text-start text-muted fw-medium" style="width: 12%;">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="d-flex align-items-center gap-2" pSortableColumn="Source">
@@ -949,6 +947,18 @@
                     @if (importShowFt) {
                     <tr>
                         <th></th>
+                        <th>
+                            <p-columnFilter field="AccessionNo" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importAccessionNoList"
+                                        [(ngModel)]="importSelectedAccessionNoList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
                         <th>
                             <p-columnFilter field="BookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
                                 <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -1041,19 +1051,7 @@
                                         placeholder="All"></p-multiSelect>
                                 </ng-template>
                             </p-columnFilter>
-                        </th>
-                        <th>
-                            <p-columnFilter field="AccessionNo" matchMode="in" [showMenu]="false"
-                                [showClearButton]="false">
-                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                    <p-multiSelect [options]="importAccessionNoList"
-                                        [(ngModel)]="importSelectedAccessionNoList" (onChange)="filter($event.value)"
-                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
-                                        optionLabel="label" optionValue="value" appendTo="body"
-                                        placeholder="All"></p-multiSelect>
-                                </ng-template>
-                            </p-columnFilter>
-                        </th>
+                        </th>                        
                         <th>
                             <p-columnFilter field="Source" matchMode="in" [showMenu]="false"
                                 [showClearButton]="false">
@@ -1107,6 +1105,7 @@
                 <ng-template pTemplate="body" let-book let-index="rowIndex">
                     <tr class="border-bottom">
                         <td>{{ index + 1 }}</td>
+                        <td>{{ book.AccessionNo }}</td>
                         <td>
                             <span [pTooltip]="book.BookName">
                                 {{ book.BookName }}
@@ -1130,8 +1129,7 @@
                         </td>
                         <td>{{ book.PublishedYear }}</td>
                         <td>{{ book.BillNo }}</td>
-                        <td>{{ book.CallNo }}</td>
-                        <td>{{ book.AccessionNo }}</td>
+                        <td>{{ book.CallNo }}</td>                        
                         <td>{{ book.Source }}</td>
                         <td>{{ book.SubjectName }}</td>
                         <!-- <td>
@@ -1180,8 +1178,19 @@
         appendTo="body">
         <div class="row">
             <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                    Accession No<sup>*</sup>
+                </label>
+                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+                [disabled] = "isViewOnly" (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
+                @if (errors.AccessionNo) {
+                <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
+                }                
+            </div>
+            <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
-                    Book<sup>*</sup>
+                    Book Title<sup>*</sup>
                 </label>
                 <input id="bookName" type="text" class="form-control" pInputText [disabled]="isViewOnly"
                     [(ngModel)]="currentBook.BookName" [ngModelOptions]="{standalone: true}" placeholder="Enter book"
@@ -1322,7 +1331,7 @@
                 </label>
                 <p-datepicker [(ngModel)]="billDate" [ngModelOptions]="{standalone: true}" appendTo="body" [disabled]="isViewOnly"
                     [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
-                    [minDate]="minDate" [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select BillDate"
+                    [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select BillDate"
                     styleClass="w-100" inputStyleClass="w-100" />  
                 @if (errors.BillDate) {
                 <div class="text-danger mt-1 small">{{ errors.BillDate }}</div>
@@ -1333,7 +1342,7 @@
                     Total Page No
                 </label>
                 <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"
-                    (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                     [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
             </div>
             <div class="col-6 mb-3">
@@ -1343,17 +1352,7 @@
                 <input id="callNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.CallNo"
                     [disabled]="isViewOnly" [ngModelOptions]="{standalone: true}" placeholder="Enter call no"/>                
             </div>
-            <div class="col-6 mb-3">
-                <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
-                    Accession No
-                </label>
-                <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
-                [disabled] = "isViewOnly" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter accession no"/>  
-                @if (errors.AccessionNo) {
-                <div class="text-danger mt-1 small">{{ errors.AccessionNo }}</div>
-                }                
-            </div>
+            
             <div class="col-6 mb-3">
                 <label class="d-block small fw-medium text-secondary mb-1" for="source">
                     Source
