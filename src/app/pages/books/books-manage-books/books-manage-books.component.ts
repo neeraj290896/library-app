@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { BookService } from '@services/book.service';
-import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, UserDetails } from '@app/shared/models/api.models';
+import { AuthorDetails, BookCirculationDetails, BookDetails, BuildingDetails, CategoryDetails, FloorDetails, LanguageDetails, PublisherDetails, RackDetails, SourceDetails, SubjectDetails, UserDetails } from '@app/shared/models/api.models';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthorService } from '@app/shared/services/author.service';
 import { PublisherService } from '@app/shared/services/publisher.service';
@@ -35,6 +35,8 @@ import { AddWishlistComponent } from '../add-wishlist/add-wishlist.component';
 import { environment } from '../../../../environments/environment';
 import { UserService } from '@app/shared/services/user.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { SubjectService } from '@app/shared/services/subject.service';
+import { SourceService } from '@app/shared/services/source.service';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -74,6 +76,8 @@ export class BooksManageBooksComponent implements OnInit {
     private _bcService = inject(BookCirculationService);
     public _authService = inject(AuthService);
     public userService = inject(UserService);
+    public subjectService = inject(SubjectService);
+    public sourceService = inject(SourceService);
     private confirmationService = inject(ConfirmationService);
 
     @ViewChild('dt') dataTable: Table | undefined;
@@ -83,6 +87,8 @@ export class BooksManageBooksComponent implements OnInit {
     public authors: AuthorDetails[] = [];
     public publishers: PublisherDetails[] = [];
     public categories: CategoryDetails[] = [];
+    public subjects: SubjectDetails[] = [];
+    public sources: SourceDetails[] = [];
     public languages: LanguageDetails[] = [];
     public buildings: BuildingDetails[] = [];
     public floors: FloorDetails[] = [];
@@ -92,14 +98,16 @@ export class BooksManageBooksComponent implements OnInit {
     public authorNameList: { label: string, value: string }[] = [];
     public publisherNameList: { label: string, value: string }[] = [];
     public categoryNameList: { label: string, value: string }[] = [];
-    public languageNameList: { label: string, value: string }[] = [];
+    public accessionNoList: { label: string, value: string }[] = [];
+    public subjectList: { label: string, value: string }[] = [];
     public publishedYearList: { label: number, value: number }[] = [];
     public statusList: { label: string, value: boolean }[] = [];
     public selectedBookNameList: string[] = [];
     public selectedAuthorNameList: string[] = [];
     public selectedPublisherNameList: string[] = [];
     public selectedCategoryNameList: string[] = [];
-    public selectedLanguageNameList: string[] = [];
+    public selectedSubjectList: string[] = [];
+    public selectedAccessionNoList: string[] = [];
     public selectedPublishedYearList: number[] = [];
     public selectedStatusList: boolean[] = [];
     public bookDialogVisible = false;
@@ -118,6 +126,15 @@ export class BooksManageBooksComponent implements OnInit {
         LanguageName: '',
         PublishedYear: null,
         Price: 0,
+        BillNo: '',
+        BillDate:null,
+        TotalPageNo:null,
+        CallNo: '',
+        AccessionNo: '',
+        SourceId: null,
+        SourceName: '',
+        SubjectId: null,
+        SubjectName: '',
         Status: 'Available',
         BuildingId: null,
         BuildingName: '',
@@ -138,9 +155,12 @@ export class BooksManageBooksComponent implements OnInit {
         LanguageId: string,
         PublishedYear: string,
         Price: string,
+        BillDate: string,
         BuildingId: string,
         FloorId: string,
         RackId: string,
+        SubjectId: string,
+        AccessionNo: string,
         BookBarcode: string,
         IsActive: string
     } = {
@@ -151,15 +171,20 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
+            AccessionNo: '',
             BookBarcode: '',
             IsActive: ''
         };
     public authorOptions: { label: string; value: number; }[] = [];
     public publisherOptions: { label: string; value: number; }[] = [];
     public categoryOptions: { label: string; value: number; }[] = [];
+    public subjectOptions: { label: string; value: number; }[] = [];
+    public sourceOptions: { label: string; value: number; }[] = [];
     public languageOptions: { label: string; value: number; }[] = [];
     public buildingOptions: { label: string; value: number; }[] = [];
     public floorOptions: { label: string; value: number; }[] = [];
@@ -183,6 +208,14 @@ export class BooksManageBooksComponent implements OnInit {
     public importPublishedYearList: { label: number, value: number }[] = [];
     public importStatusList: { label: string, value: boolean }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
+    public importBillNoList: { label: string, value: string }[] = [];
+    public importBillDateList: { label: string, value: string }[] = [];
+    public importTotalPageNoList: { label: number, value: number }[] = [];
+    public importCallNoList: { label: string, value: string }[] = [];
+    public importAccessionNoList: { label: string, value: string }[] = [];
+    public importSourceList: { label: string, value: string }[] = [];
+    public importSubjectList: { label: number, value: number }[] = [];
+
     public importSelectedBookNameList: string[] = [];
     public importSelectedAuthorNameList: string[] = [];
     public importSelectedPublisherNameList: string[] = [];
@@ -191,6 +224,13 @@ export class BooksManageBooksComponent implements OnInit {
     public importSelectedPublishedYearList: number[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
+    public importSelectedBillNoList: string[] = [];
+    public importSelectedBillDateList: string[] = [];
+    public importSelectedTotalPageNoList: string[] = [];
+    public importSelectedCallNoList: string[] = [];
+    public importSelectedAccessionNoList: string[] = [];
+    public importSelectedSourceList: string[] = [];
+    public importSelectedSubjectList: number[] = [];
 
     public activeTab: number = 0;
 
@@ -208,16 +248,30 @@ export class BooksManageBooksComponent implements OnInit {
     public isBarcodeSearch : boolean = false;
     public searchUserTerm: string = '';
     public lstUserDetails: UserDetails[] = [];
+    public minDate: Date | undefined;
+    public maxDate: Date | undefined;
+    public billDate: Date | null = null;
 
     ngOnInit(): void {
         const today = new Date();
         this.todayDate = this.parseCustomDateStringForUI(today);
 
+        this.maxDate = new Date();  
+
+        this.minDate = new Date();
+        this.minDate.setMonth(today.getMonth() - 1);        
+
+        this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+
+               
+        
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
         this.loadBooks();
         this.loadAuthors();
         this.loadPublishers();
         this.loadCategories();
+        this.loadSubjects();
+        this.loadSources();
         this.loadLanguages();
         this.loadBuildings();
         this.loadFloors();
@@ -345,6 +399,34 @@ export class BooksManageBooksComponent implements OnInit {
         });
     }
 
+    loadSubjects(): void {
+        this.subjectService.getSubjectDetails().subscribe({
+            next: (data: SubjectDetails[]) => {
+                this.subjects = data;
+                this.subjectOptions = data.filter(x => x.IsActive == true).map(subject => {
+                    return { label: subject.SubjectName ?? '', value: subject.SubjectId };
+                });
+            },
+            error: (err) => {
+                console.error('Error loading subjects:', err);
+            }
+        });
+    }
+
+    loadSources(): void {
+        this.sourceService.getSourceDetails().subscribe({
+            next: (data: SourceDetails[]) => {
+                this.sources = data;
+                this.sourceOptions = data.filter(x => x.IsActive == true).map(subject => {
+                    return { label: subject.SourceName ?? '', value: subject.SourceId };
+                });
+            },
+            error: (err) => {
+                console.error('Error loading sources:', err);
+            }
+        });
+    }
+
     loadLanguages(): void {
         this.languageService.getLanguageDetails().subscribe({
             next: (data: LanguageDetails[]) => {
@@ -404,9 +486,11 @@ export class BooksManageBooksComponent implements OnInit {
             .map(e => ({ label: e!, value: e! }));
         this.categoryNameList = [...new Set(this.books.map(book => book.CategoryName))]
             .map(e => ({ label: e!, value: e! }));
-        this.languageNameList = [...new Set(this.books.map(book => book.LanguageName))]
+        this.accessionNoList = [...new Set(this.books.map(book => book.AccessionNo))]
             .map(e => ({ label: e!, value: e! }));
         this.publishedYearList = [...new Set(this.books.map(book => book.PublishedYear))]
+            .map(e => ({ label: e!, value: e! }));
+        this.subjectList = [...new Set(this.books.map(book => book.SubjectName))]
             .map(e => ({ label: e!, value: e! }));
         this.statusList = [...new Set(this.books.map(book => book.IsActive ?? false))]
             .map(e => ({ label: e ? 'Active' : 'In-Active', value: e }));
@@ -445,7 +529,8 @@ export class BooksManageBooksComponent implements OnInit {
         this.selectedAuthorNameList = [];
         this.selectedPublisherNameList = [];
         this.selectedCategoryNameList = [];
-        this.selectedLanguageNameList = [];
+        this.selectedAccessionNoList = [];
+        this.selectedSubjectList = [];
         this.selectedPublishedYearList = [];
         this.selectedStatusList = [];
         this.showFt = false;
@@ -487,6 +572,8 @@ export class BooksManageBooksComponent implements OnInit {
                     return { label: rack.RackLabel ?? '', value: rack.RackId };
                 });
 
+            this.billDate = book.BillDate ? new Date(book.BillDate) : null;
+
             if(this.currentBook.Status == "Unavailable")
             {
                 this.currentBook.Status = "Available";
@@ -506,6 +593,15 @@ export class BooksManageBooksComponent implements OnInit {
                 LanguageName: '',
                 PublishedYear: null,
                 Price: 0,
+                BillNo: '',
+                BillDate:null,
+                TotalPageNo:null,
+                CallNo: '',
+                AccessionNo: '',
+                SourceId:null,
+                SourceName: '',
+                SubjectId: 0,
+                SubjectName: '',
                 Status: 'Available',
                 BuildingId: null,
                 BuildingName: '',
@@ -530,9 +626,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -559,6 +658,8 @@ export class BooksManageBooksComponent implements OnInit {
                 .map(rack => {
                     return { label: rack.RackLabel ?? '', value: rack.RackId };
                 });
+
+            this.billDate = book.BillDate ? new Date(book.BillDate) : null;
         }
 
         this.errors = {
@@ -569,9 +670,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -596,6 +700,32 @@ export class BooksManageBooksComponent implements OnInit {
         }
 
         this.validateInput('CategoryId');
+    }
+
+    onSubjectChange(): void {
+        const subject = this.subjectOptions.find(s => s.value === this.currentBook.SubjectId);
+        if (subject) {
+            this.currentBook.SubjectName = subject.label;
+        }
+        else
+        {
+            this.currentBook.SubjectName = '';
+        }
+
+        this.validateInput('SubjectId');
+    }
+
+    onSourceChange():void{
+        const _source = this.sourceOptions.find(s => s.value === this.currentBook.SourceId);
+        if (_source) {
+            this.currentBook.SourceName = _source.label;
+        }
+        else
+        {
+            this.currentBook.SourceName = '';
+        }
+
+        // this.validateInput('SourceId');
     }
 
     onPublisherChange(): void {
@@ -678,6 +808,22 @@ export class BooksManageBooksComponent implements OnInit {
         }
 
         this.validateInput('RackId');
+    }
+
+    onBillDateChange():void{
+        if (this.billDate) {
+            // this.dobDate.setHours(0, 0, 0, 0);
+             // Reverse the 5 hour 30 min shift (in minutes: 5 * 60 + 30 = 330)
+            const userTimezoneOffset = this.billDate.getTimezoneOffset(); // Will be -330 for India    
+            const correctedDate = new Date(this.billDate.getTime() - (userTimezoneOffset * 60 * 1000));    
+
+            this.currentBook.BillDate = correctedDate.toISOString().split('T')[0] + 'T00:00:00.000Z';
+        }
+        else {
+            this.currentBook.BillDate = null;
+        }
+
+        this.validateInput('BillDate');
     }
 
     validateInput(key: string): boolean {
@@ -766,7 +912,12 @@ export class BooksManageBooksComponent implements OnInit {
                 if (!/^\d+(\.\d+)?$/.test(this.currentBook.Price?.toString().trim() ?? '')) {
                     this.errors.Price = 'Price is required and must be a valid input.';
                     isValid = false;
-                } else {
+                } 
+                else if(!(this.currentBook.Price!=null && this.currentBook.Price >0)){
+                    this.errors.Price = 'Price must be a valid input.';
+                    isValid = false;
+                }
+                else {
                     this.errors.Price = '';
                 }
                 break;
@@ -815,25 +966,73 @@ export class BooksManageBooksComponent implements OnInit {
                     this.errors.RackId = '';
                 }
                 break;
-
-            case 'BookBarcode':
-                if (!this.currentBook.BookBarcode?.trim()) {
-                    this.errors.BookBarcode = 'Barcode is required.';
+            
+            case 'SubjectId':
+                if (!this.currentBook.SubjectId) {
+                    this.errors.SubjectId = 'Subject is required.';
+                    isValid = false;
+                } 
+                else if(!(this.subjectOptions.some(option => option.value === this.currentBook.SubjectId)))
+                {
+                    this.errors.SubjectId = 'Please Select valid Subject.';
+                    isValid = false;
+                }
+                else {
+                    this.errors.SubjectId = '';
+                }
+                break;
+            case 'AccessionNo':
+                if (!this.currentBook.AccessionNo?.trim()) {
+                    this.errors.AccessionNo = 'AccessionNo is required.';
+                    isValid = false;
+                }
+                else if (!/^\d+$/.test(this.currentBook.AccessionNo.trim())) {
+                    this.errors.AccessionNo = 'AccessionNo must contain numbers only.';
+                    isValid = false;
+                }
+                else if (this.currentBook.AccessionNo.trim().length < 6) {
+                    this.errors.AccessionNo = 'AccessionNo must be at least 6 characters.';
+                    isValid = false;
+                }
+                else if (this.currentBook.BookId == 0 && this.books.find(x => x.AccessionNo == this.currentBook.AccessionNo?.trim())) {
+                    this.errors.AccessionNo = 'AccessionNo already exists.';
+                    isValid = false;
+                }
+                else if (this.currentBook.BookId > 0 && this.books.find(x => x.AccessionNo == this.currentBook.AccessionNo?.trim() && x.BookId != this.currentBook.BookId)) {
+                    this.errors.AccessionNo = 'AccessionNo already exists.';
+                    isValid = false;
+                }
+                else {
+                    this.errors.AccessionNo = '';
+                }
+                break;
+            case 'BillDate':
+                if ((this.currentBook.BillNo?.trim()) && !(this.currentBook.BillDate?.trim())) {
+                    this.errors.BillDate = 'BillDate is required.';
                     isValid = false;
                 } else {
-                    this.errors.BookBarcode = '';
+                    this.errors.BillDate = '';
                 }
                 break;
 
-            case 'IsActive':
-                if (this.currentBook.IsActive === null) {
-                    this.errors.IsActive = 'Status is required.';
-                    isValid = false;
-                } else {
-                    this.errors.IsActive = '';
+            // case 'BookBarcode':
+            //     if (!this.currentBook.BookBarcode?.trim()) {
+            //         this.errors.BookBarcode = 'Barcode is required.';
+            //         isValid = false;
+            //     } else {
+            //         this.errors.BookBarcode = '';
+            //     }
+            //     break;
 
-                }
-                break;
+            // case 'IsActive':
+            //     if (this.currentBook.IsActive === null) {
+            //         this.errors.IsActive = 'Status is required.';
+            //         isValid = false;
+            //     } else {
+            //         this.errors.IsActive = '';
+
+            //     }
+            //     break;
 
             default:
                 break;
@@ -853,12 +1052,14 @@ export class BooksManageBooksComponent implements OnInit {
         const isBuildingIdValid = this.validateInput('BuildingId');
         const isFloorIdValid = this.validateInput('FloorId');
         const isRackIdValid = this.validateInput('RackId');
-        // const isBookBarcodeValid = this.validateInput('BookBarcode');
+        const isSubjectIdValid = this.validateInput('SubjectId');
+        const isAccessionNoValid = this.validateInput('AccessionNo');
+        const isBillDateValid = this.validateInput('BillDate');
         // const isStatusValid = this.validateInput('IsActive');
         return isBookNameValid && isAuthorIdValid && isPublisherIdValid &&
             isCategoryIdValid && isLanguageIdValid && isPublishedYearValid &&
             isPriceValid && isBuildingIdValid && isFloorIdValid &&
-            isRackIdValid;
+            isRackIdValid && isSubjectIdValid && isAccessionNoValid && isBillDateValid;// && isStatusValid;
     }
 
     saveBook(): void {
@@ -870,7 +1071,7 @@ export class BooksManageBooksComponent implements OnInit {
 
         if(this.currentBook.BookId == null || this.currentBook.BookId == 0)
         {
-            const isBookExistsAlready = this.books.find(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
+            const isBookExistsAlready = this.books.find(x => x.AccessionNo == this.currentBook.AccessionNo && x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
                             x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
                             x.PublishedYear == this.currentBook.PublishedYear);
 
@@ -889,9 +1090,9 @@ export class BooksManageBooksComponent implements OnInit {
         }
         else
         {
-            const isBookExistsAlready = this.books.find(x => x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
+            const isBookExistsAlready = this.books.find(x =>  x.AccessionNo == this.currentBook.AccessionNo && x.BookName == this.currentBook.BookName && x.AuthorId == this.currentBook.AuthorId && 
                             x.PublisherId == this.currentBook.PublisherId && x.CategoryId == this.currentBook.CategoryId && x.LanguageId == this.currentBook.LanguageId &&
-                            x.PublishedYear == this.currentBook.PublishedYear);
+                            x.PublishedYear == this.currentBook.PublishedYear && x.BookId != this.currentBook.BookId);
 
             if(isBookExistsAlready !=null && isBookExistsAlready.BookId >0 && isBookExistsAlready.BookId != this.currentBook.BookId)
             {
@@ -1100,8 +1301,8 @@ export class BooksManageBooksComponent implements OnInit {
         };
 
         const worksheet = workbook.addWorksheet('Books');
-        worksheet.addRow(['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)',
-            'BUILDING', 'FLOOR', 'RACK']);
+        worksheet.addRow(['ACCESSION NO','BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)', 'BILL NO', 'BILL DATE', 
+                'TOTAL PAGE NO', 'CALL NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK']);
 
         worksheet.getRow(1).eachCell(cell => {
             cell.style = headerStyle;
@@ -1109,7 +1310,7 @@ export class BooksManageBooksComponent implements OnInit {
 
         worksheet.autoFilter = {
             from: 'A1',
-            to: 'J1'
+            to: 'Q1'
         };
 
         const authorsSheet = workbook.addWorksheet('AuthorList');
@@ -1129,6 +1330,18 @@ export class BooksManageBooksComponent implements OnInit {
             categoriesSheet.getCell(idx + 1, 1).value = cat.CategoryName;
         });
         categoriesSheet.state = 'hidden';
+
+        const subjectSheet = workbook.addWorksheet('SubjectList');
+        this.subjects.filter(x => x.IsActive == true).forEach((cat, idx) => {
+            subjectSheet.getCell(idx + 1, 1).value = cat.SubjectName;
+        });
+        subjectSheet.state = 'hidden';
+
+        const sourceSheet = workbook.addWorksheet('SourceList');
+        this.sources.filter(x => x.IsActive == true).forEach((cat, idx) => {
+            sourceSheet.getCell(idx + 1, 1).value = cat.SourceName;
+        });
+        sourceSheet.state = 'hidden';
 
         const languagesSheet = workbook.addWorksheet('LanguageList');
         this.languages.filter(x => x.IsActive == true).forEach((lang, idx) => {
@@ -1155,7 +1368,19 @@ export class BooksManageBooksComponent implements OnInit {
         racksSheet.state = 'hidden';
 
         for (let rowIndex = 2; rowIndex <= 1000; rowIndex++) {
-            const authorCell = worksheet.getCell(rowIndex, 2);
+
+            const accessionCell = worksheet.getCell(rowIndex, 1);
+            accessionCell.dataValidation = {
+                type: 'whole',
+                operator: 'between',
+                formulae: ['000001', '999999'],
+                allowBlank: true,
+                showErrorMessage: true,
+                errorTitle: 'Invalid AccessionNo',
+                error: 'Please enter a 6-digit accessionNo (e.g., 000001).'
+            };
+
+            const authorCell = worksheet.getCell(rowIndex, 3);
             authorCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1165,7 +1390,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid author from the list.'
             };
 
-            const publisherCell = worksheet.getCell(rowIndex, 3);
+            const publisherCell = worksheet.getCell(rowIndex, 4);
             publisherCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1175,7 +1400,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid publisher from the list.'
             };
 
-            const categoryCell = worksheet.getCell(rowIndex, 4);
+            const categoryCell = worksheet.getCell(rowIndex, 5);
             categoryCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1185,7 +1410,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid category from the list.'
             };
 
-            const languageCell = worksheet.getCell(rowIndex, 5);
+            const languageCell = worksheet.getCell(rowIndex, 6);
             languageCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1195,7 +1420,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid language from the list.'
             };
 
-            const yearCell = worksheet.getCell(rowIndex, 6);
+            const yearCell = worksheet.getCell(rowIndex, 7);
             yearCell.dataValidation = {
                 type: 'whole',
                 operator: 'between',
@@ -1206,7 +1431,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please enter a 4-digit year (e.g., 2024).'
             };
 
-            const priceCell = worksheet.getCell(rowIndex, 7);
+            const priceCell = worksheet.getCell(rowIndex, 8);
             priceCell.dataValidation = {
                 type: 'decimal',
                 operator: 'greaterThan',
@@ -1217,7 +1442,42 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please enter a valid price (greater than 0).'
             };
 
-            const buildingCell = worksheet.getCell(rowIndex, 8);
+            //9 --> BillNo, 10 --> BillDate
+
+            const pageNoCell = worksheet.getCell(rowIndex, 11);
+            pageNoCell.dataValidation = {
+                type: 'whole',
+                operator: 'greaterThan',
+                formulae: ['0'],
+                allowBlank: true,
+                showErrorMessage: true,
+                errorTitle: 'Invalid Total PageNo',
+                error: 'Please enter a valid total pageNo (greater than 0).'
+            };
+
+            //12 --? CallNo            
+
+            const sourceCell = worksheet.getCell(rowIndex, 13);
+            sourceCell.dataValidation = {
+                type: 'list',
+                allowBlank: true,
+                formulae: [`SourceList!$A$1:$A$${this.sources.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Source',
+                error: 'Please select a valid source from the list.'
+            };
+
+            const subjectCell = worksheet.getCell(rowIndex, 14);
+            subjectCell.dataValidation = {
+                type: 'list',
+                allowBlank: false,
+                formulae: [`SubjectList!$A$1:$A$${this.subjects.length}`],
+                showErrorMessage: true,
+                errorTitle: 'Invalid Subject',
+                error: 'Please select a valid subject from the list.'
+            };
+
+            const buildingCell = worksheet.getCell(rowIndex, 15);
             buildingCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1227,7 +1487,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid building from the list.'
             };
 
-            const floorCell = worksheet.getCell(rowIndex, 9);
+            const floorCell = worksheet.getCell(rowIndex, 16);
             floorCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1237,7 +1497,7 @@ export class BooksManageBooksComponent implements OnInit {
                 error: 'Please select a valid floor for a selected building.'
             };
 
-            const rackCell = worksheet.getCell(rowIndex, 10);
+            const rackCell = worksheet.getCell(rowIndex, 17);
             rackCell.dataValidation = {
                 type: 'list',
                 allowBlank: false,
@@ -1308,8 +1568,8 @@ export class BooksManageBooksComponent implements OnInit {
                 }
 
                 const headerRow = Object.keys(rows[0] || {});
-                const expectedHeaders = ['BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR',
-                    'PRICE(₹)', 'BUILDING', 'FLOOR', 'RACK'];
+                const expectedHeaders = ['ACCESSION NO','BOOK', 'AUTHOR', 'PUBLISHER', 'CATEGORY', 'LANGUAGE', 'YEAR', 'PRICE(₹)', 'BILL NO', 'BILL DATE', 
+                'TOTAL PAGE NO', 'CALL NO', 'SOURCE', 'SUBJECT', 'BUILDING', 'FLOOR', 'RACK'];
                 if (headerRow.length < expectedHeaders.length || !expectedHeaders.some(header => headerRow.includes(header))) {
                     this.importUploadError = `Invalid headers. Expected: ${expectedHeaders.join(', ')}`;
                     return;
@@ -1318,7 +1578,7 @@ export class BooksManageBooksComponent implements OnInit {
                 rows.forEach((row: any) => {
 
                     // console.log('rows :', rows);
-
+                    const accessionNo = row['ACCESSION NO']?.toString().trim();
                     const bookName = row['BOOK']?.toString().trim();
                     const authorName = row['AUTHOR']?.toString().trim();
                     const publisherName = row['PUBLISHER']?.toString().trim();
@@ -1326,6 +1586,12 @@ export class BooksManageBooksComponent implements OnInit {
                     const languageName = row['LANGUAGE']?.toString().trim();
                     const publishedYear = Number(row['YEAR']?.toString().trim());
                     const price = Number(row['PRICE(₹)']?.toString().trim());
+                    const billNo = row['BILL NO']?.toString().trim();
+                    const billDate = row['BILL DATE']?.toString().trim();
+                    const totalPageNo = row['TOTAL PAGE NO']?.toString().trim();
+                    const callNo = row['CALL NO']?.toString().trim();                    
+                    const source = row['SOURCE']?.toString().trim();
+                    const subjectName = row['SUBJECT']?.toString().trim();
                     const buildingName = row['BUILDING']?.toString().trim();
                     const floorName = row['FLOOR']?.toString().trim();
                     const rackLabel = row['RACK']?.toString().trim();
@@ -1347,6 +1613,14 @@ export class BooksManageBooksComponent implements OnInit {
                         LanguageName: languageName,
                         PublishedYear: publishedYear,
                         Price: price,
+                        BillNo: billNo,
+                        BillDate: billDate ?new Date(billDate).toISOString() : null,
+                        TotalPageNo: totalPageNo,
+                        CallNo: callNo,
+                        AccessionNo: accessionNo,
+                        SourceId:null,
+                        SourceName: source,
+                        SubjectName: subjectName,                        
                         Status: 'Available',
                         BuildingId: null,
                         BuildingName: buildingName,
@@ -1391,6 +1665,8 @@ export class BooksManageBooksComponent implements OnInit {
                 return { label: rack.RackLabel ?? '', value: rack.RackId };
             });
 
+        this.billDate = book.BillDate ? new Date(book.BillDate) : null;
+
         this.errors = {
             BookName: '',
             AuthorId: '',
@@ -1399,9 +1675,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -1411,6 +1690,8 @@ export class BooksManageBooksComponent implements OnInit {
 
     viewImportBook(book: BookDetails): void {
         this.currentBook = { ...book };
+
+        console.log('viewImportBook book :', book);
         this.header = 'View Book';
         this.publishedDate = book.PublishedYear ? new Date(book.PublishedYear, 0, 1) : null;
 
@@ -1427,6 +1708,8 @@ export class BooksManageBooksComponent implements OnInit {
                 return { label: rack.RackLabel ?? '', value: rack.RackId };
             });
 
+        this.billDate = book.BillDate ? new Date(book.BillDate) : null;
+
         this.errors = {
             BookName: '',
             AuthorId: '',
@@ -1435,9 +1718,12 @@ export class BooksManageBooksComponent implements OnInit {
             LanguageId: '',
             PublishedYear: '',
             Price: '',
+            BillDate:'',
             BuildingId: '',
             FloorId: '',
             RackId: '',
+            SubjectId: '',
+            AccessionNo:'',
             BookBarcode: '',
             IsActive: ''
         };
@@ -1463,6 +1749,10 @@ export class BooksManageBooksComponent implements OnInit {
         this.validateImportInput('LanguageName', this.importIndex);
         this.validateImportInput('PublishedYear', this.importIndex);
         this.validateImportInput('Price', this.importIndex);
+        this.validateImportInput('BillDate', this.importIndex);
+        this.validateImportInput('SubjectName', this.importIndex);
+        this.validateImportInput('SourceName', this.importIndex);
+        this.validateImportInput('AccessionNo', this.importIndex);
         this.validateImportInput('BuildingName', this.importIndex);
         this.validateImportInput('FloorName', this.importIndex);
         this.validateImportInput('RackLabel', this.importIndex);
@@ -1479,16 +1769,42 @@ export class BooksManageBooksComponent implements OnInit {
         let isValid = true;
 
         switch (key) {
+            case 'AccessionNo':
+                if (!this.importPreview[index].AccessionNo?.trim()) {
+                    this.importPreview[index].Error = 'AccessionNo is required.';
+                    isValid = false;
+                }
+                else if (!/^\d+$/.test(this.importPreview[index].AccessionNo.trim())) {
+                    this.importPreview[index].Error = 'AccessionNo must contain numbers only.';
+                    isValid = false;
+                }
+                else if (this.importPreview[index].AccessionNo.trim().length < 6) {
+                    this.importPreview[index].Error = 'AccessionNo must be at least 6 characters.';
+                    isValid = false;
+                }
+                else if (this.books.find(x => x.AccessionNo == this.importPreview[index].AccessionNo?.trim())) {
+                    this.importPreview[index].Error = 'AccessionNo already exists.';
+                    isValid = false;
+                }
+                else if (this.importPreview.find((x, idx) => x.AccessionNo?.trim() == this.importPreview[index].AccessionNo?.trim() && idx !== index)) {
+                    this.importPreview[index].Error = 'Duplicate AccessionNo exists.';
+                    isValid = false;
+                }
+                else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+
             case 'BookName':
                 if (!this.importPreview[index].BookName?.trim()) {
                     this.importPreview[index].Error = 'Book Name is required.';
                     isValid = false;
                 }
-                else if (this.books.find(x => x.BookName == this.importPreview[index].BookName?.trim() && (x.AuthorName == this.importPreview[index].AuthorName?.trim() || x.PublisherName == this.importPreview[index].PublisherName?.trim()))) {
+                else if (this.books.find(x => x.BookName == this.importPreview[index].BookName?.trim() && x.AccessionNo == this.importPreview[index].AccessionNo?.trim())) {
                     this.importPreview[index].Error = 'Book already exists.';
                     isValid = false;
                 }
-                else if (this.importPreview.find((x, idx) => x.BookName?.trim() === this.importPreview[index].BookName?.trim() && idx !== index)) {
+                else if (this.importPreview.find((x, idx) => x.BookName?.trim() === this.importPreview[index].BookName?.trim() && x.AccessionNo == this.importPreview[index].AccessionNo?.trim() && idx !== index)) {
                     this.importPreview[index].Error = 'Duplicate BookName exists.';
                     isValid = false;
                 }
@@ -1497,17 +1813,17 @@ export class BooksManageBooksComponent implements OnInit {
                 }
                 break;
 
-            case 'AuthorName':
+            case 'AuthorName':                 
                 if (!this.importPreview[index].AuthorName?.trim()) {
                     this.importPreview[index].Error = 'Author is required.';
                     isValid = false;
                 }
-                else if (!this.authors.some(author => author.AuthorName?.toLowerCase() === this.importPreview[index].AuthorName?.trim().toLowerCase())) {
+                else if (!this.authors.some(author => author.AuthorName?.trim().toLowerCase() === this.importPreview[index].AuthorName?.trim().toLowerCase())) {
                     this.importPreview[index].Error = 'Author not enlisted.';
                     isValid = false;
                 }
-                else {
-                    const author = this.authors.find(a => a.AuthorName?.toLowerCase() === this.importPreview[index].AuthorName?.trim().toLowerCase());
+                else {                   
+                    const author = this.authors.find(a => a.AuthorName?.trim().toLowerCase() === this.importPreview[index].AuthorName?.trim().toLowerCase());
                     if (author) {
                         this.importPreview[index].AuthorId = author.AuthorId;
                         this.importPreview[index].AuthorName = author.AuthorName;
@@ -1521,12 +1837,12 @@ export class BooksManageBooksComponent implements OnInit {
                     this.importPreview[index].Error = 'Publisher is required.';
                     isValid = false;
                 }
-                else if (!this.publishers.some(publisher => publisher.PublisherName?.toLowerCase() === this.importPreview[index].PublisherName?.trim().toLowerCase())) {
+                else if (!this.publishers.some(publisher => publisher.PublisherName?.trim().toLowerCase() === this.importPreview[index].PublisherName?.trim().toLowerCase())) {
                     this.importPreview[index].Error = 'Publisher not enlisted.';
                     isValid = false;
                 }
                 else {
-                    const publisher = this.publishers.find(p => p.PublisherName?.toLowerCase() === this.importPreview[index].PublisherName?.trim().toLowerCase());
+                    const publisher = this.publishers.find(p => p.PublisherName?.trim().toLowerCase() === this.importPreview[index].PublisherName?.trim().toLowerCase());
                     if (publisher) {
                         this.importPreview[index].PublisherId = publisher.PublisherId;
                         this.importPreview[index].PublisherName = publisher.PublisherName;
@@ -1540,12 +1856,12 @@ export class BooksManageBooksComponent implements OnInit {
                     this.importPreview[index].Error = 'Category is required.';
                     isValid = false;
                 }
-                else if (!this.categories.some(category => category.CategoryName?.toLowerCase() === this.importPreview[index].CategoryName?.trim().toLowerCase())) {
+                else if (!this.categories.some(category => category.CategoryName?.trim().toLowerCase() === this.importPreview[index].CategoryName?.trim().toLowerCase())) {
                     this.importPreview[index].Error = 'Category not enlisted.';
                     isValid = false;
                 }
                 else {
-                    const category = this.categories.find(c => c.CategoryName?.toLowerCase() === this.importPreview[index].CategoryName?.trim().toLowerCase());
+                    const category = this.categories.find(c => c.CategoryName?.trim().toLowerCase() === this.importPreview[index].CategoryName?.trim().toLowerCase());
                     if (category) {
                         this.importPreview[index].CategoryId = category.CategoryId;
                         this.importPreview[index].CategoryName = category.CategoryName;
@@ -1559,12 +1875,12 @@ export class BooksManageBooksComponent implements OnInit {
                     this.importPreview[index].Error = 'Language is required.';
                     isValid = false;
                 }
-                else if (!this.languages.some(lang => lang.LanguageName?.toLowerCase() === this.importPreview[index].LanguageName?.trim().toLowerCase())) {
+                else if (!this.languages.some(lang => lang.LanguageName?.trim().toLowerCase() === this.importPreview[index].LanguageName?.trim().toLowerCase())) {
                     this.importPreview[index].Error = 'Language not enlisted.';
                     isValid = false;
                 }
                 else {
-                    const language = this.languages.find(l => l.LanguageName?.toLowerCase() === this.importPreview[index].LanguageName?.trim().toLowerCase());
+                    const language = this.languages.find(l => l.LanguageName?.trim().toLowerCase() === this.importPreview[index].LanguageName?.trim().toLowerCase());
                     if (language) {
                         this.importPreview[index].LanguageId = language.LanguageId;
                         this.importPreview[index].LanguageName = language.LanguageName;
@@ -1598,12 +1914,12 @@ export class BooksManageBooksComponent implements OnInit {
                     this.importPreview[index].Error = 'Building is required.';
                     isValid = false;
                 }
-                else if (!this.buildings.some(building => building.BuildingName?.toLowerCase() === this.importPreview[index].BuildingName?.trim().toLowerCase())) {
+                else if (!this.buildings.some(building => building.BuildingName?.trim().toLowerCase() === this.importPreview[index].BuildingName?.trim().toLowerCase())) {
                     this.importPreview[index].Error = 'Building not enlisted.';
                     isValid = false;
                 }
                 else {
-                    const building = this.buildings.find(b => b.BuildingName?.toLowerCase() === this.importPreview[index].BuildingName?.trim().toLowerCase());
+                    const building = this.buildings.find(b => b.BuildingName?.trim().toLowerCase() === this.importPreview[index].BuildingName?.trim().toLowerCase());
                     if (building) {
                         this.importPreview[index].BuildingId = building.BuildingId;
                         this.importPreview[index].BuildingName = building.BuildingName;
@@ -1618,13 +1934,13 @@ export class BooksManageBooksComponent implements OnInit {
                     isValid = false;
                 }
                 else if (!this.floors.some(floor => floor.BuildingId === this.importPreview[index].BuildingId &&
-                    floor.FloorName?.toLowerCase() === this.importPreview[index].FloorName?.trim().toLowerCase())) {
+                    floor.FloorName?.trim().toLowerCase() === this.importPreview[index].FloorName?.trim().toLowerCase())) {
                     this.importPreview[index].Error = 'Floor not enlisted for the selected building.';
                     isValid = false;
                 }
                 else {
                     const floor = this.floors.find(f => f.BuildingId === this.importPreview[index].BuildingId &&
-                        f.FloorName?.toLowerCase() === this.importPreview[index].FloorName?.trim().toLowerCase());
+                        f.FloorName?.trim().toLowerCase() === this.importPreview[index].FloorName?.trim().toLowerCase());
                     if (floor) {
                         this.importPreview[index].FloorId = floor.FloorId;
                         this.importPreview[index].FloorNumber = floor.FloorNumber;
@@ -1658,7 +1974,52 @@ export class BooksManageBooksComponent implements OnInit {
                 }
                 break;
 
-            // case 'BookBarcode':
+            case 'SubjectName':
+                if (!this.importPreview[index].SubjectName?.trim()) {
+                    this.importPreview[index].Error = 'Subject is required.';
+                    isValid = false;
+                }
+                else if (!this.subjects.some(subject => subject.SubjectName?.trim().toLowerCase() === this.importPreview[index].SubjectName?.trim().toLowerCase())) {
+                    this.importPreview[index].Error = 'Subject not enlisted.';
+                    isValid = false;
+                }
+                else {
+                    const subject = this.subjects.find(s => s.SubjectName?.trim().toLowerCase() === this.importPreview[index].SubjectName?.trim().toLowerCase());
+                    if (subject) {
+                        this.importPreview[index].SubjectId = subject.SubjectId;
+                        this.importPreview[index].SubjectName = subject.SubjectName;
+                    }
+                    this.importPreview[index].Error = '';
+                }
+                break;
+                
+            case 'SourceName':
+                if (this.importPreview[index].SourceName?.trim()) {                    
+                    if (!this.sources.some(_src => _src.SourceName?.trim().toLowerCase() === this.importPreview[index].SourceName?.trim().toLowerCase())) {
+                        this.importPreview[index].Error = 'Source not enlisted.';
+                        isValid = false;
+                    }
+                    else {
+                        const _src = this.sources.find(s => s.SourceName?.trim().toLowerCase() === this.importPreview[index].SourceName?.trim().toLowerCase());
+                        if (_src) {
+                            this.importPreview[index].SourceId = _src.SourceId;
+                            this.importPreview[index].SourceName = _src.SourceName;
+                        }                        
+                        this.importPreview[index].Error = '';
+                    }
+                }
+                
+                break;
+            
+            case 'BillDate':
+                if ((this.importPreview[index].BillNo?.trim()) && !(this.importPreview[index].BillDate?.trim())) {
+                    this.importPreview[index].Error = 'BillDate is required.';
+                    isValid = false;
+                } else {
+                    this.importPreview[index].Error = '';
+                }
+                break;
+                // case 'BookBarcode':
             //     if (!this.importPreview[index].BookBarcode?.trim()) {
             //         this.importPreview[index].Error = 'Barcode is required.';
             //         isValid = false;
@@ -1696,8 +2057,11 @@ export class BooksManageBooksComponent implements OnInit {
                 this.validateImportInput('Price', index) &&
                 this.validateImportInput('BuildingName', index) &&
                 this.validateImportInput('FloorName', index) &&
-                this.validateImportInput('RackLabel', index);
-            // this.validateImportInput('BookBarcode', index) &&
+                this.validateImportInput('RackLabel', index) &&
+                this.validateImportInput('SubjectName', index) &&
+                this.validateImportInput('SourceName', index) &&
+                this.validateImportInput('AccessionNo', index) &&
+                this.validateImportInput('BillDate', index);
             // this.validateImportInput('IsActive', index);
         });
     }
@@ -1725,6 +2089,15 @@ export class BooksManageBooksComponent implements OnInit {
                 LanguageId: item.LanguageId,
                 LanguageName: item.LanguageName,
                 PublishedYear: item.PublishedYear,
+                BillNo: item.BillNo,
+                BillDate: item.BillDate,
+                TotalPageNo: item.TotalPageNo,
+                SourceId: item.SourceId,
+                SourceName:item.SourceName,
+                AccessionNo: item.AccessionNo,
+                SubjectId: item.SubjectId,
+                SubjectName: item.SubjectName,
+                CallNo: item.CallNo,
                 Price: item.Price,
                 Status: item.Status,
                 BuildingId: item.BuildingId,
@@ -1943,4 +2316,97 @@ export class BooksManageBooksComponent implements OnInit {
     printTable(): void {
         window.print();
     }
+
+   async downloadBooksDetails(): Promise<void> {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Books');
+
+        // 1. Define Column Properties & Styles Globally (Massive Performance Boost)
+        const bodyStyle: Partial<ExcelJS.Style> = {
+            border: {
+                top: { style: 'thin', color: { argb: '00000000' } },
+                left: { style: 'thin', color: { argb: '00000000' } },
+                bottom: { style: 'thin', color: { argb: '00000000' } },
+                right: { style: 'thin', color: { argb: '00000000' } },
+            },
+            alignment: { horizontal: 'center', vertical: 'middle', wrapText: false } // Wrap text slows down rendering
+        };
+
+        // Set fixed widths to avoid heavy auto-fit calculation loops
+        worksheet.columns = [
+            { header: 'ACCESSION NO', key: 'accessionNo', width: 20, style: bodyStyle },
+            { header: 'BOOK', key: 'bookName', width: 30, style: bodyStyle },
+            { header: 'AUTHOR', key: 'author', width: 25, style: bodyStyle },
+            { header: 'PUBLISHER', key: 'publisher', width: 25, style: bodyStyle },
+            { header: 'CATEGORY', key: 'category', width: 20, style: bodyStyle },
+            { header: 'LANGUAGE', key: 'language', width: 20, style: bodyStyle },
+            { header: 'YEAR', key: 'year', width: 15, style: bodyStyle },
+            { header: 'PRICE(₹)', key: 'price', width: 15, style: bodyStyle },
+            { header: 'BILL NO', key: 'billNo', width: 15, style: bodyStyle },
+            { header: 'BILL DATE', key: 'billDate', width: 15, style: bodyStyle },
+            { header: 'TOTAL PAGE NO', key: 'pageNo', width: 15, style: bodyStyle },
+            { header: 'CALL NO', key: 'callNo', width: 20, style: bodyStyle },            
+            { header: 'SOURCE', key: 'source', width: 20, style: bodyStyle },
+            { header: 'SUBJECT', key: 'subject', width: 20, style: bodyStyle },
+            { header: 'BUILDING', key: 'building', width: 20, style: bodyStyle },
+            { header: 'FLOOR', key: 'floor', width: 15, style: bodyStyle },
+            { header: 'RACK', key: 'rack', width: 15, style: bodyStyle },
+            { header: 'STATUS', key: 'status', width: 15, style: bodyStyle },
+            { header: 'CREATED DATE', key: 'createdDate', width: 15, style: bodyStyle }
+        ];
+
+        // 2. Format Header Row directly
+        const headerStyle: Partial<ExcelJS.Style> = {
+            font: { bold: true, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF22C55E' } },
+            ...bodyStyle
+        };
+        
+        worksheet.getRow(1).eachCell(cell => {
+            cell.style = headerStyle;
+        });
+
+        worksheet.autoFilter = { from: 'A1', to: 'S1' };
+
+        // 3. Fast Row Injection using Object Keys
+        // This allows ExcelJS to stream array values efficiently internal to its build process
+        const rowsData = this.books.map( (book : BookDetails) => ({
+            accessionNo: book.AccessionNo || '',
+            bookName: book.BookName || '',
+            author: book.AuthorName || '',
+            publisher: book.PublisherName || '',
+            category: book.CategoryName || '',
+            language: book.LanguageName || '',
+            year: book.PublishedYear || '',
+            price: book.Price || 0,
+            billNo: book.BillNo || '',
+            billDate: book.BillDate || '',
+            pageNo: book.TotalPageNo || 0,
+            callNo: book.CallNo || '',            
+            source: book.SourceName || '',
+            subject: book.SubjectName || '',
+            building: book.BuildingName || '',
+            floor: book.FloorName || '',
+            rack: book.RackLabel || '',
+            status: book.Status || '',
+            createdDate: book.CreatedDate || ''
+        }));
+
+        worksheet.addRows(rowsData);
+
+        // 4. File Generation
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, 'save-book-details.xlsx');
+    }
+
+    validateNumberInput(event: KeyboardEvent, allowedKeys : string[]): void {    
+        const isNumber = event.key >= '0' && event.key <= '9';
+    
+            // If it's not a number and not in our allowed keys list, block the input
+            if (!isNumber && !allowedKeys.includes(event.key)) {
+            event.preventDefault();
+            }
+        }
+
 }

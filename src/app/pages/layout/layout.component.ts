@@ -37,6 +37,7 @@ export class LayoutComponent {
         { path: '/books', label: 'Books', icon: 'pi pi-book' },
         { path: '/transactions', label: 'Transactions', icon: 'pi pi-sync' },
         { path: '/admin', label: 'Admin', icon: 'pi pi-shield' },
+        { path: '/organization', label: 'Organization', icon: 'pi pi-building-columns' },
         { path: '/settings', label: 'Settings', icon: 'pi pi-cog' },
         { path: '/help', label: 'Help', icon: 'pi pi-question-circle' },
     ];

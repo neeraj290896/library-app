@@ -237,7 +237,7 @@
                     State<sup>*</sup>
                 </label>
                 <p-select id="state" [(ngModel)]="currentBuilding.StateId" [ngModelOptions]="{standalone: true}"
-                    [editable]="true" [options]="stateOptions" optionLabel="label" optionValue="value"
+                     [options]="stateOptions" optionLabel="label" optionValue="value"
                     placeholder="Select State" styleClass="w-100" appendTo="body"
                     (ngModelChange)="onStateChange()"></p-select>                
                 <div *ngIf="errors.StateId" class="text-danger mt-1 small">{{ errors.StateId }}</div>
@@ -247,7 +247,7 @@
                     District<sup>*</sup>
                 </label>
                 <p-select id="district" [(ngModel)]="currentBuilding.DistrictId" [ngModelOptions]="{standalone: true}"
-                    [editable]="true" [options]="districtOptions" optionLabel="label" optionValue="value"
+                     [options]="districtOptions" optionLabel="label" optionValue="value"
                     placeholder="Select District" styleClass="w-100" appendTo="body"
                     (ngModelChange)="onDistrictChange()"></p-select>                
                 <div *ngIf="errors.DistrictId" class="text-danger mt-1 small">{{ errors.DistrictId }}</div>
@@ -257,7 +257,7 @@
                     City<sup>*</sup>
                 </label>
                 <p-select id="city" [(ngModel)]="currentBuilding.CityId" [ngModelOptions]="{standalone: true}"
-                    [editable]="true" [options]="cityOptions" optionLabel="label" optionValue="value"
+                     [options]="cityOptions" optionLabel="label" optionValue="value"
                     placeholder="Select City" styleClass="w-100" appendTo="body"
                     (ngModelChange)="onCityChange()"></p-select>                
                 <div *ngIf="errors.CityId" class="text-danger mt-1 small">{{ errors.CityId }}</div>
@@ -267,7 +267,7 @@
                     Area<sup>*</sup>
                 </label>
                 <p-select id="area" [(ngModel)]="currentBuilding.AreaId" [ngModelOptions]="{standalone: true}"
-                    [editable]="true" [options]="areaOptions" optionLabel="label" optionValue="value"
+                    [options]="areaOptions" optionLabel="label" optionValue="value"
                     placeholder="Select Area" styleClass="w-100" appendTo="body"
                     (ngModelChange)="onAreaChange()"></p-select>                
                 <div *ngIf="errors.AreaId" class="text-danger mt-1 small">{{ errors.AreaId }}</div>

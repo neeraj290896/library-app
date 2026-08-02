@@ -1,0 +1,28 @@
+<div class="org-container d-flex flex-column gap-4">
+    <div class="card border-0 shadow-sm rounded p-3 card-container">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fs-4 fw-semibold mb-1">Organization</h2>
+                <p class="small text-muted mb-0">Manage organization details</p>
+            </div>
+            <app-search></app-search>
+        </div>
+
+        <!-- Filter Tabs -->
+        <p-tabView [(activeIndex)]="activeTab" class="admin-tabs">            
+            <p-tabPanel header="Manage Buildings" >
+                <app-manage-building *ngIf="activeTab === 0"></app-manage-building>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Floors" >
+                <app-manage-floor *ngIf="activeTab === 1"></app-manage-floor>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Racks" >
+                <app-manage-rack *ngIf="activeTab === 2"></app-manage-rack>
+            </p-tabPanel>
+            <p-tabPanel header="Manage Organization" *ngIf="loggedInUserDetails?.RoleId == 1">
+                <app-manage-organization *ngIf="activeTab === 3"></app-manage-organization>
+            </p-tabPanel>
+        </p-tabView>
+    </div>
+</div>

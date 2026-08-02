@@ -16,221 +16,269 @@
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
     </div>
-    <p-table [value]="filteredBcDetails" [autoLayout]="false" [paginator]="true" [rows]="10"
-        [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+    <div style="overflow-x: auto;">
+        <p-table [value]="filteredBcDetails" [autoLayout]="false" [paginator]="true" [rows]="10"
+            [style]="{ minWidth: '2300px' }" [scrollable]="true" styleClass="p-datatable-sm"
+            [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
-        <ng-template pTemplate="header">
-            <tr class="border-bottom">
-                <th class="text-start text-muted fw-medium" style="width: 4%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
-                            S.No
-                            <p-sortIcon field="sno"></p-sortIcon>
+            <ng-template pTemplate="header">
+                <tr class="border-bottom">
+                    <th class="text-start text-muted fw-medium" style="width: 4%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="sno">
+                                S.No
+                                <p-sortIcon field="sno"></p-sortIcon>
+                            </div>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 12%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
-                            Book Name
-                            <p-sortIcon field="bookName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="bookName">
+                                Book Name
+                                <p-sortIcon field="bookName"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedBookNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 12%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="borrowerName">
-                            Borrower Name
-                            <p-sortIcon field="borrowerName"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="accessionNo">
+                                Accession No
+                                <p-sortIcon field="accessionNo"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedAccessionNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi"
-                            [ngClass]="selectedBorrowerNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <!-- <th class="text-start text-muted fw-medium" style="width: 12%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="issuedBy">
-                            Issued By
-                            <p-sortIcon field="issuedBy"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="subject">
+                                Subject
+                                <p-sortIcon field="subject"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedSubjectNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedIssuedByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th> -->
-                <th class="text-start text-muted fw-medium" style="width: 10%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="issuedDate">
-                            Issued On
-                            <p-sortIcon field="issuedDate"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="borrowerName">
+                                Borrower Name
+                                <p-sortIcon field="borrowerName"></p-sortIcon>
+                            </div>
+                            <span class="pi"
+                                [ngClass]="selectedBorrowerNameList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 8%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="status">
-                            Status
-                            <p-sortIcon field="status"></p-sortIcon>
+                    </th>
+                    <!-- <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="issuedBy">
+                                Issued By
+                                <p-sortIcon field="issuedBy"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedIssuedByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                        <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 12%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnBy">
-                            Returned By
-                            <p-sortIcon field="returnBy"></p-sortIcon>
+                    </th> -->
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="issuedDate">
+                                Issued On
+                                <p-sortIcon field="issuedDate"></p-sortIcon>
+                            </div>
                         </div>
-                        <span class="pi" [ngClass]="selectedReturnByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
-                            (click)="showFilter()"></span>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 10%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="returnDate">
-                            Returned On
-                            <p-sortIcon field="returnDate"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 8%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="status">
+                                Status
+                                <p-sortIcon field="status"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedStatusList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 10%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueFrom">
-                            Over Due From
-                            <p-sortIcon field="overDueFrom"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="returnBy">
+                                Returned By
+                                <p-sortIcon field="returnBy"></p-sortIcon>
+                            </div>
+                            <span class="pi" [ngClass]="selectedReturnByList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width:10%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
-                            Over Due in Days
-                            <p-sortIcon field="overDueDays"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="returnDate">
+                                Returned On
+                                <p-sortIcon field="returnDate"></p-sortIcon>
+                            </div>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width:10%;">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
-                            Over Due Status
-                            <p-sortIcon field="overDueStatus"></p-sortIcon>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="overDueFrom">
+                                Over Due From
+                                <p-sortIcon field="overDueFrom"></p-sortIcon>
+                            </div>
                         </div>
-                    </div>
-                </th>
-                <th class="text-start text-muted fw-medium" style="width: 5%;">
-                    View
-                </th>
-            </tr>
-            @if (showFt) {
-            <tr>
-                <th></th>
-                <th>
-                    <p-columnFilter field="bookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th>
-                    <p-columnFilter field="borrowerName" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="borrowerNameList" [(ngModel)]="selectedBorrowerNameList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <!-- <th>
-                    <p-columnFilter field="issuedBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="issuedByList" [(ngModel)]="selectedIssuedByList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th> -->
-                <th></th>
-                <th>
-                    <p-columnFilter field="status" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter>
-                </th>
-                <th><p-columnFilter field="returnBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
-                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                            <p-multiSelect [options]="returnByList" [(ngModel)]="selectedReturnByList"
-                                (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
-                                [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
-                                placeholder="All">
-                            </p-multiSelect>
-                        </ng-template>
-                    </p-columnFilter></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-            </tr>
-            }
-        </ng-template>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width:10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
+                                Over Due in Days
+                                <p-sortIcon field="overDueDays"></p-sortIcon>
+                            </div>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width:10%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
+                                Over Due Status
+                                <p-sortIcon field="overDueStatus"></p-sortIcon>
+                            </div>
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 5%;">
+                        View
+                    </th>
+                </tr>
+                @if (showFt) {
+                <tr>
+                    <th></th>
+                    <th>
+                        <p-columnFilter field="bookName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="bookNameList" [(ngModel)]="selectedBookNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="accessionNo" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="accessionNoList" [(ngModel)]="selectedAccessionNoList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="subjectName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="subjectNameList" [(ngModel)]="selectedSubjectNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th>
+                        <p-columnFilter field="borrowerName" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="borrowerNameList" [(ngModel)]="selectedBorrowerNameList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <!-- <th>
+                        <p-columnFilter field="issuedBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="issuedByList" [(ngModel)]="selectedIssuedByList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th> -->
+                    <th></th>
+                    <th>
+                        <p-columnFilter field="status" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="statusList" [(ngModel)]="selectedStatusList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
+                    <th><p-columnFilter field="returnBy" matchMode="in" [showMenu]="false" [showClearButton]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-multiSelect [options]="returnByList" [(ngModel)]="selectedReturnByList"
+                                    (onChange)="filter($event.value)" selectedItemsLabel="{0} items selected"
+                                    [resetFilterOnHide]="true" optionLabel="label" optionValue="value" appendTo="body"
+                                    placeholder="All">
+                                </p-multiSelect>
+                            </ng-template>
+                        </p-columnFilter></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                }
+            </ng-template>
 
-        <ng-template pTemplate="body" let-book let-index="rowIndex">
-            <tr class="border-bottom">
-                <td>{{ index + 1 }}</td>
-                <td>{{ book.BookName }}</td>
-                <td>{{ book.BorrowerName }}</td>
-                <!-- <td>{{ book.IssuedByUserName }}</td> -->
-                <td>{{ book.IssuedDate | date:'yyyy-MM-dd'}}</td>
-                <td>
-                    <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
-                </td>
-                <td>{{ book.ReturnByUserName }}</td>
-                <td>{{ book.ReturnDate | date:'yyyy-MM-dd'}}</td>
+            <ng-template pTemplate="body" let-book let-index="rowIndex">
+                <tr class="border-bottom">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ book.BookName }}</td>
+                    <td>{{ book.AccessionNo }}</td>
+                    <td>{{ book.SubjectName }}</td>
+                    <td>{{ book.BorrowerName }}</td>
+                    <!-- <td>{{ book.IssuedByUserName }}</td> -->
+                    <td>{{ book.IssuedDate | date:'yyyy-MM-dd'}}</td>
+                    <td>
+                        <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
+                    </td>
+                    <td>{{ book.ReturnByUserName }}</td>
+                    <td>{{ book.ReturnDate | date:'yyyy-MM-dd'}}</td>
 
-                <td>
-                    <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'"
-                        [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+                    <td>
+                        <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'"
+                            [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
 
-                </td>
-                <td>
-                    <p-tag [value]="book.OverDueDays  ?? '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
-                </td>
-                <td>
-                    <p-tag [value]="book.OverDueStatus  ?? '-'"
-                        [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
-                </td>
-                <td>
-                    <div class="d-flex align-items-center gap-2">
-                        <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
-                            class="p-button-rounded p-button-text p-button-sm"></button>
-                    </div>
-                </td>
-            </tr>
-        </ng-template>
+                    </td>
+                    <td>
+                        <p-tag [value]="book.OverDueDays  ?? '-'" [severity]="getOverDueSeverity(book.OverDueDays)"></p-tag>
+                    </td>
+                    <td>
+                        <p-tag [value]="book.OverDueStatus  ?? '-'"
+                            [severity]="getOverDueStatusSeverity(book.OverDueStatus, book.OverDueDays)"></p-tag>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <button pButton icon="pi pi-info-circle" (click)="viewBookCirculationDetails(book)"
+                                class="p-button-rounded p-button-text p-button-sm"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
 
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td colspan="12" class="text-center">No books returned.</td>
-            </tr>
-        </ng-template>
-    </p-table>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="14" class="text-center">No books returned.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
     @if (bcDialogVisible) {
     <app-issue-return-books [bc]="bc" [type]="type" [showDialog]="bcDialogVisible" [selectedBorrower]=null
         [isViewOnly]="true" (onSuccess)="getAllBookCirculartion()"

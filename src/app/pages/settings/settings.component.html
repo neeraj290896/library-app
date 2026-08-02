@@ -21,16 +21,16 @@
                     </div>
                     <div class="col-md-6">
                         <label class="d-block small fw-medium text-secondary mb-1">
-                            Fine Percentage ({{settingDetails.FinePercentage}})
+                            Fine Per Day (In Rupees)
                         </label>
                         <p-inputgroup>
-                            <input id="finePercentage" type="finePercentage" placeholder="Enter fine percentage"
+                            <input id="fine" type="fine" placeholder="Enter fine per day"
                                 pInputText class="form-control" [ngModelOptions]="{standalone: true}" [disabled] = "!enableAplnSettingsAccess"
-                                [(ngModel)]="finePercentage"
-                                (ngModelChange)="validateInput('FinePercentage', $event)" />
-                            <p-inputgroup-addon>%</p-inputgroup-addon>
+                                [(ngModel)]="settingDetails.Fine"
+                                (ngModelChange)="validateInput('Fine', $event)" />
+                            <p-inputgroup-addon>₹</p-inputgroup-addon>
                         </p-inputgroup>
-                        <div *ngIf="errors.FinePercentage" class="text-danger mt-1 small">{{ errors.FinePercentage }}
+                        <div *ngIf="errors.Fine" class="text-danger mt-1 small">{{ errors.Fine }}
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -120,7 +120,7 @@
             </p-accordion-header>
             <p-accordion-content>
                 <div class="row g-3 mt-0 mb-4">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label class="d-block small fw-medium text-secondary mb-1" for="fullName">
                             FullName<sup>*</sup>
                         </label>
@@ -129,35 +129,35 @@
                             placeholder="Enter FullName" (ngModelChange)="validateUserInput('FullName')" />
                         <div *ngIf="userErrors.FullName" class="text-danger mt-1 small">{{ userErrors.FullName }}</div>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label class="d-block small fw-medium text-secondary mb-1" for="role">
                             RoleName<sup>*</sup>
                         </label>
                         <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"
-                            [editable]="true" [options]="roleOptions" optionLabel="label" optionValue="value"
+                             [options]="roleOptions" optionLabel="label" optionValue="value"
                             placeholder="Select Role" styleClass="w-100" appendTo="body"
                             (ngModelChange)="onRoleChange()"
-                            [disabled]="loggedInUserDetails?.RoleId !== 1 && loggedInUserDetails?.RoleId !== 2" />
+                            [disabled]="!enableUserSettingsAccess" />
                         <div *ngIf="userErrors.RoleId" class="text-danger mt-1 small">{{ userErrors.RoleId }}</div>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label class="d-block small fw-medium text-secondary mb-1" for="gender">
                             Gender<sup>*</sup>
                         </label>
                         <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
-                            [editable]="true" [options]="genderOptions" optionLabel="label" optionValue="value"
+                             [options]="genderOptions" optionLabel="label" optionValue="value"
                             placeholder="Select Gender" styleClass="w-100" appendTo="body"
                             (ngModelChange)="validateUserInput('Gender')" />
                         <div *ngIf="userErrors.Gender" class="text-danger mt-1 small">{{ userErrors.Gender }}</div>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6">
                         <label class="d-block small fw-medium text-secondary mb-1" for="mailId">
                             MailId<sup>*</sup>
                         </label>
                         <input id="mailId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MailId"
                             [ngModelOptions]="{standalone: true}" placeholder="Enter MailId"
                             (ngModelChange)="validateUserInput('MailId')"
-                            [disabled]="loggedInUserDetails?.RoleId !== 1 && loggedInUserDetails?.RoleId !== 2" />
+                            [disabled]="!enableUserSettingsAccess" />
                         <div *ngIf="userErrors.MailId" class="text-danger mt-1 small">{{ userErrors.MailId }}</div>
                     </div>
                     <div class="col-md-6">
@@ -165,10 +165,10 @@
                             MobileNo<sup>*</sup>
                         </label>
                         <input id="mobile" type="text" class="form-control" pInputText maxlength="10"
-                            (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                            (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                             [(ngModel)]="currentUser.MobileNo" [ngModelOptions]="{standalone: true}"
                             placeholder="Enter MobileNo" (ngModelChange)="validateUserInput('MobileNo')"
-                            [disabled]="loggedInUserDetails?.RoleId !== 1 && loggedInUserDetails?.RoleId !== 2" />
+                            [disabled]="!enableUserSettingsAccess" />
                         <div *ngIf="userErrors.MobileNo" class="text-danger mt-1 small">{{ userErrors.MobileNo }}</div>
                     </div>
                     <div class="col-md-6">
@@ -181,6 +181,53 @@
                             (ngModelChange)="onDOBChange()" placeholder="Select DOB" styleClass="w-100"
                             inputStyleClass="w-100" />
                         <div *ngIf="userErrors.DOB" class="text-danger mt-1 small">{{ userErrors.DOB }}</div>
+                    </div>
+                    <div class="col-6" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="role">
+                            Department<sup>*</sup>
+                        </label>
+                        <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" 
+                            [disabled]="!enableUserSettingsAccess" [options]="departmentOptions" optionLabel="label" optionValue="value"
+                            placeholder="Select Department" styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
+                        <div *ngIf="userErrors.DepartmentId" class="text-danger mt-1 small">{{ userErrors.DepartmentId }}</div>
+                    </div>
+                    <div class="col-6" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="admissionNumber">
+                            Admission Number<sup>*</sup>
+                        </label>
+                        <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber" 
+                            [disabled]="!enableUserSettingsAccess" [ngModelOptions]="{standalone: true}" 
+                            placeholder="Enter AdmissionNumber"                             
+                            (ngModelChange)="validateUserInput('AdmissionNumber')" />
+                        <div *ngIf="userErrors.AdmissionNumber" class="text-danger mt-1 small">{{ userErrors.AdmissionNumber }}</div>
+                    </div>
+                    <div class="col-6" *ngIf="currentUser.RoleId !=null && currentUser.RoleId > departmentEligibleForRoleIdAbove && currentUser.RoleId < studentRoleId">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="staffId">
+                            StaffId<sup>*</sup>
+                        </label>
+                        <input id="staffId" type="text" class="form-control" pInputText [(ngModel)]="currentUser.StaffId"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId" [disabled]="!enableUserSettingsAccess" 
+                            (ngModelChange)="validateUserInput('StaffId')" />
+                        <div *ngIf="userErrors.StaffId" class="text-danger mt-1 small">{{ userErrors.StaffId }}</div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
+                            Library No:<sup>*</sup>
+                        </label>
+                        <input id="libraryNo" type="text" class="form-control" pInputText [(ngModel)]="currentUser.LibraryNo"
+                            [ngModelOptions]="{standalone: true}" placeholder="Enter Library No" [disabled]="!enableUserSettingsAccess"
+                            (ngModelChange)="validateUserInput('LibraryNo')" />
+                        <div *ngIf="userErrors.LibraryNo" class="text-danger mt-1 small">{{ userErrors.LibraryNo }}</div>
+                    </div>
+                    <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                        <label class="d-block small fw-medium text-secondary mb-1" for="batch">
+                            Batch<sup>*</sup>
+                        </label>
+                        <p-select id="batch" [(ngModel)]="currentUser.Batch" [ngModelOptions]="{standalone: true}" 
+                            [options]="batchOptions" optionLabel="label" optionValue="value" placeholder="Select Batch" 
+                            [disabled]="!enableUserSettingsAccess"
+                            styleClass="w-100" appendTo="body" (ngModelChange)="validateUserInput('Batch')" />
+                        <div *ngIf="userErrors.Batch" class="text-danger mt-1 small">{{ userErrors.Batch }}</div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3 justify-content-end border-top pt-4">
@@ -205,10 +252,91 @@
                 <div class="row g-3 mt-0">
                     <div class="d-flex gap-2 align-items-center col-md-12">
                         <p-button type="button" label="Reset Password" [style]="{ width: '10rem' }"
-                            styleClass="btn-main-danger"></p-button>
+                            styleClass="btn-main-danger" (click)="resetPassword()"></p-button>
                     </div>
                 </div>
             </p-accordion-content>
         </p-accordion-panel>
     </p-accordion>
 </div>
+
+ <p-dialog header="Reset Password" [(visible)]="resetPwdDialogVisible" [modal]="true"
+        [style]="{ width: '30vw' }" appendTo="body">
+    <div class="row">
+        <div class="col-12 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="currentPassword">
+                Current Password<sup>*</sup>
+            </label>
+            <div class="position-relative">
+                <input id="currentPassword" [type]="showCurrentPassword ? 'text' : 'password'" class="form-control pe-5" pInputText
+                    [(ngModel)]="resetCredPassword.OldPwd" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Current Password" />
+                <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                    (click)="showCurrentPassword = !showCurrentPassword"
+                    [attr.aria-label]="showCurrentPassword ? 'Hide password' : 'Show password'">
+                    <i class="pi" [ngClass]="showCurrentPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-12 mb-3 password-field-with-tooltip">
+            <label class="d-block small fw-medium text-secondary mb-1" for="newPassword">
+                New Password<sup>*</sup>
+            </label>
+            <div class="position-relative">
+                <input id="newPassword" [type]="showNewPassword ? 'text' : 'password'" class="form-control pe-5" pInputText
+                    [(ngModel)]="resetCredPassword.NewPwd" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter New Password" (input)="onPasswordInput($event)" />
+                <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                    (click)="showNewPassword = !showNewPassword"
+                    [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'">
+                    <i class="pi" [ngClass]="showNewPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-12 mb-3 password-field-with-tooltip">
+            <label class="d-block small fw-medium text-secondary mb-1" for="confirmPassword">
+                Confirm Password<sup>*</sup>
+            </label>
+            <div class="position-relative">
+                <input id="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5" pInputText
+                    [(ngModel)]="confirmPassword" [ngModelOptions]="{standalone: true}"
+                    placeholder="Enter Confirm Password" />
+                <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-muted"
+                    (click)="showConfirmPassword = !showConfirmPassword"
+                    [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'">
+                    <i class="pi" [ngClass]="showConfirmPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-12 mb-3">
+            <ul class="password-rules">
+                <li [class.valid]="passwordRules.minLength">
+                Length is between 8 and 45 characters
+                </li>
+                <li [class.valid]="passwordRules.upperCase">
+                Contains at least 1 upper case letter
+                </li>
+                <li [class.valid]="passwordRules.lowerCase">
+                Contains at least 1 lower case letter
+                </li>
+                <li [class.valid]="passwordRules.number">
+                Contains at least 1 number
+                </li>
+                <li [class.valid]="passwordRules.specialChar">
+                Contains at least 1 allowed special character
+                </li>
+            </ul>
+
+            <p style="margin-top: 0.5rem; font-size: 12px">
+                Allowed Special characters are:<br />
+                <strong>{{ specialChars }}</strong>
+            </p>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">           
+             <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
+                    styleClass="btn-main-outlined" (click)="resetPwdDialogVisible = false"></p-button>
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                    (click)="saveNewPassword()"></p-button>
+        </ng-template>
+</p-dialog>

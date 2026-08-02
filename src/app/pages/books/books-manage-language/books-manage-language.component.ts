@@ -142,15 +142,25 @@ export class BooksManageLanguageComponent implements OnInit {
         let isValid = true;
 
         switch (key) {
-            case 'LanguageName':
-                if (!this.currentLanguage.LanguageName?.trim()) {
+            case 'LanguageName': {
+                const languageName = this.currentLanguage.LanguageName?.trim();
+
+                if (!languageName) {
                     this.errors.LanguageName = 'Language is required.';
                     isValid = false;
-                }
-                else {
+                } else if (
+                    this.languages.some(language =>
+                        language.LanguageName?.trim().toLowerCase() === languageName.toLowerCase() &&
+                        language.LanguageId !== this.currentLanguage.LanguageId
+                    )
+                ) {
+                    this.errors.LanguageName = 'Language already exists.';
+                    isValid = false;
+                } else {
                     this.errors.LanguageName = '';
                 }
                 break;
+            }
 
             case 'IsActive':
                 if (this.currentLanguage.IsActive === null) {

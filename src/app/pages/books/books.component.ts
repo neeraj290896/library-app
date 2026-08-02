@@ -10,10 +10,12 @@ import { BooksManageLanguageComponent } from './books-manage-language/books-mana
 import { SearchComponent } from '@app/shared/components/search/search.component';
 import { AuthService } from '@app/shared/services/auth.service';
 import { UserDetails } from '@app/shared/models/api.models';
-import { ManageBuildingComponent } from './manage-building/manage-building.component';
-import { ManageFloorComponent } from './manage-floor/manage-floor.component';
-import { ManageRackComponent } from './manage-rack/manage-rack.component';
+import { ManageBuildingComponent } from '../organization/manage-building/manage-building.component';
+import { ManageFloorComponent } from '../organization/manage-floor/manage-floor.component';
+import { ManageRackComponent } from '../organization/manage-rack/manage-rack.component';
 import { environment } from '../../../environments/environment';
+import { BooksManageSubjectComponent } from './books-manage-subject/books-manage-subject.component';
+import { BooksManageSourceComponent } from './books-manage-source/books-manage-source.component';
 
 @Component({
     selector: 'app-books',
@@ -30,7 +32,9 @@ import { environment } from '../../../environments/environment';
         SearchComponent,
         ManageBuildingComponent,
         ManageFloorComponent,
-        ManageRackComponent
+        ManageRackComponent,
+        BooksManageSubjectComponent,
+        BooksManageSourceComponent
     ],
     templateUrl: './books.component.html',
     styleUrl: './books.component.scss'
@@ -39,19 +43,11 @@ export class BooksComponent {
     public _authService = inject(AuthService);
     public activeTab: number = 0;
     public loggedInUserDetails: UserDetails | null = null;
-    public librarianRoleId : number = 3;
+    
 
     ngOnInit(): void {
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
-        this.librarianRoleId = (environment.departmentEligibleForRoleIdAbove + 1);
+        
     }  
-
-    get canAccessBuilding_Floor_Rack(): boolean {
-        const roleId = this.loggedInUserDetails?.RoleId;
-        if (roleId == null || this.librarianRoleId == null) {
-            return false;
-        }
-        return roleId <= this.librarianRoleId;
-    }
     
 }

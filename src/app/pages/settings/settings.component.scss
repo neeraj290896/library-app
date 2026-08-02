@@ -1,0 +1,26 @@
+
+.password-rules {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.password-rules li {
+  color: red;
+  margin: 2px 0;
+}
+
+.password-rules li.valid {
+  color: blue;
+   font-weight: 600;
+}
+
+.lblock {
+  position: absolute;
+  left: 0rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+}

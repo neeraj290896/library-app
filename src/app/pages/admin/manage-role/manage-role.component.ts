@@ -106,19 +106,23 @@ export class ManageRoleComponent {
         let isValid = true;
 
         switch (key) {
-            case 'RoleName':
-                if (!this.currentRole.RoleName?.trim()) {
+           case 'RoleName': 
+                const trimmedRoleName = this.currentRole.RoleName?.trim() ?? '';
+                const isDuplicate = this.roles.some(
+                    x => x.RoleId !== this.currentRole.RoleId &&
+                        x.RoleName?.trim().toLowerCase() === trimmedRoleName.toLowerCase()
+                );
+
+                if (!trimmedRoleName) {
                     this.errors.RoleName = 'Role name is required.';
                     isValid = false;
-                } 
-                else if(this.roles.filter(x => x.RoleId != this.currentRole.RoleId && x.RoleName?.trim() == this.currentRole.RoleName?.trim()).length >0){
-                    this.errors.RoleName = 'The "'+this.currentRole.RoleName?.trim()+'" Role name exists already.';
+                } else if (isDuplicate) {
+                    this.errors.RoleName = `The "${trimmedRoleName}" role name already exists.`;
                     isValid = false;
-                }
-                else {
+                } else {
                     this.errors.RoleName = '';
                 }
-                break;
+                break;            
 
             case 'IsActive':
                 if (this.currentRole.IsActive === null) {

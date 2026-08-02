@@ -96,76 +96,126 @@ export class ManageTransactiontypeComponent {
             this.transactionTypeDialogVisible = true;
         }
     
-        validateInput(key: string): boolean {
-            let isValid = true;
-    
-            switch (key) {
-                case 'TransactionTypeName':
-                    if (!this.currentTransactionType.TypeName?.trim()) {
-                        this.errors.TypeName = 'TransactionType name is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.TypeName = '';
-                    }
-                    break;
-    
-                case 'IsActive':
-                    if (this.currentTransactionType.IsActive === null) {
-                        this.errors.IsActive = 'Status is required.';
-                        isValid = false;
-                    } else {
-                        this.errors.IsActive = '';
-                    }
-                    break;
-    
-                default:
-                    break;
-            }
-    
-            return isValid;
+    validateInput(key: string): boolean {
+        let isValid = true;
+
+        switch (key) {
+            case 'TransactionTypeName':
+                const transactionTypeName = this.currentTransactionType.TypeName?.trim();
+                if (!transactionTypeName) {
+                    this.errors.TypeName = 'TransactionType name is required.';
+                    isValid = false;
+                }
+                else if(this.transactionTypes.some(tt => 
+                    tt.TypeName?.toLowerCase() === transactionTypeName.toLowerCase() && 
+                    tt.TypeId !== this.currentTransactionType.TypeId)) {
+                    this.errors.TypeName = 'TransactionType already exists.';
+                    isValid = false;
+                }
+                else {
+                    this.errors.TypeName = '';
+
+                }                     
+                break;
+
+            case 'IsActive':
+                if (this.currentTransactionType.IsActive === null) {
+                    this.errors.IsActive = 'Status is required.';
+                    isValid = false;
+                } else {
+                    this.errors.IsActive = '';
+                }
+                break;
+
+            default:
+                break;
         }
-    
-        validateTransactionType(): boolean {
-            const isNameValid = this.validateInput('TypeName');
-            const isStatusValid = this.validateInput('IsActive');
-            return isNameValid && isStatusValid;
+
+        return isValid;
+    }
+
+    validateTransactionType(): boolean {
+        const isNameValid = this.validateInput('TypeName');
+        const isStatusValid = this.validateInput('IsActive');
+        return isNameValid && isStatusValid;
+    }
+
+    saveTransactionType(): void {
+        if (!this.validateTransactionType()) {
+            return;
         }
-    
-        saveTransactionType(): void {
-            if (!this.validateTransactionType()) {
-                return;
-            }
-    
-            // const payload = [this.currentTransactionType];
-            this.transactionTypeService.updateTransactionTypeDetails(this.currentTransactionType).subscribe({
-                next: (res: any) => {
-                    if (!res || !res.Status) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Manage TransactionType - Failed',
-                            detail: res ? res.Message : 'Failed to update TransactionType. Please try again.'
-                        });
-                    } else {
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Manage TransactionType - Success',
-                            detail: 'TransactionType updated successfully.'
-                        });
-                        
-                        this.loadTransactionTypeDetails();
-                        this.transactionTypeDialogVisible = false;
-                    }
-    
-                },
-                error: () => {
+
+        if(this.currentTransactionType.TypeId >0)
+        {
+            this.updateTransactionType();
+        }
+        else{
+            this.addNewTransactionType();
+        }
+        
+    }
+
+    addNewTransactionType(): void{        
+        this.transactionTypeService.addTransactionTypeDetails(this.currentTransactionType).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Manage TransactionType - Failed',
-                        detail: 'Failed to update TransactionType. Please try again.'
+                        detail: res ? res.Message : 'Failed to update TransactionType. Please try again.'
                     });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage TransactionType - Success',
+                        detail: 'TransactionType updated successfully.'
+                    });
+                    
+                    this.loadTransactionTypeDetails();
+                    this.transactionTypeDialogVisible = false;
                 }
-            });
-        }
+
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage TransactionType - Failed',
+                    detail: 'Failed to update TransactionType. Please try again.'
+                });
+            }
+        });
+    }
+
+    updateTransactionType(): void{        
+        this.transactionTypeService.updateTransactionTypeDetails(this.currentTransactionType).subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Manage TransactionType - Failed',
+                        detail: res ? res.Message : 'Failed to update TransactionType. Please try again.'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Manage TransactionType - Success',
+                        detail: 'TransactionType updated successfully.'
+                    });
+                    
+                    this.loadTransactionTypeDetails();
+                    this.transactionTypeDialogVisible = false;
+                }
+
+            },
+            error: () => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Manage TransactionType - Failed',
+                    detail: 'Failed to update TransactionType. Please try again.'
+                });
+            }
+        });
+    }
 
     deleteTransactionType(transactionType: TransactionTypeDetails): void { 
         

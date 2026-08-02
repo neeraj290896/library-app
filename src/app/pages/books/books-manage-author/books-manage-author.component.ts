@@ -142,14 +142,25 @@ export class BooksManageAuthorComponent implements OnInit {
         let isValid = true;
 
         switch (key) {
-            case 'AuthorName':
-                if (!this.currentAuthor.AuthorName?.trim()) {
+            case 'AuthorName': {
+                const authorName = this.currentAuthor.AuthorName?.trim();
+
+                if (!authorName) {
                     this.errors.AuthorName = 'Author name is required.';
+                    isValid = false;
+                } else if (
+                    this.authors.some(author =>
+                        author.AuthorName?.trim().toLowerCase() === authorName.toLowerCase() &&
+                        author.AuthorId !== this.currentAuthor.AuthorId
+                    )
+                ) {
+                    this.errors.AuthorName = 'Author already exists.';
                     isValid = false;
                 } else {
                     this.errors.AuthorName = '';
                 }
                 break;
+            }
 
             case 'IsActive':
                 if (this.currentAuthor.IsActive === null) {

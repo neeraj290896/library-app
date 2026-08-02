@@ -15,7 +15,7 @@ export interface AccessRequestDetails {
 export interface SettingDetails {
     SettingId: number;
     CutOffDays: number;
-    FinePercentage: number;
+    Fine: number;
     EnableFineRule: boolean;
     EnableEmailNotification: boolean;
     EnableWishlistNotification: boolean;
@@ -57,6 +57,15 @@ export interface BookDetails {
     LanguageName?: string | null;
     PublishedYear?: number | null;
     Price?: number | null;
+    BillNo?: string | null;
+    BillDate?: string | null;
+    TotalPageNo?: number | null;
+    CallNo?: string | null;
+    AccessionNo?: string | null;
+    SourceId?: number | null;
+    SourceName?: string | null;
+    SubjectId?: number | null;
+    SubjectName?: string | null;
     Status?: string | null;
     BuildingId?: number | null;
     BuildingName?: string | null;
@@ -68,12 +77,16 @@ export interface BookDetails {
     RackLabel?: string | null;
     BookBarcode?: string | null;
     IsActive: boolean | null;
+    CreatedDate?: string | null;
 }
 
 export interface BookCirculationDetails {
     BookCirculationId: number;
     BookId: number;
     BookName?: string | null;
+    AccessionNo?: string | null;
+    SubjectId?: number | null;
+    SubjectName?: string | null;
     BorrowerId?: number | null;
     BorrowerName?: string | null;
     BorrowerMailId?: string | null;
@@ -81,6 +94,8 @@ export interface BookCirculationDetails {
     IssuedByUserName?: string | null;
     IssuedByUserMailId?: string | null;
     IssuedDate?: string | null;
+    ActualOverDueDate?: string | null;
+    ExtendedDate?: string | null;
     OverDueId?: number | null;
     FineAmount?: number | null;
     OverDueFrom?: string | null;
@@ -128,6 +143,18 @@ export interface BuildingDetails {
 export interface CategoryDetails {
     CategoryId: number;
     CategoryName?: string | null;
+    IsActive: boolean | null;
+}
+
+export interface SubjectDetails {
+    SubjectId: number;
+    SubjectName?: string | null;
+    IsActive: boolean | null;
+}
+
+export interface SourceDetails {
+    SourceId: number;
+    SourceName?: string | null;
     IsActive: boolean | null;
 }
 
@@ -298,7 +325,7 @@ export interface UserDetails {
     MailId?: string | null;
     DepartmentId?: number | null;
     DepartmentName?: string | null;
-    AdmissionNumber?: number | null;
+    AdmissionNumber?: string | null;
     StaffId?: string | null;
     ProfilePhoto?: string | null;
     Status?: string | null;
@@ -307,6 +334,8 @@ export interface UserDetails {
     LastLogInTime?: string | null;
     UserBarcode?: string | null;
     IsActive?: boolean | null;
+    LibraryNo?: string | null;
+    Batch?: string | null;
     IsFirstTimeLogin?: boolean | null;
     BorrowedBooksCount?: number | null;
     OverDueBooksCount?: number | null;
@@ -331,11 +360,16 @@ export interface OverDueDetails {
     BookCirculationId: number;
     BookId: number;
     BookName?: string | null;
+    AccessionNo?: string | null;    
+    SubjectId?: number | null;
+    SubjectName?: string | null;
     IssuedDate?: string | null;
     IssuedByUserId: number;
     IssuedByUserName?: string | null;
     BorrowerId: number;
     BorrowerName?: string | null;
+    ActualOverDueDate?: string | null;
+    ExtendedDate?: string | null;
     FineAmount?: number | null;
     OverDueFrom?: string | null;
     OverDueDays?: number | null;

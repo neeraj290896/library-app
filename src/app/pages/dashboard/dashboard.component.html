@@ -78,9 +78,20 @@
     }
 </p-dialog>
 
-<p-dialog header="Add Book" [(visible)]="addNewBookDialogVisible" [modal]="true" [style]="{ width: '60vw' }"
+<p-dialog header="Add Book" [(visible)]="addNewBookDialogVisible" [modal]="true" [style]="{ 'width': '60vw', 'max-height': '96%' }"
     appendTo="body" (onHide)="loadDashboardSummary()">
     <div class="row">
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="accessionNo">
+                Accession No<sup>*</sup>
+            </label>
+            <input id="accessionNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.AccessionNo"
+            (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                 maxlength="6" [ngModelOptions]="{standalone: true}" placeholder="Enter accession no" (ngModelChange)="validateBookInput('AccessionNo')"/>  
+            @if (bookErrors.AccessionNo) {
+            <div class="text-danger mt-1 small">{{ bookErrors.AccessionNo }}</div>
+            }              
+        </div>
         <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="bookName">
                 Book<sup>*</sup>
@@ -97,7 +108,7 @@
                 Author<sup>*</sup>
             </label>
             <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}"
-                [options]="authorOptions" optionLabel="label" optionValue="value" placeholder="Select author"
+                [options]="authorOptions" optionLabel="label" optionValue="value" placeholder="Select author" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onAuthorChange()"></p-select>
             @if (bookErrors.AuthorId) {
             <div class="text-danger mt-1 small">{{ bookErrors.AuthorId }}</div>
@@ -108,7 +119,7 @@
                 Publisher<sup>*</sup>
             </label>
             <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [ngModelOptions]="{standalone: true}"
-                [options]="publisherOptions" optionLabel="label" optionValue="value" placeholder="Select publisher"
+                [options]="publisherOptions" optionLabel="label" optionValue="value" placeholder="Select publisher" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onPublisherChange()"></p-select>
             @if (bookErrors.PublisherId) {
             <div class="text-danger mt-1 small">{{ bookErrors.PublisherId }}</div>
@@ -119,7 +130,7 @@
                 Category<sup>*</sup>
             </label>
             <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [ngModelOptions]="{standalone: true}"
-                [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category"
+                [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onCategoryChange()"></p-select>
             @if (bookErrors.CategoryId) {
             <div class="text-danger mt-1 small">{{ bookErrors.CategoryId }}</div>
@@ -130,7 +141,7 @@
                 Language<sup>*</sup>
             </label>
             <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [ngModelOptions]="{standalone: true}"
-                [options]="languageOptions" optionLabel="label" optionValue="value" placeholder="Select language"
+                [options]="languageOptions" optionLabel="label" optionValue="value" placeholder="Select language" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onLanguageChange()"></p-select>
             @if (bookErrors.LanguageId) {
             <div class="text-danger mt-1 small">{{ bookErrors.LanguageId }}</div>
@@ -141,11 +152,23 @@
                 Published Year<sup>*</sup>
             </label>
             <p-datepicker [(ngModel)]="publishedDate" [ngModelOptions]="{standalone: true}" appendTo="body"
-                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy"
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" view="year" dateFormat="yy" (ngModelChange)="onPublishedYearChange()"
                 placeholder="Select published year" styleClass="w-100" inputStyleClass="w-100" />
             @if (bookErrors.PublishedYear) {
             <div class="text-danger mt-1 small">{{ bookErrors.PublishedYear }}</div>
             }
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="subjectId">
+                Subject<sup>*</sup>
+            </label>
+            <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
+                [options]="subjectOptions" optionLabel="label" optionValue="value" [editable]="true"
+                placeholder="Select subject" styleClass="w-100" appendTo="body"
+                (ngModelChange)="onSubjectChange()"></p-select>  
+                @if (bookErrors.SubjectId) {
+                    <div class="text-danger mt-1 small">{{ bookErrors.SubjectId }}</div>
+                }              
         </div>
         <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="price">
@@ -163,7 +186,7 @@
                 Building<sup>*</sup>
             </label>
             <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [ngModelOptions]="{standalone: true}"
-                [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select building"
+                [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select building" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onBuildingChange()"></p-select>
             @if (bookErrors.BuildingId) {
             <div class="text-danger mt-1 small">{{ bookErrors.BuildingId }}</div>
@@ -174,7 +197,7 @@
                 Floor<sup>*</sup>
             </label>
             <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}"
-                [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor"
+                [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onFloorChange()"></p-select>
             @if (bookErrors.FloorId) {
             <div class="text-danger mt-1 small">{{ bookErrors.FloorId }}</div>
@@ -185,12 +208,56 @@
                 Rack<sup>*</sup>
             </label>
             <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}"
-                [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack"
+                [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onRackChange()"></p-select>
             @if (bookErrors.RackId) {
             <div class="text-danger mt-1 small">{{ bookErrors.RackId }}</div>
             }
+        </div>        
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="billNo">
+                Bill No
+            </label>
+            <input id="billNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.BillNo"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter bill no"/>                
         </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="billDate">
+                Bill Date
+            </label>
+            <p-datepicker [(ngModel)]="billDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                [maxDate]="maxDate" (ngModelChange)="onBillDateChange()" placeholder="Select Bill Date"
+                styleClass="w-100" inputStyleClass="w-100" />  
+            @if (bookErrors.BillDate) {
+            <div class="text-danger mt-1 small">{{ bookErrors.BillDate }}</div>
+            }             
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
+                Total Page No
+            </label>
+            <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo"
+                (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
+        </div>
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="callNo">
+                Call No
+            </label>
+            <input id="callNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.CallNo"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter call no"/>                
+        </div>            
+        <div class="col-6 mb-3">
+            <label class="d-block small fw-medium text-secondary mb-1" for="source">
+                Source
+            </label>
+            <p-select id="sourceId" [(ngModel)]="currentBook.SourceId" [ngModelOptions]="{standalone: true}"
+                [options]="sourceOptions" optionLabel="label" optionValue="value" [editable]="true"
+                placeholder="Select source" styleClass="w-100" appendTo="body"
+                (ngModelChange)="onSourceChange()"></p-select>  
+                
+        </div> 
         <!-- <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="bookBarcode">
                 Barcode<sup>*</sup>
@@ -240,7 +307,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="role">
                 RoleName<sup>*</sup>
             </label>
-            <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"  [editable]="true"
+            <p-select id="role" [(ngModel)]="currentUser.RoleId" [ngModelOptions]="{standalone: true}"
                 [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Select Role"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onRoleChange()" />
             <div *ngIf="userErrors.RoleId" class="text-danger mt-1 small">{{ userErrors.RoleId }}</div>
@@ -249,7 +316,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="gender">
                 Gender<sup>*</sup>
             </label>
-            <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}" [editable]="true"
+            <p-select id="gender" [(ngModel)]="currentUser.Gender" [ngModelOptions]="{standalone: true}"
                 [options]="genderOptions" optionLabel="label" optionValue="value" placeholder="Select Gender"
                 styleClass="w-100" appendTo="body" />
             <!-- (ngModelChange)="onGenderChange()" -->
@@ -269,7 +336,8 @@
                 MobileNo<sup>*</sup>
             </label>
             <input id="mobile" type="text" class="form-control" pInputText [(ngModel)]="currentUser.MobileNo"
-                [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                [ngModelOptions]="{standalone: true}" placeholder="Enter MobileNo" 
+                (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                 (ngModelChange)="validateUserInput('MobileNo')" />
             <div *ngIf="userErrors.MobileNo" class="text-danger mt-1 small">{{ userErrors.MobileNo }}</div>
         </div>
@@ -287,7 +355,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="role">
                 Department<sup>*</sup>
             </label>
-            <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}" [editable]="true"
+            <p-select id="department" [(ngModel)]="currentUser.DepartmentId" [ngModelOptions]="{standalone: true}"
                 [options]="departmentOptions" optionLabel="label" optionValue="value" placeholder="Select Department"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onDepartmentChange()" />
             <div *ngIf="userErrors.DepartmentId" class="text-danger mt-1 small">{{ userErrors.DepartmentId }}</div>
@@ -297,7 +365,8 @@
                     Admission Number<sup>*</sup>
                 </label>
                 <input id="admissionNumber" type="text" class="form-control" pInputText [(ngModel)]="currentUser.AdmissionNumber"
-                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" (keydown)="validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter AdmissionNumber" 
+                    (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
                     (ngModelChange)="validateUserInput('AdmissionNumber')" />
                 <div *ngIf="userErrors.AdmissionNumber" class="text-danger mt-1 small">{{ userErrors.AdmissionNumber }}</div>
             </div>
@@ -309,6 +378,24 @@
                     [ngModelOptions]="{standalone: true}" placeholder="Enter StaffId"
                     (ngModelChange)="validateUserInput('StaffId')" />
                 <div *ngIf="userErrors.StaffId" class="text-danger mt-1 small">{{ userErrors.StaffId }}</div>
+            </div>
+            <div class="col-6 mb-3">
+                <label class="d-block small fw-medium text-secondary mb-1" for="libraryNo">
+                    Library No:<sup>*</sup>
+                </label>
+                <input id="libraryNo" type="text" class="form-control" pInputText [(ngModel)]="currentUser.LibraryNo"
+                    [ngModelOptions]="{standalone: true}" placeholder="Enter Library No" 
+                    (ngModelChange)="validateUserInput('LibraryNo')" />
+                <div *ngIf="userErrors.LibraryNo" class="text-danger mt-1 small">{{ userErrors.LibraryNo }}</div>
+            </div>
+            <div class="col-6 mb-3" *ngIf="currentUser.RoleId !=null && currentUser.RoleId == studentRoleId">
+                <label class="d-block small fw-medium text-secondary mb-1" for="batch">
+                    Batch<sup>*</sup>
+                </label>
+                <p-select id="batch" [(ngModel)]="currentUser.Batch" [ngModelOptions]="{standalone: true}" 
+                    [options]="batchOptions" optionLabel="label" optionValue="value" placeholder="Select Batch"
+                    styleClass="w-100" appendTo="body" (ngModelChange)="validateUserInput('Batch')" />
+                <div *ngIf="userErrors.Batch" class="text-danger mt-1 small">{{ userErrors.Batch }}</div>
             </div>
         <!-- <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="status">

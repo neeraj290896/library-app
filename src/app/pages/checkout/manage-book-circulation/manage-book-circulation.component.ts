@@ -13,6 +13,9 @@ import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { IssueReturnBooksComponent } from '../issue-return-books/issue-return-books.component';
+import * as Xlsx from 'xlsx';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 @Component({
     selector: 'app-manage-book-circulation',
@@ -30,11 +33,15 @@ export class ManageBookCirculationComponent {
     @ViewChild('dt') dataTable: Table | undefined;
     public showFt: boolean = false;
     public bookNameList: { label: string, value: string }[] = [];
+    public accessionNoList: { label: string, value: string }[] = [];
+    public subjectNameList: { label: string, value: string }[] = [];
     public borrowerNameList: { label: string, value: string }[] = [];
     public issuedByList: { label: string, value: string }[] = [];
     public statusList: { label: string, value: string }[] = [];
     public returnByList: { label: string, value: string }[] = [];
     public selectedBookNameList: string[] = [];
+    public selectedAccessionNoList: string[] = [];
+    public selectedSubjectNameList: string[] = [];
     public selectedBorrowerNameList: string[] = [];
     public selectedIssuedByList: string[] = [];
     public selectedStatusList: string[] = [];
@@ -120,6 +127,8 @@ export class ManageBookCirculationComponent {
 
     initializeFilterLists(): void {
         this.bookNameList = [...new Set(this.bcDetails.map(book => book.BookName))].map(e => ({ label: e ?? "", value: e ?? "" }));
+        this.accessionNoList = [...new Set(this.bcDetails.map(book => book.AccessionNo))].map(e => ({ label: e ?? "", value: e ?? "" }));
+        this.subjectNameList = [...new Set(this.bcDetails.map(book => book.SubjectName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.borrowerNameList = [...new Set(this.bcDetails.map(book => book.BorrowerName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.issuedByList = [...new Set(this.bcDetails.map(book => book.IssuedByUserName))].map(e => ({ label: e ?? "", value: e ?? "" }));
         this.statusList = [...new Set(this.bcDetails.map(book => book.Status))].map(e => ({ label: e ?? "", value: e ?? "" }));
@@ -137,6 +146,8 @@ export class ManageBookCirculationComponent {
         this.selectedIssuedByList = [];
         this.selectedStatusList = [];
         this.selectedReturnByList = [];
+        this.selectedAccessionNoList = [];
+        this.selectedSubjectNameList = [];
         this.searchBookTerm = '';
         this.searchUserTerm = '';
         this.onBookSearch('');
@@ -303,4 +314,89 @@ export class ManageBookCirculationComponent {
         this.bcDialogVisible = true;
 
      }
+
+    private formatDateTime(value: string | Date | null | undefined): string {
+        if (!value) {
+            return '';
+        }
+
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+
+        return date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+    }
+
+    async downloadBookCirculationDetails(): Promise<void> {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Books');
+
+        // 1. Define Column Properties & Styles Globally (Massive Performance Boost)
+        const bodyStyle: Partial<ExcelJS.Style> = {
+            border: {
+                top: { style: 'thin', color: { argb: '00000000' } },
+                left: { style: 'thin', color: { argb: '00000000' } },
+                bottom: { style: 'thin', color: { argb: '00000000' } },
+                right: { style: 'thin', color: { argb: '00000000' } },
+            },
+            alignment: { horizontal: 'center', vertical: 'middle', wrapText: false } // Wrap text slows down rendering
+        };
+
+        // Set fixed widths to avoid heavy auto-fit calculation loops
+        worksheet.columns = [
+            { header: 'BOOK', key: 'bookName', width: 35, style: bodyStyle },
+            { header: 'BORROWER NAME', key: 'borrowerName', width: 25, style: bodyStyle },
+            { header: 'ISSUED BY', key: 'issuedBy', width: 25, style: bodyStyle },
+            { header: 'ISSUED DATE', key: 'issuedDate', width: 20, style: bodyStyle },
+            { header: 'STATUS', key: 'status', width: 20, style: bodyStyle },
+            { header: 'RETURN BY', key: 'returnBy', width: 25, style: bodyStyle },
+            { header: 'RETURN DATE', key: 'returnDate', width: 20, style: bodyStyle },
+            { header: 'OVER DUE FROM', key: 'overDueFrom', width: 20, style: bodyStyle },
+            { header: 'OVER DUE IN DAYS', key: 'overDueDays', width: 20, style: bodyStyle },
+            { header: 'OVER DUE STATUS', key: 'overDueStatus', width: 20, style: bodyStyle }
+           
+        ];
+
+        // 2. Format Header Row directly
+        const headerStyle: Partial<ExcelJS.Style> = {
+            font: { bold: true, color: { argb: 'FFFFFFFF' } },
+            fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF22C55E' } },
+            ...bodyStyle
+        };
+        
+        worksheet.getRow(1).eachCell(cell => {
+            cell.style = headerStyle;
+        });
+
+        worksheet.autoFilter = { from: 'A1', to: 'J1' };
+
+        
+        const rowsData = this.filteredBcDetails.map((bcDetails: BookCirculationDetails) => ({
+            bookName: bcDetails.BookName || '',
+            borrowerName: bcDetails.BorrowerName || '',
+            issuedBy: bcDetails.IssuedByUserName || '',
+            issuedDate: this.formatDateTime(bcDetails.IssuedDate),
+            status: bcDetails.Status || '',
+            returnBy: bcDetails.ReturnByUserName || '',
+            returnDate: this.formatDateTime(bcDetails.ReturnDate),
+            OverDueFrom: this.formatDateTime(bcDetails.OverDueFrom),
+            overDueDays: bcDetails.OverDueDays || '',
+            overDueStatus: bcDetails.OverDueStatus || ''
+        }));
+
+        worksheet.addRows(rowsData);
+
+        // 4. File Generation
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, 'save-book-circulation-details.xlsx');
+    }
 }

@@ -53,6 +53,25 @@
                 placeholder="Select Issued Date" styleClass="w-100" inputStyleClass="w-100" />
         </div>
         <hr>
+        <div class="col-6 mb-3" *ngIf="selectedBook.BookCirculationId  !=null && selectedBook.BookCirculationId  >0">
+            <label class="d-block small fw-medium text-secondary mb-1" for="actualOverDueDate">
+                Actual OverDue Date<sup>*</sup>
+            </label>
+            <p-datepicker [(ngModel)]="actualOverDueDate" 
+                [ngModelOptions]="{standalone: true}" appendTo="body" dataType="string" [showIcon]="true"
+                [readonlyInput]="true" [showOnFocus]="true" dateFormat="yy-mm-dd" [disabled]="true"
+                placeholder="Select Issued Date" styleClass="w-100" inputStyleClass="w-100" />
+        </div>
+        <div class="col-6 mb-3" *ngIf="selectedBook.BookCirculationId  !=null && selectedBook.BookCirculationId  >0">
+            <label class="d-block small fw-medium text-secondary mb-1" for="extendedDate">
+                Extended Date<sup>*</sup>
+            </label>
+            <p-datepicker [(ngModel)]="extendedDate" (ngModelChange)="onExtendedDateChange()" 
+                [disabled]="isViewOnly || selectedBook?.Status === 'Returned'"
+                [ngModelOptions]="{standalone: true}" appendTo="body" dataType="string" [showIcon]="true"
+                [showOnFocus]="true" dateFormat="yy-mm-dd" [minDate]="extendedMinDate"
+                [maxDate]="extendedMaxDate" placeholder="Select Extended Date" styleClass="w-100" inputStyleClass="w-100" />
+        </div>
         <div class="col-6 mb-3">
             <label class="d-block small fw-medium text-secondary mb-1" for="comments">
                 Comments
