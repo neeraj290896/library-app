@@ -108,7 +108,7 @@
                 Author<sup>*</sup>
             </label>
             <p-select id="authorId" [(ngModel)]="currentBook.AuthorId" [ngModelOptions]="{standalone: true}"
-                [options]="authorOptions" optionLabel="label" optionValue="value" placeholder="Select author"
+                [options]="authorOptions" optionLabel="label" optionValue="value" placeholder="Select author" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onAuthorChange()"></p-select>
             @if (bookErrors.AuthorId) {
             <div class="text-danger mt-1 small">{{ bookErrors.AuthorId }}</div>
@@ -119,7 +119,7 @@
                 Publisher<sup>*</sup>
             </label>
             <p-select id="publisherId" [(ngModel)]="currentBook.PublisherId" [ngModelOptions]="{standalone: true}"
-                [options]="publisherOptions" optionLabel="label" optionValue="value" placeholder="Select publisher"
+                [options]="publisherOptions" optionLabel="label" optionValue="value" placeholder="Select publisher" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onPublisherChange()"></p-select>
             @if (bookErrors.PublisherId) {
             <div class="text-danger mt-1 small">{{ bookErrors.PublisherId }}</div>
@@ -130,7 +130,7 @@
                 Category<sup>*</sup>
             </label>
             <p-select id="categoryId" [(ngModel)]="currentBook.CategoryId" [ngModelOptions]="{standalone: true}"
-                [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category"
+                [options]="categoryOptions" optionLabel="label" optionValue="value" placeholder="Select category" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onCategoryChange()"></p-select>
             @if (bookErrors.CategoryId) {
             <div class="text-danger mt-1 small">{{ bookErrors.CategoryId }}</div>
@@ -141,7 +141,7 @@
                 Language<sup>*</sup>
             </label>
             <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [ngModelOptions]="{standalone: true}"
-                [options]="languageOptions" optionLabel="label" optionValue="value" placeholder="Select language"
+                [options]="languageOptions" optionLabel="label" optionValue="value" placeholder="Select language" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onLanguageChange()"></p-select>
             @if (bookErrors.LanguageId) {
             <div class="text-danger mt-1 small">{{ bookErrors.LanguageId }}</div>
@@ -163,7 +163,7 @@
                 Subject<sup>*</sup>
             </label>
             <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
-                [options]="subjectOptions" optionLabel="label" optionValue="value"
+                [options]="subjectOptions" optionLabel="label" optionValue="value" [editable]="true"
                 placeholder="Select subject" styleClass="w-100" appendTo="body"
                 (ngModelChange)="onSubjectChange()"></p-select>  
                 @if (bookErrors.SubjectId) {
@@ -186,7 +186,7 @@
                 Building<sup>*</sup>
             </label>
             <p-select id="buildingId" [(ngModel)]="currentBook.BuildingId" [ngModelOptions]="{standalone: true}"
-                [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select building"
+                [options]="buildingOptions" optionLabel="label" optionValue="value" placeholder="Select building" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onBuildingChange()"></p-select>
             @if (bookErrors.BuildingId) {
             <div class="text-danger mt-1 small">{{ bookErrors.BuildingId }}</div>
@@ -197,7 +197,7 @@
                 Floor<sup>*</sup>
             </label>
             <p-select id="floorId" [(ngModel)]="currentBook.FloorId" [ngModelOptions]="{standalone: true}"
-                [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor"
+                [options]="floorOptions" optionLabel="label" optionValue="value" placeholder="Select floor" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onFloorChange()"></p-select>
             @if (bookErrors.FloorId) {
             <div class="text-danger mt-1 small">{{ bookErrors.FloorId }}</div>
@@ -208,7 +208,7 @@
                 Rack<sup>*</sup>
             </label>
             <p-select id="rackId" [(ngModel)]="currentBook.RackId" [ngModelOptions]="{standalone: true}"
-                [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack"
+                [options]="rackOptions" optionLabel="label" optionValue="value" placeholder="Select rack" [editable]="true"
                 styleClass="w-100" appendTo="body" (ngModelChange)="onRackChange()"></p-select>
             @if (bookErrors.RackId) {
             <div class="text-danger mt-1 small">{{ bookErrors.RackId }}</div>

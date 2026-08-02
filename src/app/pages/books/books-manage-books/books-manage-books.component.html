@@ -346,7 +346,7 @@
                 </label>
                 <p-select id="languageId" [(ngModel)]="currentBook.LanguageId" [ngModelOptions]="{standalone: true}"
                     [editable]="true" [options]="languageOptions" optionLabel="label" optionValue="value"
-                    placeholder="Select language" styleClass="w-100" appendTo="body"
+                    placeholder="Select language" styleClass="w-100" appendTo="body" 
                     (ngModelChange)="onLanguageChange()"></p-select>
                 @if (errors.LanguageId) {
                 <div class="text-danger mt-1 small">{{ errors.LanguageId }}</div>
@@ -369,7 +369,7 @@
                     Subject<sup>*</sup>
                 </label>
                 <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
-                    [options]="subjectOptions" optionLabel="label" optionValue="value"
+                    [options]="subjectOptions" optionLabel="label" optionValue="value" [editable]="true"
                     placeholder="Select subject" styleClass="w-100" appendTo="body"
                     (ngModelChange)="onSubjectChange()"></p-select>  
                     @if (errors.SubjectId) {
