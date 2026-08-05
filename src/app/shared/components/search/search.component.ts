@@ -31,34 +31,81 @@ export class SearchComponent {
     private inactivityTimer: any;
     private readonly INACTIVITY_TIME = 3000; // 3 seconds
 
+    private get isAnyDialogOpen(): boolean {
+        return this.showBookDialog || this.showUserDialog || this.hasOpenPrimeDialog();
+    }
+
     ngOnInit(): void {
         this.startInactivityTimer();
     }
 
-    // Listen to mouse movements across the document window
+    // Listen to user activity across the document window
     @HostListener('document:mousemove')
     @HostListener('document:keydown')
-    onMouseMove(): void {
+    @HostListener('document:mousedown')
+    @HostListener('document:touchstart')
+    onUserActivity(): void {
         this.resetInactivityTimer();
     }
 
     private startInactivityTimer(): void {
+        this.clearInactivityTimer();
+
+        if (this.isAnyDialogOpen) {
+            return;
+        }
+
         this.inactivityTimer = setTimeout(() => {
-        this.focusSearchInput();
+            this.focusSearchInput();
         }, this.INACTIVITY_TIME);
     }
 
     private resetInactivityTimer(): void {
-        if (this.inactivityTimer) {
-        clearTimeout(this.inactivityTimer);
+        if (this.isAnyDialogOpen) {
+            this.clearInactivityTimer();
+            return;
         }
+
         this.startInactivityTimer();
     }
 
+    private clearInactivityTimer(): void {
+        if (this.inactivityTimer) {
+            clearTimeout(this.inactivityTimer);
+            this.inactivityTimer = null;
+        }
+    }
+
+    private hasOpenPrimeDialog(): boolean {
+        const dialogMasks = Array.from(document.querySelectorAll<HTMLElement>('.p-dialog-mask'));
+        const hasVisibleMask = dialogMasks.some((mask) => {
+            const style = mask.getAttribute('style') || '';
+            const ariaHidden = mask.getAttribute('aria-hidden');
+            const isHidden = style.includes('display: none') || style.includes('display:none') || ariaHidden === 'true';
+            return !isHidden;
+        });
+
+        if (hasVisibleMask) {
+            return true;
+        }
+
+        const dialogs = Array.from(document.querySelectorAll<HTMLElement>('.p-dialog'));
+        return dialogs.some((dialog) => {
+            const style = dialog.getAttribute('style') || '';
+            const ariaHidden = dialog.getAttribute('aria-hidden');
+            const isHidden = style.includes('display: none') || style.includes('display:none') || ariaHidden === 'true';
+            const isActive = dialog.classList.contains('p-dialog-active')
+                || dialog.classList.contains('p-dialog-enter-active')
+                || dialog.classList.contains('p-dialog-enter-done')
+                || dialog.classList.contains('p-dialog-visible');
+
+            return !isHidden && isActive;
+        });
+    }
+
     private focusSearchInput(): void {
-        // Check if dialogs are open; you might want to skip focusing if a dialog is active
-        if (!this.showBookDialog && !this.showUserDialog && this.searchInput) {
-        this.searchInput.nativeElement.focus();
+        if (!this.isAnyDialogOpen && this.searchInput) {
+            this.searchInput.nativeElement.focus();
         }
     }
 
@@ -72,20 +119,24 @@ export class SearchComponent {
        
 
         if (this.searchTerm.includes(environment.usersBarcodeSyntax)) {
+            this.clearInactivityTimer();
             this.showUserDialog = true;
             this.showBookDialog = false;
         }
         else if (this.searchTerm.includes(environment.booksBarcodeSyntax)) {
+            this.clearInactivityTimer();
             this.showBookDialog = true;
             this.showUserDialog = false;
         }
         else if(isMobile || isEmail || isLibraryNo)
         {
+            this.clearInactivityTimer();
             this.showUserDialog = true;
             this.showBookDialog = false;
         } 
         else if(isAccessionNo)
         {
+            this.clearInactivityTimer();
             this.showUserDialog = false;
             this.showBookDialog = true;
         }       
@@ -95,17 +146,23 @@ export class SearchComponent {
         }
     }
 
+    onDialogShow(): void {
+        this.clearInactivityTimer();
+    }
+
     onDialogClose(): void {
         this.searchTerm = '';
         this.showBookDialog = false;
         this.showUserDialog = false;
-        this.resetInactivityTimer(); // Restart timer when a dialog closes
+        this.clearInactivityTimer();
+
+        setTimeout(() => {
+            this.startInactivityTimer();
+        }, 150);
     }
 
     // Prevent memory leaks when the component destroys
     ngOnDestroy(): void {
-        if (this.inactivityTimer) {
-        clearTimeout(this.inactivityTimer);
-        }
+        this.clearInactivityTimer();
     }
 }

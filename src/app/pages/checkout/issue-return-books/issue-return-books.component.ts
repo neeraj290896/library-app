@@ -565,7 +565,7 @@ export class IssueReturnBooksComponent implements OnChanges {
                         summary: 'Manage Book circulation - Success',
                         detail: 'Updated Book circulation successfully.'
                     });
-
+                    this.loadBooks();
                     this.bcDialogVisible = false;
                     this.onSuccess.emit();
                 }
@@ -608,7 +608,7 @@ export class IssueReturnBooksComponent implements OnChanges {
                         summary: 'Manage Book circulation - Success',
                         detail: 'Updated Book circulation successfully.'
                     });
-
+                    this.loadBooks();
                     this.bcDialogVisible = false;
                     this.onSuccess.emit();
                 }
@@ -647,7 +647,7 @@ export class IssueReturnBooksComponent implements OnChanges {
                         summary: 'Manage Book circulation - Success',
                         detail: 'Updated Book circulation successfully.'
                     });
-
+                    this.loadBooks();
                     this.bcDialogVisible = false;
                     this.onSuccess.emit();
                 }

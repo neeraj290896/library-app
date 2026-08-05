@@ -5,8 +5,10 @@
         <p-button [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
             styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print"
             (onClick)="printBarcode()"></p-button>
-        <p-button type="button" label="Download User Details" icon="pi pi-download" *ngIf="users.length >0"
+        <p-button type="button" label="Download User Details" icon="pi pi-download" *ngIf="users.length > 1"
                     styleClass="btn-main-outlined" (click)="downloadUserDetails()"></p-button>
+        <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                    (click)="importUser()"></p-button>
         <div class="position-relative" *ngIf="isBarcodeSearch">
             <span class="pi pi-search search-icon position-absolute text-muted"></span>
             <input #bookInput autofocus pInputText type="text" placeholder="Search Book" [(ngModel)]="searchBookTerm" (keydown.enter)="onBookSearch()"

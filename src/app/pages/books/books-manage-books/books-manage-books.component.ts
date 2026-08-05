@@ -206,6 +206,7 @@ export class BooksManageBooksComponent implements OnInit {
     public importCategoryNameList: { label: string, value: string }[] = [];
     public importLanguageNameList: { label: string, value: string }[] = [];
     public importPublishedYearList: { label: number, value: number }[] = [];
+    public importPriceList: { label: number, value: number }[] = [];
     public importStatusList: { label: string, value: boolean }[] = [];
     public importErrorList: { label: string, value: string }[] = [];
     public importBillNoList: { label: string, value: string }[] = [];
@@ -222,6 +223,7 @@ export class BooksManageBooksComponent implements OnInit {
     public importSelectedCategoryNameList: string[] = [];
     public importSelectedLanguageNameList: string[] = [];
     public importSelectedPublishedYearList: number[] = [];
+    public importSelectedPriceList: number[] = [];
     public importSelectedStatusList: boolean[] = [];
     public importSelectedErrorList: string[] = [];
     public importSelectedBillNoList: string[] = [];
@@ -1367,7 +1369,7 @@ export class BooksManageBooksComponent implements OnInit {
         });
         racksSheet.state = 'hidden';
 
-        for (let rowIndex = 2; rowIndex <= 1000; rowIndex++) {
+        for (let rowIndex = 2; rowIndex <= 2000; rowIndex++) {
 
             const accessionCell = worksheet.getCell(rowIndex, 1);
             accessionCell.dataValidation = {
@@ -1576,8 +1578,7 @@ export class BooksManageBooksComponent implements OnInit {
                 }
 
                 rows.forEach((row: any) => {
-
-                    // console.log('rows :', rows);
+                    debugger;
                     const accessionNo = row['ACCESSION NO']?.toString().trim();
                     const bookName = row['BOOK']?.toString().trim();
                     const authorName = row['AUTHOR']?.toString().trim();
@@ -1585,12 +1586,13 @@ export class BooksManageBooksComponent implements OnInit {
                     const categoryName = row['CATEGORY']?.toString().trim();
                     const languageName = row['LANGUAGE']?.toString().trim();
                     const publishedYear = Number(row['YEAR']?.toString().trim());
-                    const price = Number(row['PRICE(₹)']?.toString().trim());
+                    const priceValue = row['PRICE(₹)']?.toString().trim();
+                    const price = priceValue != null && priceValue !== '' ? Number(priceValue.replace('₹', '').replace(',', '').trim()) : null;
                     const billNo = row['BILL NO']?.toString().trim();
                     const billDate = row['BILL DATE']?.toString().trim();
                     const totalPageNo = row['TOTAL PAGE NO']?.toString().trim();
                     const callNo = row['CALL NO']?.toString().trim();                    
-                    const source = row['SOURCE']?.toString().trim();
+                    const sourceName = row['SOURCE']?.toString().trim();
                     const subjectName = row['SUBJECT']?.toString().trim();
                     const buildingName = row['BUILDING']?.toString().trim();
                     const floorName = row['FLOOR']?.toString().trim();
@@ -1612,14 +1614,14 @@ export class BooksManageBooksComponent implements OnInit {
                         LanguageId: null,
                         LanguageName: languageName,
                         PublishedYear: publishedYear,
-                        Price: price,
+                        Price: price, 
                         BillNo: billNo,
                         BillDate: billDate ?new Date(billDate).toISOString() : null,
                         TotalPageNo: totalPageNo,
                         CallNo: callNo,
                         AccessionNo: accessionNo,
                         SourceId:null,
-                        SourceName: source,
+                        SourceName: sourceName,
                         SubjectName: subjectName,                        
                         Status: 'Available',
                         BuildingId: null,
@@ -1634,8 +1636,10 @@ export class BooksManageBooksComponent implements OnInit {
                         IsActive: true,
                         Error: ''
                     };
+                 
+
                     this.importPreview.push(importItem);
-                });
+                });                
 
                 this.validateImportBook();
                 this.initializeImportFilterLists();
@@ -1651,6 +1655,32 @@ export class BooksManageBooksComponent implements OnInit {
         this.currentBook = { ...book };
         this.header = 'Edit Book';
         this.publishedDate = book.PublishedYear ? new Date(book.PublishedYear, 0, 1) : null;
+       
+
+        if((this.currentBook.BuildingId == null || this.currentBook.BuildingId == 0) && this.currentBook.BuildingName !=null && this.currentBook.BuildingName.trim() !="")
+        {
+            this.currentBook.BuildingId = this.buildings.find(x => x.BuildingName == this.currentBook.BuildingName?.trim())?.BuildingId ?? null; 
+        }
+
+        if((this.currentBook.FloorId == null || this.currentBook.FloorId == 0) && this.currentBook.FloorName !=null && this.currentBook.FloorName.trim() !="")
+        {
+            this.currentBook.FloorId = this.floors.find(x => x.FloorName == this.currentBook.FloorName?.trim() && x.BuildingId == this.currentBook.BuildingId)?.FloorId ?? null; 
+        }
+
+        if((this.currentBook.RackId == null || this.currentBook.RackId == 0) && this.currentBook.RackLabel !=null && this.currentBook.RackLabel.trim() !="")
+        {
+            this.currentBook.RackId = this.racks.find(x => x.RackLabel == this.currentBook.RackLabel?.trim() && x.BuildingId == this.currentBook.BuildingId && x.FloorId == this.currentBook.FloorId)?.RackId ?? null; 
+        }
+
+        if((this.currentBook.SubjectId == null || this.currentBook.SubjectId == 0) && this.currentBook.SubjectName !=null && this.currentBook.SubjectName.trim() !="")
+        {
+            this.currentBook.SubjectId = this.subjects.find(x => x.SubjectName == this.currentBook.SubjectName?.trim())?.SubjectId ?? null; 
+        }
+
+        if((this.currentBook.SourceId == null || this.currentBook.SourceId == 0) && this.currentBook.SourceName !=null && this.currentBook.SourceName.trim() !="")
+        {
+            this.currentBook.SourceId = this.sources.find(x => x.SourceName == this.currentBook.SourceName?.trim())?.SourceId ?? null; 
+        }
 
         this.floorOptions = this.floors
             .filter(floor => floor.BuildingId === this.currentBook.BuildingId)
@@ -1694,6 +1724,31 @@ export class BooksManageBooksComponent implements OnInit {
         console.log('viewImportBook book :', book);
         this.header = 'View Book';
         this.publishedDate = book.PublishedYear ? new Date(book.PublishedYear, 0, 1) : null;
+
+        if((this.currentBook.BuildingId == null || this.currentBook.BuildingId == 0) && this.currentBook.BuildingName !=null && this.currentBook.BuildingName.trim() !="")
+        {
+            this.currentBook.BuildingId = this.buildings.find(x => x.BuildingName == this.currentBook.BuildingName?.trim())?.BuildingId ?? null; 
+        }
+
+        if((this.currentBook.FloorId == null || this.currentBook.FloorId == 0) && this.currentBook.FloorName !=null && this.currentBook.FloorName.trim() !="")
+        {
+            this.currentBook.FloorId = this.floors.find(x => x.FloorName == this.currentBook.FloorName?.trim() && x.BuildingId == this.currentBook.BuildingId)?.FloorId ?? null; 
+        }
+
+        if((this.currentBook.RackId == null || this.currentBook.RackId == 0) && this.currentBook.RackLabel !=null && this.currentBook.RackLabel.trim() !="")
+        {
+            this.currentBook.RackId = this.racks.find(x => x.RackLabel == this.currentBook.RackLabel?.trim() && x.BuildingId == this.currentBook.BuildingId && x.FloorId == this.currentBook.FloorId)?.RackId ?? null; 
+        }
+
+        if((this.currentBook.SubjectId == null || this.currentBook.SubjectId == 0) && this.currentBook.SubjectName !=null && this.currentBook.SubjectName.trim() !="")
+        {
+            this.currentBook.SubjectId = this.subjects.find(x => x.SubjectName == this.currentBook.SubjectName?.trim())?.SubjectId ?? null; 
+        }
+
+        if((this.currentBook.SourceId == null || this.currentBook.SourceId == 0) && this.currentBook.SourceName !=null && this.currentBook.SourceName.trim() !="")
+        {
+            this.currentBook.SourceId = this.sources.find(x => x.SourceName == this.currentBook.SourceName?.trim())?.SourceId ?? null; 
+        }
 
         this.floorOptions = this.floors
             .filter(floor => floor.BuildingId === this.currentBook.BuildingId)
@@ -1759,10 +1814,12 @@ export class BooksManageBooksComponent implements OnInit {
 
         this.importIndex = -1;
         this.importBookDialogVisible = false;
+        this.validateImportBook();
     }
 
     deleteImportBook(index: number): void {
         this.importPreview.splice(index, 1);
+        this.validateImportBook();
     }
 
     validateImportInput(key: string, index: number): boolean {
@@ -2114,6 +2171,7 @@ export class BooksManageBooksComponent implements OnInit {
         });
         this.bookService.updateBookDetails(payload).subscribe({
             next: (res: any) => {
+                debugger;
                 if (!res || !res.Status) {
                     this.messageService.add({
                         severity: 'error',
