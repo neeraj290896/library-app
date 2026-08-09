@@ -43,7 +43,7 @@ export class SettingsComponent {
     public departments: DepartmentDetails[] = [];
     public settingDetails: SettingDetails = {
         SettingId: 0, CutOffDays: 90, Fine: 1, EnableFineRule: true, EnableEmailNotification: true, EnableWishlistNotification: true,
-        EnableMobileNotification: false, EnableBarcodeScanning:false, ReminderMailNotificationInDays: 2, IsActive: true
+        EnableMobileNotification: false, EnableBarcodeScanning:false, EnableBarcodePrintOption: false, ReminderMailNotificationInDays: 2, IsActive: true
     };
     // public finePercentage: string = "";
     public errors: { CutOffDays: string, Fine: string, ReminderMailNotificationInDays: string } = { CutOffDays: '', Fine: '', ReminderMailNotificationInDays:'' };

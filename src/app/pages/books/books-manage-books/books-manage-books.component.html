@@ -2,7 +2,7 @@
     <div class="table-clear-filter d-flex align-items-center gap-3">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
-        <p-button [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
+        <p-button *ngIf="isBarcodePrintOptionEnabled" [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
             styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print"
             (onClick)="printBarcode()"></p-button>
         <div class="position-relative" *ngIf="isBarcodeSearch">
@@ -219,7 +219,7 @@
 
             <ng-template pTemplate="body" let-book let-index="rowIndex">
                 <tr class="border-bottom">
-                    <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" /></td>
+                    <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" [disabled]="!isBarcodePrintOptionEnabled"/></td>
                     <td>{{ index + 1 }}</td>
                     <td>
                         <span [pTooltip]="book.AccessionNo">
@@ -372,7 +372,7 @@
                     Subject<sup>*</sup>
                 </label>
                 <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
-                    [options]="subjectOptions" optionLabel="label" optionValue="value" [editable]="true"
+                   [editable]="true" [options]="subjectOptions" optionLabel="label" optionValue="value"
                     placeholder="Select subject" styleClass="w-100" appendTo="body"
                     (ngModelChange)="onSubjectChange()"></p-select>  
                     @if (errors.SubjectId) {

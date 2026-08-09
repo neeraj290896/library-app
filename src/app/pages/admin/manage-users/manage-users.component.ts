@@ -204,6 +204,7 @@ export class ManageUsersComponent {
     public lstBookDetails: BookDetails[] = [];
     public studentRoleId: number  = 5;
     public nextAvailableLibraryNo : string ="VCN ";
+    public isBarcodePrintOptionEnabled: boolean = false;
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -216,6 +217,7 @@ export class ManageUsersComponent {
         let maxYear = year - environment.studentsMinimumAge;
 
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
+        this.isBarcodePrintOptionEnabled = this._authService.settingsDetails()?.EnableBarcodePrintOption ?? false;
 
         this.minDate = new Date();
         this.minDate.setDate(1);
@@ -841,9 +843,11 @@ export class ManageUsersComponent {
                     });
                 }
 
-                this.loadUserDetails();               
-
-                this.confirmationService.confirm({
+                this.loadUserDetails();  
+                
+                if(this.isBarcodePrintOptionEnabled)
+                {
+                    this.confirmationService.confirm({
                     message: "Do you want to print user's barcode?",
                     header: 'Print Confirmation',
                     icon: 'pi pi-print',
@@ -862,6 +866,9 @@ export class ManageUsersComponent {
                         this.userDialogVisible = false;
                     }
                 });
+                }
+
+                
             },
             error: () => {
                 this.messageService.add({
@@ -1632,38 +1639,42 @@ export class ManageUsersComponent {
 
                     // 5. Refresh view and close dialog
                     this.loadUserDetails();
-                    this.confirmationService.confirm({
-                        message: "Do you want to print imported user's barcode?",
-                        header: 'Print Confirmation',
-                        icon: 'pi pi-print',
-                        acceptLabel: 'Yes',
-                        rejectLabel: 'No',
-                        accept: () => {
 
-                            this.selectedUserDetails = [];
-                            payload.forEach(ele => {
-                                
-                                if(ele.MobileNo !=null && successes.includes(ele.MobileNo))
-                                {
-                                   const _importedData = this.users.find(x => x.FullName == ele.FullName && x.RoleId == ele.RoleId && x.MobileNo == ele.MobileNo
-                                        && x.MailId == ele.MailId);
+                    if(this.isBarcodePrintOptionEnabled)
+                    {
+                        this.confirmationService.confirm({
+                            message: "Do you want to print imported user's barcode?",
+                            header: 'Print Confirmation',
+                            icon: 'pi pi-print',
+                            acceptLabel: 'Yes',
+                            rejectLabel: 'No',
+                            accept: () => {
 
-                                    if(_importedData !=null)
+                                this.selectedUserDetails = [];
+                                payload.forEach(ele => {
+                                    
+                                    if(ele.MobileNo !=null && successes.includes(ele.MobileNo))
                                     {
-                                        this.selectedUserDetails.push(_importedData);
-                                    }                                    
-                                }
-                            });                            
+                                    const _importedData = this.users.find(x => x.FullName == ele.FullName && x.RoleId == ele.RoleId && x.MobileNo == ele.MobileNo
+                                            && x.MailId == ele.MailId);
 
-                            this.importDialogVisible = false;
-                            this.onSelectionChange();
-                            this.printBarcode();
+                                        if(_importedData !=null)
+                                        {
+                                            this.selectedUserDetails.push(_importedData);
+                                        }                                    
+                                    }
+                                });                            
 
-                        },
-                        reject: () => {
-                            this.importDialogVisible = false;
-                        }
-                    });
+                                this.importDialogVisible = false;
+                                this.onSelectionChange();
+                                this.printBarcode();
+
+                            },
+                            reject: () => {
+                                this.importDialogVisible = false;
+                            }
+                        });
+                    }
 
                 }
                 else if (successes.length > 0) {
@@ -1675,34 +1686,37 @@ export class ManageUsersComponent {
 
                     // 5. Refresh view and close dialog
                     this.loadUserDetails();
-                    this.confirmationService.confirm({
-                        message: "Do you want to print imported user's barcode?",
-                        header: 'Print Confirmation',
-                        icon: 'pi pi-print',
-                        acceptLabel: 'Yes',
-                        rejectLabel: 'No',
-                        accept: () => {
+                    if(this.isBarcodePrintOptionEnabled)
+                    {
+                        this.confirmationService.confirm({
+                            message: "Do you want to print imported user's barcode?",
+                            header: 'Print Confirmation',
+                            icon: 'pi pi-print',
+                            acceptLabel: 'Yes',
+                            rejectLabel: 'No',
+                            accept: () => {
 
-                            this.selectedUserDetails = [];
-                            payload.forEach(ele => {
-                                const _importedData = this.users.find(x => x.FullName == ele.FullName && x.RoleId == ele.RoleId && x.MobileNo == ele.MobileNo
-                                    && x.MailId == ele.MailId);
-                                    
-                                if(_importedData !=null)
-                                {
-                                    this.selectedUserDetails.push(_importedData);
-                                }
-                            });                            
+                                this.selectedUserDetails = [];
+                                payload.forEach(ele => {
+                                    const _importedData = this.users.find(x => x.FullName == ele.FullName && x.RoleId == ele.RoleId && x.MobileNo == ele.MobileNo
+                                        && x.MailId == ele.MailId);
+                                        
+                                    if(_importedData !=null)
+                                    {
+                                        this.selectedUserDetails.push(_importedData);
+                                    }
+                                });                            
 
-                            this.importDialogVisible = false;
-                            this.onSelectionChange();
-                            this.printBarcode();
+                                this.importDialogVisible = false;
+                                this.onSelectionChange();
+                                this.printBarcode();
 
-                        },
-                        reject: () => {
-                            this.importDialogVisible = false;
-                        }
-                    });
+                            },
+                            reject: () => {
+                                this.importDialogVisible = false;
+                            }
+                        });
+                    }
                 }
                  
                 

@@ -21,6 +21,7 @@ export interface SettingDetails {
     EnableWishlistNotification: boolean;
     EnableMobileNotification: boolean;
     EnableBarcodeScanning: boolean;
+    EnableBarcodePrintOption: boolean;
     ReminderMailNotificationInDays: number;
     IsActive: boolean;
 }
