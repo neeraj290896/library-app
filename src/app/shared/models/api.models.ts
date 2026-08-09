@@ -427,3 +427,11 @@ export interface WishlistDetails {
     NotifiedOn?: string | null;
     UpdatedOn?: string | null;
 }
+
+export interface DbBackUpDetails {
+    Id: number;
+    BackUpFileName?: string | null;
+    TriggeredBy?: string | null;
+    CreatedDate?: string | null;
+    CompletedDate?: string | null;    
+}

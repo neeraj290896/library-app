@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DepartmentDetails, ResetCredPassword, RoleDetails, SettingDetails, UserDetails } from '@app/shared/models/api.models';
+import { DbBackUpDetails, DepartmentDetails, ResetCredPassword, RoleDetails, SettingDetails, UserDetails } from '@app/shared/models/api.models';
 import { AdminService } from '@app/shared/services/admin.service';
 import { AuthService } from '@app/shared/services/auth.service';
 import { MessageService } from 'primeng/api';
@@ -129,6 +129,7 @@ export class SettingsComponent {
     public batchOptions: { label: string; value: string; }[] = [];
     public studentRoleId: number  = 5;
     public departmentEligibleForRoleIdAbove: number  = 1;
+    public dbBackUpDetails: DbBackUpDetails[] = [];
 
     ngOnInit(): void {
         this.loggedInUserDetails = this._authService.userData() ?? this._authService.userDataTemp;
@@ -171,6 +172,7 @@ export class SettingsComponent {
         this.loadDepartmentDetails();
         this.generateBatchOptions();
         this.loadUserDetails();
+        this.getLatestDbBackUpDetails();
     }
 
      generateBatchOptions(): void {
@@ -723,5 +725,49 @@ export class SettingsComponent {
     this.resetCredPassword.NewPwd = password;
 
     console.log('this.resetCredPassword.NewPwd : ', this.resetCredPassword.NewPwd);
-  }
+    }
+
+    generateDatabaseBackup(): void {
+        this._adminService.initiateDbBackUp(this.loggedInUserDetails?.FullName ?? 'System').subscribe({
+            next: (res: any) => {
+                if (!res || !res.Status) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Database Backup - Failed',
+                        detail: res ? res.Message : 'Failed to initialize database backup. Please try again.'
+                    });
+                }
+                else{
+                    this.messageService.add({
+                    severity: 'success',
+                    summary: 'Database Backup',
+                    detail: 'Database backup initialized successfully'
+                    });
+                
+                    this.getLatestDbBackUpDetails();
+                    
+                }
+            },
+            error: (err) => {
+                // this.spinnerService.HideSpinner();
+
+                this.messageService.add({
+                severity: 'error',
+                summary: 'Database Backup Failed',
+                detail: 'Failed to initialize database backup. Please try again.'
+                });
+            }
+        });
+    }
+
+    getLatestDbBackUpDetails(): void {
+        this._adminService.getLatestDbBackUpDetails().subscribe({
+            next: (data: DbBackUpDetails[]) => {
+                this.dbBackUpDetails = data || [];
+            },
+            error: (err) => {
+                console.error('Error loading database backup details:', err);
+            }
+        });
+    }
 }
