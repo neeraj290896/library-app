@@ -247,9 +247,11 @@
 
                     </td>
                     <td>
-                        <p-tag [value]="(book.ExtendedDate | date:'yyyy-MM-dd') || '-'"
-                            [severity]="getBookDueSeverity(book.ExtendedDate)"></p-tag>
+                        <!-- <p-tag [value]="(book.ExtendedDate | date:'yyyy-MM-dd') || '-'"
+                            [severity]="getBookDueSeverity(book.ExtendedDate)"></p-tag> -->
 
+                            <p-tag [value]="(book.ExtendedDate | date:'yyyy-MM-dd') || '-'"
+                            [severity]="getBookDueSeverity(book.ActualOverDueDate)"></p-tag>
                     </td>
                     <td>
                         <p-tag [value]="(book.OverDueFrom | date:'yyyy-MM-dd') || '-'"

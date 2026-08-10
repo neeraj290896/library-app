@@ -848,24 +848,28 @@ export class ManageUsersComponent {
                 if(this.isBarcodePrintOptionEnabled)
                 {
                     this.confirmationService.confirm({
-                    message: "Do you want to print user's barcode?",
-                    header: 'Print Confirmation',
-                    icon: 'pi pi-print',
-                    acceptLabel: 'Yes',
-                    rejectLabel: 'No',
-                    accept: () => {
-                        this.selectedUserDetails = this.users.filter(x => x.FullName == this.currentUser.FullName && x.RoleId == this.currentUser.RoleId && x.MobileNo == this.currentUser.MobileNo
-                            && x.MailId == this.currentUser.MailId
-                        );
-                        this.userDialogVisible = false;
-                        this.onSelectionChange();
-                        this.printBarcode();
+                        message: "Do you want to print user's barcode?",
+                        header: 'Print Confirmation',
+                        icon: 'pi pi-print',
+                        acceptLabel: 'Yes',
+                        rejectLabel: 'No',
+                        accept: () => {
+                            this.selectedUserDetails = this.users.filter(x => x.FullName == this.currentUser.FullName && x.RoleId == this.currentUser.RoleId && x.MobileNo == this.currentUser.MobileNo
+                                && x.MailId == this.currentUser.MailId
+                            );
+                            this.userDialogVisible = false;
+                            this.onSelectionChange();
+                            this.printBarcode();
 
-                    },
-                    reject: () => {
-                        this.userDialogVisible = false;
-                    }
-                });
+                        },
+                        reject: () => {
+                            this.userDialogVisible = false;
+                        }
+                    });
+                }
+                else
+                {
+                    this.userDialogVisible = false;
                 }
 
                 
@@ -1675,6 +1679,10 @@ export class ManageUsersComponent {
                             }
                         });
                     }
+                    else
+                    {
+                        this.importDialogVisible = false;
+                    }
 
                 }
                 else if (successes.length > 0) {
@@ -1716,6 +1724,10 @@ export class ManageUsersComponent {
                                 this.importDialogVisible = false;
                             }
                         });
+                    }
+                    else
+                    {
+                        this.importDialogVisible = false;
                     }
                 }
                  

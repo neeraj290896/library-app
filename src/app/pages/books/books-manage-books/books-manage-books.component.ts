@@ -1202,6 +1202,10 @@ export class BooksManageBooksComponent implements OnInit {
                             });
                         }
                     }
+                    else
+                    {
+                        this.bookDialogVisible = false;
+                    }
                 }
             },
             error: () => {
@@ -2236,6 +2240,10 @@ export class BooksManageBooksComponent implements OnInit {
                         {
                             this.importDialogVisible = false;
                         }
+                    }
+                    else
+                    {
+                        this.bookDialogVisible = false;
                     }
                     
                 }                

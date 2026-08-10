@@ -1043,6 +1043,10 @@ export class DashboardComponent {
                             });
                         }
                     }
+                    else
+                    {
+                        this.addNewBookDialogVisible = false;
+                    }
 
                 }
 
@@ -1382,6 +1386,10 @@ export class DashboardComponent {
                                 this.registerUserDialogVisible = false;
                             }
                         });
+                    }
+                    else
+                    {
+                        this.registerUserDialogVisible = false;
                     }
 
                 }                

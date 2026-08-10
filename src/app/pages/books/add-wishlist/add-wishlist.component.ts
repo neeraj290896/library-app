@@ -59,13 +59,31 @@ export class AddWishlistComponent {
               this.lstBookDetails = data;
               if (this.selectedBookId == 0) {
                   this.bookOptions = this.lstBookDetails.filter(x => x.Status == "Issued").map(book => {
-                      return { label: book.BookName ?? '', value: book.BookId };
-                  });                  
+                                // 1. Keep bookName fallback clean
+                                const bookName = book.BookName || 'Unnamed Book';
+                                
+                                // 2. Conditionally build the prefix with the pipe included
+                                const prefix = book.AccessionNo ? `(${book.AccessionNo}) | ` : '';
+
+                                return { 
+                                    label: `${prefix}${bookName}`, 
+                                    value: book.BookId 
+                                };
+                            }); 
               }
               else {
                   this.bookOptions = data.map(book => {
-                      return { label: book.BookName ?? '', value: book.BookId };
-                  });
+                                // 1. Keep bookName fallback clean
+                                const bookName = book.BookName || 'Unnamed Book';
+                                
+                                // 2. Conditionally build the prefix with the pipe included
+                                const prefix = book.AccessionNo ? `(${book.AccessionNo}) | ` : '';
+
+                                return { 
+                                    label: `${prefix}${bookName}`, 
+                                    value: book.BookId 
+                                };
+                            }); 
 
                   this.selectedWishlist.BookId = this.selectedBookId;
 

@@ -266,13 +266,18 @@
         </p-accordion-panel>
     </p-accordion>
 
-    <p-accordion value="">
+    <p-accordion value="" *ngIf="enableUserSettingsAccess">
         <p-accordion-panel value="0">
             <p-accordion-header>
                 <div class="d-flex align-items-center justify-content-between w-100">
                     <div>
                         <h2 class="fs-4 fw-semibold mb-1">Database BackUp</h2>
-                        <p class="small text-muted mb-0">Last Database BackUp was taken on: {{ (dbBackUpDetails?.[0]?.CompletedDate | date:'yyyy-MM-dd HH:mm:ss') || '--------' }}</p>
+                        <!-- <p class="small text-muted mb-0"></p> -->
+
+                        <i class="pi pi-clock text-color-secondary font-regular small text-muted mb-0"></i>
+                        <span class="text-sm text-color-secondary font-regular small text-muted mb-0">
+                            Last Database BackUp was taken on:  <strong>{{ (dbBackUpDetails?.[0]?.CompletedDate | date:'yyyy-MM-dd HH:mm:ss a') || '--------' }}</strong>
+                        </span>
                     </div>
                 </div>
             </p-accordion-header>
