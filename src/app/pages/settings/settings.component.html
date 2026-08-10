@@ -66,7 +66,7 @@
                         <p-checkbox inputId="email-notif" [binary]="true"
                             [(ngModel)]="settingDetails.EnableEmailNotification" [disabled] = "!enableAplnSettingsAccess"
                             [ngModelOptions]="{standalone: true}"></p-checkbox>
-                        <label for="email-notif" class="form-check-label small text-secondary">Enable email
+                        <label for="email-notif" class="form-check-label small text-secondary">Enable E-Mail
                             notifications</label>
                     </div>
                     <div class="d-flex gap-2 align-items-center col-md-6">
@@ -98,6 +98,13 @@
                             [ngModelOptions]="{standalone: true}"></p-checkbox>
                         <label for="barcode-scan" class="form-check-label small text-secondary">Enable Barcode
                             scanning</label>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center col-md-6"
+                        *ngIf="(loggedInUserDetails?.RoleId ?? 0) == 1">
+                        <p-checkbox inputId="barcode-print" [binary]="true" [disabled] = "!enableAplnSettingsAccess"
+                            [(ngModel)]="settingDetails.EnableBarcodePrintOption"
+                            [ngModelOptions]="{standalone: true}"></p-checkbox>
+                        <label for="barcode-print" class="form-check-label small text-secondary">Enable Barcode Print Option</label>
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3 justify-content-end border-top pt-4">
@@ -253,6 +260,32 @@
                     <div class="d-flex gap-2 align-items-center col-md-12">
                         <p-button type="button" label="Reset Password" [style]="{ width: '10rem' }"
                             styleClass="btn-main-danger" (click)="resetPassword()"></p-button>
+                    </div>
+                </div>
+            </p-accordion-content>
+        </p-accordion-panel>
+    </p-accordion>
+
+    <p-accordion value="" *ngIf="enableUserSettingsAccess">
+        <p-accordion-panel value="0">
+            <p-accordion-header>
+                <div class="d-flex align-items-center justify-content-between w-100">
+                    <div>
+                        <h2 class="fs-4 fw-semibold mb-1">Database BackUp</h2>
+                        <!-- <p class="small text-muted mb-0"></p> -->
+
+                        <i class="pi pi-clock text-color-secondary font-regular small text-muted mb-0"></i>
+                        <span class="text-sm text-color-secondary font-regular small text-muted mb-0">
+                            Last Database BackUp was taken on:  <strong>{{ (dbBackUpDetails?.[0]?.CompletedDate | date:'yyyy-MM-dd HH:mm:ss a') || '--------' }}</strong>
+                        </span>
+                    </div>
+                </div>
+            </p-accordion-header>
+            <p-accordion-content>
+                <div class="row g-3 mt-0">
+                    <div class="d-flex gap-2 align-items-center col-md-12">
+                        <p-button type="button" label="Initialize Database BackUp" [style]="{ width: '14rem' }"
+                            styleClass="btn-main" (click)="generateDatabaseBackup()"></p-button>
                     </div>
                 </div>
             </p-accordion-content>

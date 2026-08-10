@@ -259,37 +259,60 @@ export class UsersBookCirculationComponent {
             return 'success';
         }
 
-        if (status === 'Returned' && _overDueDays <= 7) {
+        if (status === 'Returned' && _overDueDays <= 2) {
             return 'info';
         }
 
-        if (status === 'Issued' && _overDueDays <= 7) {
+        if (status === 'Issued' && _overDueDays <= 2) {
             return 'info';
         }
 
-        if (status === 'Issued' && _overDueDays > 7 && _overDueDays <= 14) {
+        if (status === 'Issued' && _overDueDays > 2 && _overDueDays <= 5) {
             return 'warn';
         }
 
-        if (status === 'Issued' && _overDueDays > 14) {
+        if (status === 'Issued' && _overDueDays > 5) {
             return 'danger';
         }
         
         return 'secondary'
     }
 
-
-    getOverDueSeverity(_overDueDays: number): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
-       
-        if (_overDueDays <= 7) {
-            return 'info';
-        }
+     getBookDueSeverity(_dateParam: Date): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
         
-        if (_overDueDays > 7 && _overDueDays <= 14) {
+        // 1. Create a copy of the parameter and strip its time
+        const inputDate = new Date(_dateParam);
+        inputDate.setHours(0, 0, 0, 0);
+
+        // 2. Create a copy of today's date and strip its time
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // 3. Compare using timestamps
+        if (inputDate.getTime() > today.getTime()) {
+            return 'success';
+        }
+
+        if (inputDate.getTime() === today.getTime()) {
             return 'warn';
         }
 
-        if (_overDueDays > 14) {
+        return 'danger'; // Remaining case: inputDate > today
+       
+    }
+
+
+    getOverDueSeverity(_overDueDays: number): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
+       
+        if (_overDueDays <= 2) {
+            return 'info';
+        }
+        
+        if (_overDueDays > 2 && _overDueDays <= 5) {
+            return 'warn';
+        }
+
+        if (_overDueDays > 5) {
             return 'danger';
         }
   
@@ -309,11 +332,11 @@ export class UsersBookCirculationComponent {
             return 'success';
         }
 
-        if (status !=null && _overDueDays <= 7) {
+        if (status !=null && _overDueDays <= 2) {
             return 'info';
         }
         
-        if (status !=null && (_overDueDays > 7 && _overDueDays <= 14)) {
+        if (status !=null && (_overDueDays > 2 && _overDueDays <= 5)) {
             return 'warn';
         }
   
@@ -330,7 +353,7 @@ export class UsersBookCirculationComponent {
         else
         {
             this.bc  = { BookCirculationId: 0, BookId: 0,  BookName: '', BorrowerId: this.selectedUserDetails.UserId, BorrowerName : this.selectedUserDetails.FullName, 
-                        IssuedByUserId: this.loggedInUserDetails?.UserId, IssuedByUserName :this.loggedInUserDetails?.FullName, 
+                        IssuedByUserId: this.loggedInUserDetails?.UserId, IssuedByUserName :this.loggedInUserDetails?.FullName, ActualOverDueDate: null, ExtendedDate: null,
                         IssuedDate : this.todayDate, IssuedByUserMailId: this.loggedInUserDetails?.MailId, OverDueId: 0, FineAmount: 0.0, 
                         OverDueFrom : null, OverDueDays: 0, OverDueStatus : '', SytemUpdatedDate:null, ReturnByUserId: 0,
                         ReturnByUserName : '', ReturnDate : null,  Comments: '', Status : 'Issued', UpdatedByUserId : 0, 

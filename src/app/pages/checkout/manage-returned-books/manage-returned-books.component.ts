@@ -274,33 +274,56 @@ searchBookTerm = '';
             return 'success';
         }
 
-        if (status === 'Returned' && _overDueDays <= 7) {
+        if (status === 'Returned' && _overDueDays <= 2) {
             return 'info';
         }
 
-        if (status === 'Returned' && (_overDueDays > 7 && _overDueDays <= 14)) {
+        if (status === 'Returned' && (_overDueDays > 2 && _overDueDays <= 5)) {
             return 'warn';
         }
 
-        if (status === 'Returned' && (_overDueDays > 14)) {
+        if (status === 'Returned' && (_overDueDays > 5)) {
             return 'danger';
         }
         
         return 'secondary'
     }
 
-
-    getOverDueSeverity(_overDueDays: number): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
-       
-        if (_overDueDays <= 7) {
-            return 'info';
-        }
+     getBookDueSeverity(_dateParam: Date): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
         
-        if (_overDueDays > 7 && _overDueDays <= 14) {
+        // 1. Create a copy of the parameter and strip its time
+        const inputDate = new Date(_dateParam);
+        inputDate.setHours(0, 0, 0, 0);
+
+        // 2. Create a copy of today's date and strip its time
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // 3. Compare using timestamps
+        if (inputDate.getTime() > today.getTime()) {
+            return 'success';
+        }
+
+        if (inputDate.getTime() === today.getTime()) {
             return 'warn';
         }
 
-        if (_overDueDays > 14) {
+        return 'danger'; // Remaining case: inputDate > today
+       
+    }
+
+
+    getOverDueSeverity(_overDueDays: number): 'success' | 'warn'| 'danger' | 'info' | 'secondary' {
+       
+        if (_overDueDays <= 2) {
+            return 'info';
+        }
+        
+        if (_overDueDays > 2 && _overDueDays <= 5) {
+            return 'warn';
+        }
+
+        if (_overDueDays > 5) {
             return 'danger';
         }
   
@@ -320,11 +343,11 @@ searchBookTerm = '';
             return 'success';
         }
 
-        if (status !=null && _overDueDays <= 7) {
+        if (status !=null && _overDueDays <= 2) {
             return 'info';
         }
         
-        if (status !=null && (_overDueDays > 7 && _overDueDays <= 14)) {
+        if (status !=null && (_overDueDays > 2 && _overDueDays <= 5)) {
             return 'warn';
         }
   

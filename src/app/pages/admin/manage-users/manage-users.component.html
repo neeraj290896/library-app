@@ -2,11 +2,13 @@
     <div class="table-clear-filter  d-flex align-items-center gap-3">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
-        <p-button [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
+        <p-button *ngIf="isBarcodePrintOptionEnabled" [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
             styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print"
             (onClick)="printBarcode()"></p-button>
-        <p-button type="button" label="Download User Details" icon="pi pi-download" *ngIf="users.length >0"
+        <p-button type="button" label="Download User Details" icon="pi pi-download" *ngIf="users.length > 1"
                     styleClass="btn-main-outlined" (click)="downloadUserDetails()"></p-button>
+        <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                    (click)="importUser()"></p-button>
         <div class="position-relative" *ngIf="isBarcodeSearch">
             <span class="pi pi-search search-icon position-absolute text-muted"></span>
             <input #bookInput autofocus pInputText type="text" placeholder="Search Book" [(ngModel)]="searchBookTerm" (keydown.enter)="onBookSearch()"
@@ -24,7 +26,7 @@
                     <th style="width: 3%">
                         <!-- Header checkbox for selecting/deselecting all items -->
                         <p-tableHeaderCheckbox> id="chk-header-all"
-                            [value]="books" </p-tableHeaderCheckbox>
+                            [value]="users" </p-tableHeaderCheckbox>
                     </th>
                     <th class="text-start text-muted fw-medium" style="width: 4%;">
                         <div class="d-flex align-items-center gap-2">
@@ -183,7 +185,7 @@
 
             <ng-template pTemplate="body" let-user let-index="rowIndex">
                 <tr class="border-bottom">
-                    <td><p-tableCheckbox [index]="index" [value]="user" id="chk-row-{{user.UserId}}" /></td>
+                    <td><p-tableCheckbox [index]="index" [value]="user" id="chk-row-{{user.UserId}}" [disabled]="!isBarcodePrintOptionEnabled" /></td>
                     <td>{{ index + 1 }}</td>
                     <td>{{ user.FullName }}</td>
                     <td>{{ user.RoleName }}</td>

@@ -35,4 +35,12 @@ export class AdminService {
     updateAccessRequestDetails(payload: AccessRequestDetails[]): Observable<any> {
         return this.http.post(`${this.baseUrl}/UpdateAccessRequestDetails`, payload);
     }
+
+    initiateDbBackUp(triggeredBy: string): Observable<any> {
+        return this.http.get(`${this.baseUrl}/InitiateDbBackUp?triggeredBy=${triggeredBy}`);
+    }
+
+    getLatestDbBackUpDetails(): Observable<any> {
+        return this.http.get(`${this.baseUrl}/GetLatestDbBackUpDetails`);
+    }
 }

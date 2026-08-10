@@ -20,7 +20,7 @@
     </div>
     <div style="overflow-x: auto;">
         <p-table [value]="filteredBcDetails" [autoLayout]="false" [paginator]="true" [rows]="10"
-            [style]="{ minWidth: '3200px' }" [scrollable]="true" styleClass="p-datatable-sm"
+            [style]="{ minWidth: '3500px' }" [scrollable]="true" styleClass="p-datatable-sm"
             [rowsPerPageOptions]="[10, 20, 50, 100]" paginatorPosition="top" [showCurrentPageReport]="true"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
@@ -44,7 +44,7 @@
                                 (click)="showFilter()"></span>
                         </div>
                     </th>
-                    <th class="text-start text-muted fw-medium" style="width: 10%;">
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="accessionNo">
                                 Accession No
@@ -105,6 +105,26 @@
                     </th>
                     <th class="text-start text-muted fw-medium" style="width: 12%;">
                         <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="actualOverDue">
+                                Actual Due Date
+                                <p-sortIcon field="actualOverDue"></p-sortIcon>
+                            </div>
+                            <!-- <span class="pi" [ngClass]="selectedActualOverDueFromList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span> -->
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2" pSortableColumn="overDueExtendedDate">
+                                Extended Due Date
+                                <p-sortIcon field="overDueExtendedDate"></p-sortIcon>
+                            </div>
+                            <!-- <span class="pi" [ngClass]="selectedOverDueExtendedDateList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                (click)="showFilter()"></span> -->
+                        </div>
+                    </th>
+                    <th class="text-start text-muted fw-medium" style="width: 12%;">
+                        <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="returnBy">
                                 Returned By
                                 <p-sortIcon field="returnBy"></p-sortIcon>
@@ -129,7 +149,7 @@
                             </div>
                         </div>
                     </th>
-                    <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <th class="text-start text-muted fw-medium" style="width:12%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="overDueDays">
                                 Over Due in Days
@@ -137,7 +157,7 @@
                             </div>
                         </div>
                     </th>
-                    <th class="text-start text-muted fw-medium" style="width:10%;">
+                    <th class="text-start text-muted fw-medium" style="width:12%;">
                         <div class="d-flex align-items-center gap-2">
                             <div class="d-flex align-items-center gap-2" pSortableColumn="overDueStatus">
                                 Over Due Status
@@ -235,6 +255,8 @@
                     <th></th>
                     <th></th>
                     <th></th>
+                    <th></th>
+                    <th></th>
                 </tr>
                 }
             </ng-template>
@@ -250,6 +272,16 @@
                     <td>{{ book.IssuedDate | date:'yyyy-MM-dd'}}</td>
                     <td>
                         <p-tag [value]="book.Status" [severity]="getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
+                    </td>
+                    <td>
+                        <p-tag [value]="(book.ActualOverDueDate | date:'yyyy-MM-dd') || '-'"
+                            [severity]="book.Status === 'Issued' ? getBookDueSeverity(book.ActualOverDueDate) : getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
+
+                    </td>
+                    <td>
+                        <p-tag [value]="(book.ExtendedDate | date:'yyyy-MM-dd') || '-'"
+                             [severity]="book.Status === 'Issued' ? getBookDueSeverity(book.ActualOverDueDate) : getStatusSeverity(book.Status, book.OverDueDays)"></p-tag>
+
                     </td>
                     <td>{{ book.ReturnByUserName || '-' }}</td>
                     <td>{{ (book.ReturnDate | date:'yyyy-MM-dd') || '-'}}</td>
@@ -282,7 +314,7 @@
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="14" class="text-center">No book circulation found.</td>
+                    <td colspan="16" class="text-center">No book circulation found.</td>
                 </tr>
             </ng-template>
         </p-table>

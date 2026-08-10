@@ -21,6 +21,7 @@ export interface SettingDetails {
     EnableWishlistNotification: boolean;
     EnableMobileNotification: boolean;
     EnableBarcodeScanning: boolean;
+    EnableBarcodePrintOption: boolean;
     ReminderMailNotificationInDays: number;
     IsActive: boolean;
 }
@@ -425,4 +426,12 @@ export interface WishlistDetails {
     IssuedOn?: string | null;
     NotifiedOn?: string | null;
     UpdatedOn?: string | null;
+}
+
+export interface DbBackUpDetails {
+    Id: number;
+    BackUpFileName?: string | null;
+    TriggeredBy?: string | null;
+    CreatedDate?: string | null;
+    CompletedDate?: string | null;    
 }

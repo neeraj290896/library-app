@@ -294,19 +294,19 @@ export class BooksViewCirculationComponent {
             return 'success';
         }
 
-        if (status === 'Returned' && _overDueDays <= 7) {
+        if (status === 'Returned' && _overDueDays <= 2) {
             return 'info';
         }
 
-        if (status === 'Issued' && _overDueDays <= 7) {
+        if (status === 'Issued' && _overDueDays <= 2) {
             return 'info';
         }
 
-        if (status === 'Issued' && _overDueDays > 7 && _overDueDays <= 14) {
+        if (status === 'Issued' && _overDueDays > 2 && _overDueDays <= 5) {
             return 'warn';
         }
 
-        if (status === 'Issued' && _overDueDays > 14) {
+        if (status === 'Issued' && _overDueDays > 5) {
             return 'danger';
         }
 
@@ -316,15 +316,15 @@ export class BooksViewCirculationComponent {
 
     getOverDueSeverity(_overDueDays: number): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
 
-        if (_overDueDays <= 7) {
+        if (_overDueDays <= 2) {
             return 'info';
         }
 
-        if (_overDueDays > 7 && _overDueDays <= 14) {
+        if (_overDueDays > 2 && _overDueDays <= 5) {
             return 'warn';
         }
 
-        if (_overDueDays > 14) {
+        if (_overDueDays > 5) {
             return 'danger';
         }
 
@@ -344,11 +344,11 @@ export class BooksViewCirculationComponent {
             return 'success';
         }
 
-        if (status != null && _overDueDays <= 7) {
+        if (status != null && _overDueDays <= 2) {
             return 'info';
         }
 
-        if (status != null && (_overDueDays > 7 && _overDueDays <= 14)) {
+        if (status != null && (_overDueDays > 2 && _overDueDays <= 5)) {
             return 'warn';
         }
 

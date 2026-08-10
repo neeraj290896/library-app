@@ -264,6 +264,7 @@ export class DashboardComponent {
     public minDate: Date | undefined;
     public maxDate: Date | undefined;
     public nextAvailableLibraryNo : string ="VCN ";
+    public isBarcodePrintOptionEnabled: boolean = false;
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -296,6 +297,7 @@ export class DashboardComponent {
      
 
         this.loggedInUserDetails = this.authService.userData() ?? this.authService.userDataTemp;
+        this.isBarcodePrintOptionEnabled = this.authService.settingsDetails()?.EnableBarcodePrintOption ?? false;
 
         this.loadDashboardSummary();
         this.loadOverDueDetails();
@@ -999,45 +1001,51 @@ export class DashboardComponent {
                 
                     this.loadBooks();
                     
-
-                    // 1. Get the message string
-                    const responseMsg: string = res.Message;
-
-                    // 2. Split by "-" and grab the first element safely using optional chaining
-                    const firstPart: string = responseMsg?.split('-')[0] || '';
-
-                    // 3. Split the first part by "," to get your final array
-                    const finalArray: string[] = firstPart ? firstPart.split(',') : [];
-              
-                    if(finalArray !=null && finalArray.length >0)
+                    if(this.isBarcodePrintOptionEnabled)
                     {
+                        // 1. Get the message string
+                        const responseMsg: string = res.Message;
 
-                        this.confirmationService.confirm({
-                            message: "Do you want to print book's barcode?",
-                            header: 'Print Confirmation',
-                            icon: 'pi pi-print',
-                            acceptLabel: 'Yes',
-                            rejectLabel: 'No',
-                            accept: () => {
-                                this.selectedBookDetails = [];
+                        // 2. Split by "-" and grab the first element safely using optional chaining
+                        const firstPart: string = responseMsg?.split('-')[0] || '';
 
-                                finalArray.forEach(ele => {
-                                    const _importedData = this.books.find(x => x.BookId == parseInt(ele));
-                                        
-                                    if(_importedData !=null)
-                                    {
-                                        this.selectedBookDetails.push(_importedData);
-                                    }
-                                }); 
-                                this.addNewBookDialogVisible = false;
-                                this.onBookSelectionChange();
-                                this.printBookBarcode();
+                        // 3. Split the first part by "," to get your final array
+                        const finalArray: string[] = firstPart ? firstPart.split(',') : [];
+                
+                        if(finalArray !=null && finalArray.length >0)
+                        {
 
-                            },
-                            reject: () => {
-                                this.addNewBookDialogVisible = false;
-                            }
-                        });
+                            this.confirmationService.confirm({
+                                message: "Do you want to print book's barcode?",
+                                header: 'Print Confirmation',
+                                icon: 'pi pi-print',
+                                acceptLabel: 'Yes',
+                                rejectLabel: 'No',
+                                accept: () => {
+                                    this.selectedBookDetails = [];
+
+                                    finalArray.forEach(ele => {
+                                        const _importedData = this.books.find(x => x.BookId == parseInt(ele));
+                                            
+                                        if(_importedData !=null)
+                                        {
+                                            this.selectedBookDetails.push(_importedData);
+                                        }
+                                    }); 
+                                    this.addNewBookDialogVisible = false;
+                                    this.onBookSelectionChange();
+                                    this.printBookBarcode();
+
+                                },
+                                reject: () => {
+                                    this.addNewBookDialogVisible = false;
+                                }
+                            });
+                        }
+                    }
+                    else
+                    {
+                        this.addNewBookDialogVisible = false;
                     }
 
                 }
@@ -1356,26 +1364,33 @@ export class DashboardComponent {
 
                     this.loadUserDetails();
                     
+                    if(this.isBarcodePrintOptionEnabled)
+                    {
 
-                    this.confirmationService.confirm({
-                        message: "Do you want to print user's barcode?",
-                        header: 'Print Confirmation',
-                        icon: 'pi pi-print',
-                        acceptLabel: 'Yes',
-                        rejectLabel: 'No',
-                        accept: () => {
-                            this.selectedUserDetails = this.users.filter(x => x.FullName == this.currentUser.FullName && x.RoleId == this.currentUser.RoleId && x.MobileNo == this.currentUser.MobileNo
-                                && x.MailId == this.currentUser.MailId
-                            );
-                            this.registerUserDialogVisible = false;
-                            this.onUserSelectionChange();
-                            this.printUserBarcode();
+                        this.confirmationService.confirm({
+                            message: "Do you want to print user's barcode?",
+                            header: 'Print Confirmation',
+                            icon: 'pi pi-print',
+                            acceptLabel: 'Yes',
+                            rejectLabel: 'No',
+                            accept: () => {
+                                this.selectedUserDetails = this.users.filter(x => x.FullName == this.currentUser.FullName && x.RoleId == this.currentUser.RoleId && x.MobileNo == this.currentUser.MobileNo
+                                    && x.MailId == this.currentUser.MailId
+                                );
+                                this.registerUserDialogVisible = false;
+                                this.onUserSelectionChange();
+                                this.printUserBarcode();
 
-                        },
-                        reject: () => {
-                            this.registerUserDialogVisible = false;
-                        }
-                    });
+                            },
+                            reject: () => {
+                                this.registerUserDialogVisible = false;
+                            }
+                        });
+                    }
+                    else
+                    {
+                        this.registerUserDialogVisible = false;
+                    }
 
                 }                
             },

@@ -2,7 +2,7 @@
     <div class="table-clear-filter d-flex align-items-center gap-3">
         <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
             (onClick)="clear()"></p-button>
-        <p-button [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
+        <p-button *ngIf="isBarcodePrintOptionEnabled" [disabled]="this.selectedIds ==null || this.selectedIds.length == 0" class="p-button-outlined"
             styleClass="btn-main-outlined" label="Print Barcode" icon="pi pi-print"
             (onClick)="printBarcode()"></p-button>
         <div class="position-relative" *ngIf="isBarcodeSearch">
@@ -10,8 +10,11 @@
             <input #userInput autofocus pInputText type="text" placeholder="Search User" [(ngModel)]="searchUserTerm" (keydown.enter)="onUserSearch()"
                 class="form-control ps-5" />
         </div>
-        <p-button type="button" label="Download Book Details" icon="pi pi-download" *ngIf="books.length >0"
+        <p-button type="button" label="Download Book Details" icon="pi pi-download" *ngIf="books.length >1"
                     styleClass="btn-main-outlined" (click)="downloadBooksDetails()"></p-button>
+
+        <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                    (click)="importBook()"></p-button>
     </div>
     <div style="overflow-x: auto;">
         <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails"
@@ -216,7 +219,7 @@
 
             <ng-template pTemplate="body" let-book let-index="rowIndex">
                 <tr class="border-bottom">
-                    <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" /></td>
+                    <td><p-tableCheckbox [index]="index" [value]="book" id="chk-row-{{book.BookId}}" [disabled]="!isBarcodePrintOptionEnabled"/></td>
                     <td>{{ index + 1 }}</td>
                     <td>
                         <span [pTooltip]="book.AccessionNo">
@@ -369,7 +372,7 @@
                     Subject<sup>*</sup>
                 </label>
                 <p-select id="subjectId" [(ngModel)]="currentBook.SubjectId" [ngModelOptions]="{standalone: true}"
-                    [options]="subjectOptions" optionLabel="label" optionValue="value" [editable]="true"
+                   [editable]="true" [options]="subjectOptions" optionLabel="label" optionValue="value"
                     placeholder="Select subject" styleClass="w-100" appendTo="body"
                     (ngModelChange)="onSubjectChange()"></p-select>  
                     @if (errors.SubjectId) {
@@ -763,12 +766,11 @@
     [style]="{ width: '100vw', maxWidth: '2000px', left: '0px' }" appendTo="body">
         <div class="row">
             <div class="col-12 d-flex flex-wrap align-items-center justify-content-between">
-                <div class="table-clear-filter">
+               
+                <div class="d-flex align-items-center gap-3">
                     <p-button class="p-button-outlined" styleClass="btn-main-outlined" label="Clear" icon="pi pi-filter-slash"
                         (onClick)="clearImport()"></p-button>
-                </div>
-                <div class="d-flex align-items-center gap-3">
-                    <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
+                    <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main" [style]="{ marginLeft: '0.5rem' }"
                         (click)="fileInput.click()"></p-button>
                     <input type="file" #fileInput
                         accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
@@ -781,9 +783,9 @@
                     styleClass="btn-main-outlined" (click)="downloadBookTemplate()"></p-button>
             </div>
         </div>        
-        <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
+        <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh; margin-top: 1rem !important;">
             <p-table #importDt [value]="importPreview" [autoLayout]="false" [paginator]="false" [scrollable]="true" 
-                [style]="{ minWidth: '2800px' }" [scrollable]="true" styleClass="p-datatable-sm">
+                [style]="{ minWidth: '3200px' }" [scrollable]="true" styleClass="p-datatable-sm">
 
                 <ng-template pTemplate="header">
                     <tr class="border-bottom">
@@ -794,7 +796,7 @@
                                 </div>
                             </div>
                         </th>
-                        <th class="text-start text-muted fw-medium" style="width: 9%;">
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="d-flex align-items-center gap-2" pSortableColumn="AccessionNo">
                                     Accession No
@@ -871,6 +873,17 @@
                                     (click)="showImportFilter()"></span>
                             </div>
                         </th>
+                        <th class="text-start text-muted fw-medium" style="width: 9%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="price">
+                                    Price (₹)
+                                    <p-sortIcon field="price"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedPriceList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
                         <th class="text-start text-muted fw-medium" style="width: 12%;">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="d-flex align-items-center gap-2" pSortableColumn="BillNo">
@@ -879,6 +892,17 @@
                                 </div>
                                 <span class="pi"
                                     [ngClass]="importSelectedBillNoList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
+                                    (click)="showImportFilter()"></span>
+                            </div>
+                        </th>
+                        <th class="text-start text-muted fw-medium" style="width: 12%;">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2" pSortableColumn="BillDate">
+                                    Bill Date
+                                    <p-sortIcon field="BillDate"></p-sortIcon>
+                                </div>
+                                <span class="pi"
+                                    [ngClass]="importSelectedBillDateList.length > 0 ? 'pi-filter-fill' : 'pi-filter'"
                                     (click)="showImportFilter()"></span>
                             </div>
                         </th>
@@ -1029,11 +1053,35 @@
                             </p-columnFilter>
                         </th>
                         <th>
+                            <p-columnFilter field="Price" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importPriceList"
+                                        [(ngModel)]="importSelectedPriceList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
                             <p-columnFilter field="BillNo" matchMode="in" [showMenu]="false"
                                 [showClearButton]="false">
                                 <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                     <p-multiSelect [options]="importBillNoList"
                                         [(ngModel)]="importSelectedBillNoList" (onChange)="filter($event.value)"
+                                        selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
+                                        optionLabel="label" optionValue="value" appendTo="body"
+                                        placeholder="All"></p-multiSelect>
+                                </ng-template>
+                            </p-columnFilter>
+                        </th>
+                        <th>
+                            <p-columnFilter field="BillDate" matchMode="in" [showMenu]="false"
+                                [showClearButton]="false">
+                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                    <p-multiSelect [options]="importBillDateList"
+                                        [(ngModel)]="importSelectedBillDateList" (onChange)="filter($event.value)"
                                         selectedItemsLabel="{0} items selected" [resetFilterOnHide]="true"
                                         optionLabel="label" optionValue="value" appendTo="body"
                                         placeholder="All"></p-multiSelect>
@@ -1128,9 +1176,11 @@
                             </span>
                         </td>
                         <td>{{ book.PublishedYear }}</td>
+                        <td>{{ book.Price }}</td>
                         <td>{{ book.BillNo }}</td>
+                        <td>{{ book.BillDate }}</td>
                         <td>{{ book.CallNo }}</td>                        
-                        <td>{{ book.Source }}</td>
+                        <td>{{ book.SourceName }}</td>
                         <td>{{ book.SubjectName }}</td>
                         <!-- <td>
                             <p-tag [value]="book.IsActive ? 'Active' : 'In-Active'"
@@ -1157,7 +1207,7 @@
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="14" class="text-center">
+                        <td colspan="16" class="text-center">
                             No books found.
                         </td>
                     </tr>
@@ -1448,8 +1498,8 @@
                             <ngx-barcode6 [bc-value]="book.BookBarcode" [bc-format]="'CODE128'" [bc-display-value]="false"
                                 [bc-height]="40" [bc-width]="1.5"> </ngx-barcode6>
                             <div class="barcode-label"
-                                style="font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; margin-top: -1rem;margin-left: 3rem;">
-                                {{ book.BookName }}
+                                style="font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold; margin-top: -1rem; text-align: center; width: 100%;">
+                                {{ book.AccessionNo }}
                             </div>
                         </td>
                     </tr>
