@@ -60,7 +60,7 @@ export interface BookDetails {
     Price?: number | null;
     BillNo?: string | null;
     BillDate?: string | null;
-    TotalPageNo?: number | null;
+    TotalPageNo?: string | null;
     CallNo?: string | null;
     AccessionNo?: string | null;
     SourceId?: number | null;
@@ -435,3 +435,24 @@ export interface DbBackUpDetails {
     CreatedDate?: string | null;
     CompletedDate?: string | null;    
 }
+
+export interface StaticsticsFieldDetails {
+    StaticsticsId: number;
+    StaticsticsField?: string | null;
+    IsActive?: boolean | null;   
+}
+
+export interface StaticsticsData {
+    Id: number;
+    Name?: string | null;
+    Count: number;   
+}
+
+
+
+export interface SearchQuery {
+    DsMode: string;
+    FromDate?: string | null;
+    ToDate?: string | null; 
+}
+

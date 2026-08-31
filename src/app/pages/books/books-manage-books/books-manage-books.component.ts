@@ -56,6 +56,8 @@ type ImportBookDetails = BookDetails & {
 })
 export class BooksManageBooksComponent implements OnInit {
     @Input() public searchTerm: string = '';
+    @Input() public statsData: BookDetails[] = [];
+
     @ViewChild('userInput') set userInputElement(content: ElementRef<HTMLInputElement>) {
     if (content && content.nativeElement) {
         setTimeout(() => {
@@ -211,7 +213,7 @@ export class BooksManageBooksComponent implements OnInit {
     public importErrorList: { label: string, value: string }[] = [];
     public importBillNoList: { label: string, value: string }[] = [];
     public importBillDateList: { label: string, value: string }[] = [];
-    public importTotalPageNoList: { label: number, value: number }[] = [];
+    public importTotalPageNoList: { label: string, value: string }[] = [];
     public importCallNoList: { label: string, value: string }[] = [];
     public importAccessionNoList: { label: string, value: string }[] = [];
     public importSourceList: { label: string, value: string }[] = [];
@@ -330,6 +332,11 @@ export class BooksManageBooksComponent implements OnInit {
                     console.error('Error loading books:', err);
                 }
             });
+        }
+        else if(this.statsData !=null && this.statsData.length >0)
+        {
+            this.books = [...this.statsData];
+            this.initializeFilterLists();
         }
         else {
             this.bookService.getAllBookDetails().subscribe({
@@ -2454,7 +2461,7 @@ export class BooksManageBooksComponent implements OnInit {
             price: book.Price || 0,
             billNo: book.BillNo || '',
             billDate: book.BillDate || '',
-            pageNo: book.TotalPageNo || 0,
+            pageNo: book.TotalPageNo || '',
             callNo: book.CallNo || '',            
             source: book.SourceName || '',
             subject: book.SubjectName || '',

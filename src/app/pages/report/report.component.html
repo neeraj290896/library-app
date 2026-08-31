@@ -1,0 +1,26 @@
+<div class="report-container d-flex flex-column gap-4">
+    <div class="card border-0 shadow-sm rounded p-3 card-container">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fs-4 fw-semibold mb-1">Reports</h2>
+                <p class="small text-muted mb-0">View Report Details</p>
+            </div>
+            <app-search></app-search>
+        </div>
+
+        <!-- Filter Tabs -->
+        <p-tabView [(activeIndex)]="activeTab" class="report-tabs">            
+            <p-tabPanel header="Statistics" >
+                <app-statistics *ngIf="activeTab === 0"></app-statistics>
+            </p-tabPanel>
+            <p-tabPanel header="View Transaction Details" >
+                <app-transaction-details *ngIf="activeTab === 1"></app-transaction-details>
+            </p-tabPanel>
+            <p-tabPanel header="Search Books Details" >
+                <app-search-books-details *ngIf="activeTab === 2"></app-search-books-details>
+            </p-tabPanel>
+            
+        </p-tabView>
+    </div>
+</div>

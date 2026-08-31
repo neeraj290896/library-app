@@ -33,11 +33,12 @@ export class LayoutComponent {
     public organizationImagePath: string = '';
 
     public readonly menuItems = [
-        { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-chart-bar' },
+        { path: '/dashboard', label: 'Dashboard', icon: 'pi pi-home' },
         { path: '/books', label: 'Books', icon: 'pi pi-book' },
         { path: '/transactions', label: 'Transactions', icon: 'pi pi-sync' },
         { path: '/admin', label: 'Admin', icon: 'pi pi-shield' },
         { path: '/organization', label: 'Organization', icon: 'pi pi-building-columns' },
+        { path: '/reports', label: 'Reports', icon: 'pi pi-chart-line' },
         { path: '/settings', label: 'Settings', icon: 'pi pi-cog' },
         { path: '/help', label: 'Help', icon: 'pi pi-question-circle' },
     ];
