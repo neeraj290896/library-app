@@ -15,6 +15,8 @@
 
         <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
                     (click)="importBook()"></p-button>
+        <p-button type="button" label="Import book from ISBN" icon="pi pi-download" 
+                    styleClass="btn-main-outlined" (click)="importISBN()"></p-button>
     </div>
     <div style="overflow-x: auto;">
         <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails"
@@ -725,10 +727,12 @@
             </p-tabPanel>
 
             <p-tabPanel header="View Book Circulation">
-                @if (activeTab === 1) {
-                <app-books-view-circulation [selectedMainBook]="currentBook"
-                    (onSuccess)="loadBooks(true)"></app-books-view-circulation>
-                }
+                <div style="width: 100%; overflow-x: auto; white-space: nowrap;">
+                    @if (activeTab === 1) {
+                    <app-books-view-circulation [selectedMainBook]="currentBook"
+                        (onSuccess)="loadBooks(true)"></app-books-view-circulation>
+                    }
+                </div>
             </p-tabPanel>
             <p-tabPanel header="View Wishlist" *ngIf="_authService.settingsDetails()?.EnableWishlistNotification">
                 @if (activeTab === 2) {
@@ -1525,6 +1529,10 @@
     @if (addWishlistDialogVisible) {
         <app-add-wishlist [selectedBookId]="currentBook.BookId" [selectedUserId]="0"  
          (onDialogClose)="addWishlistDialogVisible = false"></app-add-wishlist>
+    }
+
+    @if(isbnBookDialogVisible) {
+        <app-import-isbn-books (onDialogClose)="isbnBookDialogClose()"></app-import-isbn-books>
     }
 
     <p-confirmDialog></p-confirmDialog>

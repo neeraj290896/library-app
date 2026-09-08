@@ -29,6 +29,7 @@ export class SearchComponent {
     public showUserDialog: boolean = false;
 
     private inactivityTimer: any;
+    private dialogObserver?: MutationObserver;
     private readonly INACTIVITY_TIME = 3000; // 3 seconds
 
     private get isAnyDialogOpen(): boolean {
@@ -36,7 +37,21 @@ export class SearchComponent {
     }
 
     ngOnInit(): void {
+        this.observeDialogs();
         this.startInactivityTimer();
+    }
+
+    private observeDialogs(): void {
+        this.dialogObserver = new MutationObserver(() => {
+            this.resetInactivityTimer();
+        });
+
+        this.dialogObserver.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['aria-hidden', 'class', 'style'],
+            childList: true,
+            subtree: true
+        });
     }
 
     // Listen to user activity across the document window
@@ -77,29 +92,14 @@ export class SearchComponent {
     }
 
     private hasOpenPrimeDialog(): boolean {
-        const dialogMasks = Array.from(document.querySelectorAll<HTMLElement>('.p-dialog-mask'));
-        const hasVisibleMask = dialogMasks.some((mask) => {
-            const style = mask.getAttribute('style') || '';
-            const ariaHidden = mask.getAttribute('aria-hidden');
-            const isHidden = style.includes('display: none') || style.includes('display:none') || ariaHidden === 'true';
-            return !isHidden;
-        });
-
-        if (hasVisibleMask) {
-            return true;
-        }
-
         const dialogs = Array.from(document.querySelectorAll<HTMLElement>('.p-dialog'));
         return dialogs.some((dialog) => {
-            const style = dialog.getAttribute('style') || '';
             const ariaHidden = dialog.getAttribute('aria-hidden');
-            const isHidden = style.includes('display: none') || style.includes('display:none') || ariaHidden === 'true';
-            const isActive = dialog.classList.contains('p-dialog-active')
-                || dialog.classList.contains('p-dialog-enter-active')
-                || dialog.classList.contains('p-dialog-enter-done')
-                || dialog.classList.contains('p-dialog-visible');
-
-            return !isHidden && isActive;
+            const computedStyle = getComputedStyle(dialog);
+            return ariaHidden !== 'true'
+                && computedStyle.display !== 'none'
+                && computedStyle.visibility !== 'hidden'
+                && !dialog.classList.contains('p-dialog-hidden');
         });
     }
 
@@ -164,5 +164,6 @@ export class SearchComponent {
     // Prevent memory leaks when the component destroys
     ngOnDestroy(): void {
         this.clearInactivityTimer();
+        this.dialogObserver?.disconnect();
     }
 }

@@ -1,0 +1,88 @@
+.certificate-card {
+  border: 5px double #333;
+  padding: 40px;
+  text-align: center;
+  max-width: 900px;
+  margin: 20px auto;
+}
+.signature-section {
+  margin-top: 50px;
+  border-top: 1px dotted #000;
+  display: inline-block;
+  width: 250px;
+  margin-top: 5rem;
+}
+
+/* Print Overrides */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .certificate-card, .certificate-card * {
+    visibility: visible;
+  }
+  .certificate-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+.header-logo {
+    width: 5rem;
+    object-fit: contain;
+    border-radius: 0.25rem;
+}
+
+/* --- Screen Layout Styles --- */
+/* Keeps the printable card centered and elegant on screen */
+.certificate-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    // padding: 2rem;
+}
+
+/* --- Print Engine Rules --- */
+@media print {
+    /* 1. Force hide the PrimeNG confirmation overlay, buttons, and top bars */
+    .no-print,
+    p-confirmDialog,
+    .p-dialog-mask,
+    .p-component-overlay,
+    .p-dialog {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+
+    /* 2. Wipe clean the parent layout margins so everything else disappears */
+    body *, 
+    html * {
+        visibility: hidden;
+    }
+
+    /* 3. Make ONLY the certificate card layout visible and force it to print */
+    .certificate-card,
+    .certificate-card * {
+        visibility: visible !important;
+    }
+
+    /* 4. Position the card perfectly to fill the entire printed page symmetrically */
+    .certificate-card {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 1.5cm !important; /* Professional margins */
+        box-shadow: none !important; /* Removes shadow effects on paper */
+        border: none !important;
+    }
+}
+
+

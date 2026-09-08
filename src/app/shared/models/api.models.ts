@@ -456,3 +456,11 @@ export interface SearchQuery {
     ToDate?: string | null; 
 }
 
+export interface Guidance {
+    HelpId: number;
+    Question: string;
+    Answer: string; 
+    Expanded: boolean;
+    IsActive: boolean;
+}
+

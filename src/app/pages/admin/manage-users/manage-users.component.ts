@@ -29,6 +29,7 @@ import { ManageWishlistComponent } from '@app/pages/books/manage-wishlist/manage
 import { DepartmentService } from '@app/shared/services/department.service';
 import { BookService } from '@app/shared/services/book.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { NocComponent } from '../noc/noc.component';
 
 type ImportUserDetails = UserDetails & {
     Error: string;
@@ -37,7 +38,7 @@ type ImportUserDetails = UserDetails & {
 @Component({
     selector: 'app-manage-users',
     imports: [CommonModule, ButtonModule, TableModule, TagModule, DatePickerModule,
-        PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule,
+        PaginatorModule, MultiSelectModule, DialogModule, InputTextModule, TabViewModule, NocComponent,
         SelectModule, FormsModule, TooltipModule, QRCodeComponent, UsersBookCirculationComponent, IssueReturnBooksComponent, ManageWishlistComponent, ConfirmDialogModule],
     providers: [ConfirmationService],
     templateUrl: './manage-users.component.html',
@@ -205,6 +206,7 @@ export class ManageUsersComponent {
     public studentRoleId: number  = 5;
     public nextAvailableLibraryNo : string ="VCN ";
     public isBarcodePrintOptionEnabled: boolean = false;
+    public nocDialogVisible:boolean = false;
 
     ngOnInit(): void {
         this.departmentEligibleForRoleIdAbove = environment.departmentEligibleForRoleIdAbove;
@@ -1864,9 +1866,7 @@ export class ManageUsersComponent {
             
         }
         
-    }
-
-    
+    }    
 
     async downloadUserDetails(): Promise<void> {
         const workbook = new ExcelJS.Workbook();
@@ -1943,5 +1943,8 @@ export class ManageUsersComponent {
         saveAs(blob, 'save-user-details.xlsx');
     }
 
-
+    issueNOC():void{
+        this.nocDialogVisible = true;
+        // console.log('this.nocDialogVisible :', this.nocDialogVisible);
+    }
 }

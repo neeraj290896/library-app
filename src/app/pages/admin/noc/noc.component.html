@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-end align-items-center gap-3" style="padding-right:9.5rem;">
+  <!-- <h2>Issue Library NOC</h2> -->
+  <p-button class="p-button-outlined" [disabled] = "!isEmailOptionEnabled"
+            styleClass="btn-main-outlined" label="Send NOC" icon="pi pi-envelope"
+            (onClick)="sendNOC()"></p-button>
+    <p-button type="button" [style]="{ width: '6rem' }"
+            styleClass="btn-main" label="Confirm" icon="pi pi-print"
+            (onClick)="confirmAndDeActivateUserProfile()"></p-button>
+
+</div>
+
+<!-- Printable Certificate View -->
+<!-- <div class="certificate-container">
+  <div class="print-actions no-print">
+    <p-button type="button" [style]="{ width: '6rem' }"
+            styleClass="btn-main" label="Confirm" icon="pi pi-envelope"
+            (onClick)="confirmAndDeActivateUserProfile()"></p-button>
+  </div>
+  
+  <div class="certificate-card">
+    <div class="col-4 d-flex align-items-center justify-content-center gap-2 min-w-0">        
+        <img [src]="organizationImagePath" alt="Logo" class="header-logo me-2 flex-shrink-0" />
+        <h1 class="fw-semibold mb-0 text-nowrap flex-shrink-1" style="min-width: 0;">{{ libraryName }}</h1>        
+    </div>
+    <h3 style="padding-top: 2rem;">NO OBJECTION CERTIFICATE - LIBRARY</h3>
+    <hr>
+    <p style="padding-top: 5rem;">This is to certify that <strong>{{selectedUserDetails.FullName}}</strong> (Library No: {{selectedUserDetails.LibraryNo}})</p>
+    <p>has returned all borrowed materials and cleared all outstanding dues with the college library.</p>
+    <div class="signature-section">
+      <p>Authorized Librarian Signature</p>
+    </div>
+  </div>
+</div> -->
+
+<!-- Printable Certificate View -->
+<div class="certificate-container" #printArea>
+  <!-- Keep everything inside exactly as it is -->
+  <div class="certificate-card">
+    <div class="col-4 d-flex align-items-center justify-content-center gap-2 min-w-0">        
+        <img [src]="organizationImagePath" alt="Logo" class="header-logo me-2 flex-shrink-0" />
+        <h2 class="fw-semibold mb-0 text-nowrap flex-shrink-1" style="min-width: 0;">{{ libraryName }}</h2>        
+    </div>
+    <h3 style="padding-top: 2rem;">NO OBJECTION CERTIFICATE - LIBRARY</h3>
+    <hr>
+    <p style="padding-top: 5rem;">This is to certify that <strong>{{selectedUserDetails.FullName}}</strong> (Library No: {{selectedUserDetails.LibraryNo}})</p>
+    <p>has returned all borrowed materials and cleared all outstanding dues with the college library.</p>
+    <div class="signature-section">
+      <p>Authorized Librarian Signature</p>
+    </div>
+  </div>
+</div>
+
+
+<p-confirmDialog></p-confirmDialog>

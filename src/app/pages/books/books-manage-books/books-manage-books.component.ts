@@ -37,6 +37,7 @@ import { UserService } from '@app/shared/services/user.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SubjectService } from '@app/shared/services/subject.service';
 import { SourceService } from '@app/shared/services/source.service';
+import { ImportIsbnBooksComponent } from '../import-isbn-books/import-isbn-books.component';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -48,7 +49,7 @@ type ImportBookDetails = BookDetails & {
     imports: [
         CommonModule, ButtonModule, TableModule, TagModule, PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
         SelectModule, FormsModule, DatePickerModule, TooltipModule, TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent,
-         ManageWishlistComponent, AddWishlistComponent, ConfirmDialogModule
+         ManageWishlistComponent, AddWishlistComponent, ConfirmDialogModule, ImportIsbnBooksComponent
     ],
     providers: [ConfirmationService],
     templateUrl: './books-manage-books.component.html',
@@ -256,6 +257,7 @@ export class BooksManageBooksComponent implements OnInit {
     public maxDate: Date | undefined;
     public billDate: Date | null = null;
     public isBarcodePrintOptionEnabled: boolean = false;
+    public isbnBookDialogVisible: boolean = false;
 
     ngOnInit(): void {
         const today = new Date();
@@ -611,8 +613,8 @@ export class BooksManageBooksComponent implements OnInit {
                 SubjectId: 0,
                 SubjectName: '',
                 Status: 'Available',
-                BuildingId: null,
-                BuildingName: '',
+                BuildingId: this.buildingOptions.length == 1 ? this.buildingOptions[0].value : null,
+                BuildingName: this.buildingOptions.length == 1 ? this.buildingOptions[0].label : '',
                 FloorId: null,
                 FloorNumber: null,
                 FloorName: '',
@@ -624,6 +626,9 @@ export class BooksManageBooksComponent implements OnInit {
             };
             this.header = 'Add Book';
             this.publishedDate = null;
+
+            this.onBuildingChange();
+            this.onFloorChange();
         }
 
         this.errors = {
@@ -778,6 +783,11 @@ export class BooksManageBooksComponent implements OnInit {
             .map(floor => {
                 return { label: floor.FloorName ?? '', value: floor.FloorId };
             });
+
+        if(this.floorOptions !=null && this.floorOptions.length == 1)
+        {
+            this.currentBook.FloorId = this.floorOptions[0].value;            
+        }
 
         const building = this.buildingOptions.find(b => b.value === this.currentBook.BuildingId);
         if (building) {
@@ -2487,6 +2497,15 @@ export class BooksManageBooksComponent implements OnInit {
             if (!isNumber && !allowedKeys.includes(event.key)) {
             event.preventDefault();
             }
-        }
+    }
+
+    importISBN(): void{
+        this.isbnBookDialogVisible = true;
+    }
+
+    isbnBookDialogClose():void{
+        this.isbnBookDialogVisible = false;
+        this.loadBooks();
+    }
 
 }
