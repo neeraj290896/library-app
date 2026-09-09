@@ -600,7 +600,9 @@ export class DashboardComponent {
         };
 
         this.onBuildingChange();
-        this.onFloorChange();
+        setTimeout(() => {
+                this.onFloorChange();
+            }, 150);
 
         this.addNewBookDialogVisible = true;
     }

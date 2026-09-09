@@ -628,7 +628,9 @@ export class BooksManageBooksComponent implements OnInit {
             this.publishedDate = null;
 
             this.onBuildingChange();
-            this.onFloorChange();
+            setTimeout(() => {
+                this.onFloorChange();
+            }, 150);
         }
 
         this.errors = {
