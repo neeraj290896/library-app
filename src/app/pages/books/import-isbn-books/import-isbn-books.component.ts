@@ -1010,10 +1010,10 @@ export class ImportIsbnBooksComponent {
                 this.saveAuthor();   
             }
         }
-        else
-        {
-            this.validateInput('AuthorId')
-        }
+        // else
+        // {
+        //     this.validateInput('AuthorId')
+        // }
 
         if(this.currentBook.PublisherName !=null && this.currentBook.PublisherName.trim() !='')
         {
@@ -1025,10 +1025,12 @@ export class ImportIsbnBooksComponent {
                 this.savePublisher();
             }
         }
-        else
-        {
-            this.validateInput('PublisherId')
-        }
+        // else
+        // {
+        //     this.validateInput('PublisherId')
+        // }
+
+        this.validateBook();
     }
 
     saveAuthor(): void {
