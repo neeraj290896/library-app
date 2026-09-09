@@ -926,13 +926,19 @@ export class ImportIsbnBooksComponent {
         this.bookService.getISBNDetails(this._isbnText).subscribe({
             next: (data: any) => {
                 console.log('ISBN Details:', data);
-                if (data && data.title) {
-                    this.currentBook.BookName = data.title || '';
-                    this.currentBook.AuthorName = data.authors ? data.authors.map((author: any) => author.name).join(' & ') : '';
-                    this.currentBook.PublisherName = data.publishers ? data.publishers.map((publisher: any) => publisher.name).join(' & ') : '';
-                    this.currentBook.PublishedYear = data.publish_date ? parseInt(data.publish_date.split(' ')[data.publish_date.split(' ').length - 1]) : null;
-                    this.currentBook.LanguageName = data.languages ? data.languages.map((lang: any) => lang.name).join(', ') : '';
-                    this.currentBook.TotalPageNo = data.number_of_pages || null;
+                const bookData = data?.title
+                    ? data
+                    : data && typeof data === 'object'
+                        ? Object.values(data)[0]
+                        : null;
+
+                if (bookData && (bookData as any).title) {
+                    this.currentBook.BookName = (bookData as any).title || '';
+                    this.currentBook.AuthorName = (bookData as any).authors ? (bookData as any).authors.map((author: any) => author.name).join(' & ') : '';
+                    this.currentBook.PublisherName = (bookData as any).publishers ? (bookData as any).publishers.map((publisher: any) => publisher.name).join(' & ') : '';
+                    this.currentBook.PublishedYear = (bookData as any).publish_date ? parseInt((bookData as any).publish_date.split(' ')[(bookData as any).publish_date.split(' ').length - 1], 10) : null;
+                    this.currentBook.LanguageName = (bookData as any).languages ? (bookData as any).languages.map((lang: any) => lang.name).join(', ') : '';
+                    this.currentBook.TotalPageNo = (bookData as any).number_of_pages || (bookData as any).pagination || null;
                 }
                 else
                 {
@@ -1004,6 +1010,10 @@ export class ImportIsbnBooksComponent {
                 this.saveAuthor();   
             }
         }
+        else
+        {
+            this.validateInput('AuthorId')
+        }
 
         if(this.currentBook.PublisherName !=null && this.currentBook.PublisherName.trim() !='')
         {
@@ -1014,6 +1024,10 @@ export class ImportIsbnBooksComponent {
             } else {
                 this.savePublisher();
             }
+        }
+        else
+        {
+            this.validateInput('PublisherId')
         }
     }
 
