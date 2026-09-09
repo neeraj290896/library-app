@@ -15,6 +15,8 @@
 
         <p-button type="button" label="Upload Excel" icon="pi pi-upload" styleClass="btn-main"
                     (click)="importBook()"></p-button>
+        <p-button type="button" label="Import book from ISBN" icon="pi pi-download" 
+                    styleClass="btn-main-outlined" (click)="importISBN()"></p-button>
     </div>
     <div style="overflow-x: auto;">
         <p-table #dt [value]="books" [autoLayout]="false" [paginator]="true" [rows]="10" [(selection)]="selectedBookDetails"
@@ -449,8 +451,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
                     Total Page No
                 </label>
-                <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo"
-                    (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo"                    
                     [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
             </div>
             <div class="col-6 mb-3">
@@ -672,8 +673,7 @@
                         <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
                             Total Page No
                         </label>
-                        <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"
-                            (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                        <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"                            
                             [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
                     </div>
                     <div class="col-6 mb-3">
@@ -727,10 +727,12 @@
             </p-tabPanel>
 
             <p-tabPanel header="View Book Circulation">
-                @if (activeTab === 1) {
-                <app-books-view-circulation [selectedMainBook]="currentBook"
-                    (onSuccess)="loadBooks(true)"></app-books-view-circulation>
-                }
+                <div style="width: 100%; overflow-x: auto; white-space: nowrap;">
+                    @if (activeTab === 1) {
+                    <app-books-view-circulation [selectedMainBook]="currentBook"
+                        (onSuccess)="loadBooks(true)"></app-books-view-circulation>
+                    }
+                </div>
             </p-tabPanel>
             <p-tabPanel header="View Wishlist" *ngIf="_authService.settingsDetails()?.EnableWishlistNotification">
                 @if (activeTab === 2) {
@@ -1391,8 +1393,7 @@
                 <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
                     Total Page No
                 </label>
-                <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"
-                    (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+                <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo" [disabled]="isViewOnly"                    
                     [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
             </div>
             <div class="col-6 mb-3">
@@ -1528,6 +1529,10 @@
     @if (addWishlistDialogVisible) {
         <app-add-wishlist [selectedBookId]="currentBook.BookId" [selectedUserId]="0"  
          (onDialogClose)="addWishlistDialogVisible = false"></app-add-wishlist>
+    }
+
+    @if(isbnBookDialogVisible) {
+        <app-import-isbn-books (onDialogClose)="isbnBookDialogClose()"></app-import-isbn-books>
     }
 
     <p-confirmDialog></p-confirmDialog>

@@ -4,16 +4,16 @@
     <p class="small text-muted mb-4">Find answers to frequently asked questions</p>
 
     <div class="d-flex flex-column gap-3">
-      @for (faq of faqs(); track faq.id) {
+      @for (faq of faqs; track faq.HelpId) {
         <div class="border rounded p-3">
           <button class="btn btn-link w-100 text-start text-decoration-none d-flex justify-content-between align-items-center p-0 fw-semibold text-dark"
                   (click)="toggleFAQ(faq)">
-            <span>{{ faq.question }}</span>
-            <span class="faq-arrow" [class.expanded]="faq.expanded">▼</span>
+            <span>{{ faq.Question }}</span>
+            <span class="faq-arrow" [class.expanded]="faq.Expanded">▼</span>
           </button>
-          @if (faq.expanded) {
+          @if (faq.Expanded) {
             <div class="mt-3 pt-3 border-top text-muted small">
-              {{ faq.answer }}
+              {{ faq.Answer }}
             </div>
           }
         </div>

@@ -37,6 +37,7 @@ import { UserService } from '@app/shared/services/user.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SubjectService } from '@app/shared/services/subject.service';
 import { SourceService } from '@app/shared/services/source.service';
+import { ImportIsbnBooksComponent } from '../import-isbn-books/import-isbn-books.component';
 
 type ImportBookDetails = BookDetails & {
     Error: string;
@@ -48,7 +49,7 @@ type ImportBookDetails = BookDetails & {
     imports: [
         CommonModule, ButtonModule, TableModule, TagModule, PaginatorModule, MultiSelectModule, DialogModule, InputTextModule,
         SelectModule, FormsModule, DatePickerModule, TooltipModule, TabViewModule, BooksViewCirculationComponent, NgxBarcode6, IssueReturnBooksComponent,
-         ManageWishlistComponent, AddWishlistComponent, ConfirmDialogModule
+         ManageWishlistComponent, AddWishlistComponent, ConfirmDialogModule, ImportIsbnBooksComponent
     ],
     providers: [ConfirmationService],
     templateUrl: './books-manage-books.component.html',
@@ -56,6 +57,8 @@ type ImportBookDetails = BookDetails & {
 })
 export class BooksManageBooksComponent implements OnInit {
     @Input() public searchTerm: string = '';
+    @Input() public statsData: BookDetails[] = [];
+
     @ViewChild('userInput') set userInputElement(content: ElementRef<HTMLInputElement>) {
     if (content && content.nativeElement) {
         setTimeout(() => {
@@ -211,7 +214,7 @@ export class BooksManageBooksComponent implements OnInit {
     public importErrorList: { label: string, value: string }[] = [];
     public importBillNoList: { label: string, value: string }[] = [];
     public importBillDateList: { label: string, value: string }[] = [];
-    public importTotalPageNoList: { label: number, value: number }[] = [];
+    public importTotalPageNoList: { label: string, value: string }[] = [];
     public importCallNoList: { label: string, value: string }[] = [];
     public importAccessionNoList: { label: string, value: string }[] = [];
     public importSourceList: { label: string, value: string }[] = [];
@@ -254,6 +257,7 @@ export class BooksManageBooksComponent implements OnInit {
     public maxDate: Date | undefined;
     public billDate: Date | null = null;
     public isBarcodePrintOptionEnabled: boolean = false;
+    public isbnBookDialogVisible: boolean = false;
 
     ngOnInit(): void {
         const today = new Date();
@@ -330,6 +334,11 @@ export class BooksManageBooksComponent implements OnInit {
                     console.error('Error loading books:', err);
                 }
             });
+        }
+        else if(this.statsData !=null && this.statsData.length >0)
+        {
+            this.books = [...this.statsData];
+            this.initializeFilterLists();
         }
         else {
             this.bookService.getAllBookDetails().subscribe({
@@ -604,8 +613,8 @@ export class BooksManageBooksComponent implements OnInit {
                 SubjectId: 0,
                 SubjectName: '',
                 Status: 'Available',
-                BuildingId: null,
-                BuildingName: '',
+                BuildingId: this.buildingOptions.length == 1 ? this.buildingOptions[0].value : null,
+                BuildingName: this.buildingOptions.length == 1 ? this.buildingOptions[0].label : '',
                 FloorId: null,
                 FloorNumber: null,
                 FloorName: '',
@@ -617,6 +626,11 @@ export class BooksManageBooksComponent implements OnInit {
             };
             this.header = 'Add Book';
             this.publishedDate = null;
+
+            this.onBuildingChange();
+            setTimeout(() => {
+                this.onFloorChange();
+            }, 150);
         }
 
         this.errors = {
@@ -771,6 +785,11 @@ export class BooksManageBooksComponent implements OnInit {
             .map(floor => {
                 return { label: floor.FloorName ?? '', value: floor.FloorId };
             });
+
+        if(this.floorOptions !=null && this.floorOptions.length == 1)
+        {
+            this.currentBook.FloorId = this.floorOptions[0].value;            
+        }
 
         const building = this.buildingOptions.find(b => b.value === this.currentBook.BuildingId);
         if (building) {
@@ -2454,7 +2473,7 @@ export class BooksManageBooksComponent implements OnInit {
             price: book.Price || 0,
             billNo: book.BillNo || '',
             billDate: book.BillDate || '',
-            pageNo: book.TotalPageNo || 0,
+            pageNo: book.TotalPageNo || '',
             callNo: book.CallNo || '',            
             source: book.SourceName || '',
             subject: book.SubjectName || '',
@@ -2480,6 +2499,15 @@ export class BooksManageBooksComponent implements OnInit {
             if (!isNumber && !allowedKeys.includes(event.key)) {
             event.preventDefault();
             }
-        }
+    }
+
+    importISBN(): void{
+        this.isbnBookDialogVisible = true;
+    }
+
+    isbnBookDialogClose():void{
+        this.isbnBookDialogVisible = false;
+        this.loadBooks();
+    }
 
 }

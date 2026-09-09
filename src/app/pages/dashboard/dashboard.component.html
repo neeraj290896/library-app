@@ -237,8 +237,7 @@
             <label class="d-block small fw-medium text-secondary mb-1" for="pageNo">
                 Total Page No
             </label>
-            <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo"
-                (keydown)="($event.ctrlKey || $event.metaKey) && ($event.key === 'c' || $event.key === 'v') ? true : validateNumberInput($event, ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'])"
+            <input id="pageNo" type="text" class="form-control" pInputText [(ngModel)]="currentBook.TotalPageNo"                
                 [ngModelOptions]="{standalone: true}" placeholder="Enter total page no"/>                
         </div>
         <div class="col-6 mb-3">

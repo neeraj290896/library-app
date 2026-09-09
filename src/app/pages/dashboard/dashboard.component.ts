@@ -564,8 +564,8 @@ export class DashboardComponent {
             PublishedYear: null,
             Price: 0,
             Status: 'Available',
-            BuildingId: null,
-            BuildingName: '',
+            BuildingId: this.buildingOptions.length == 1 ? this.buildingOptions[0].value : null,
+            BuildingName: this.buildingOptions.length == 1 ? this.buildingOptions[0].label : '',
             FloorId: null,
             FloorNumber: '',
             FloorName: '',
@@ -598,6 +598,12 @@ export class DashboardComponent {
             BookBarcode: '',
             IsActive: ''
         };
+
+        this.onBuildingChange();
+        setTimeout(() => {
+                this.onFloorChange();
+            }, 150);
+
         this.addNewBookDialogVisible = true;
     }
 
@@ -661,6 +667,11 @@ export class DashboardComponent {
             .map(floor => {
                 return { label: floor.FloorName ?? '', value: floor.FloorId };
             });
+
+        if(this.floorOptions !=null && this.floorOptions.length == 1)
+        {
+            this.currentBook.FloorId = this.floorOptions[0].value;            
+        }
 
         const building = this.buildingOptions.find(b => b.value === this.currentBook.BuildingId);
         if (building) {

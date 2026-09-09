@@ -1,0 +1,35 @@
+$color-primary: #22c55e;
+
+.search-icon {
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+}
+
+::ng-deep {
+    .barcode-label {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 6px;
+        color: #000000;
+    }
+}
+
+@media print {
+  /* Hide headers, footers, buttons, and side navs */
+  body * {
+    visibility: hidden;
+  }
+  /* Show only the specific table container and its child components */
+  #printArea, #printArea * {
+    visibility: visible;
+  }
+  #printArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}

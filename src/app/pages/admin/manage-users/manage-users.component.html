@@ -512,8 +512,10 @@
                     styleClass="btn-main" (click)="checkOutBook(currentUser)"></p-button>
                 <p-button type="button" label="Cancel" [style]="{ width: '6rem' }" class="p-button-outlined"
                     *ngIf="!isViewOnly" styleClass="btn-main-outlined" (click)="userDialogVisible = false"></p-button>
-                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main"
+                <p-button type="button" label="Save" [style]="{ width: '6rem' }" styleClass="btn-main" icon="pi pi-save"
                     *ngIf="!isViewOnly" (click)="saveUser()"></p-button>
+                <p-button type="button" label="Issue NOC" [style]="{ width: '8rem' }" class="p-button-outlined" icon="pi pi-receipt"
+                    *ngIf="currentUser.BorrowedBooksCount==0" styleClass="btn-main-outlined" (click)="issueNOC()"></p-button>
             </div>
             }
         </ng-template>
@@ -1099,6 +1101,13 @@
         @if (checkInDialogVisible) {
         <app-users-book-circulation [selectedUserDetails]="currentUser"
             [isReturnOnly]="true"></app-users-book-circulation>
+        }
+    </p-dialog>
+
+     <p-dialog header="Issue NOC" [(visible)]="nocDialogVisible" [modal]="true" [style]="{ width: '60vw' }"
+        appendTo="body">
+        @if (nocDialogVisible) {
+        <app-noc [selectedUserDetails]="currentUser" (onDialogClose)="nocDialogVisible = false"></app-noc>
         }
     </p-dialog>
 

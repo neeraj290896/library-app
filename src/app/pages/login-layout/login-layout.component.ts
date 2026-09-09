@@ -19,7 +19,7 @@ export class LoginLayoutComponent {
         this.organizationImagePath = environment.apiUrl + environment.uploadedFilesPath + this.authService.organizationDetails()?.ImagePath;
     }
     else{
-        this.organizationImagePath = 'assets/images/VCN_Image.png';
+        this.organizationImagePath = 'assets/images/'+ environment.OrganizationDetails.ImagePath;
     }
   }
 }

@@ -81,4 +81,8 @@ export class UserService {
     resetCredPassword(payload: ResetCredPassword): Observable<any> {
         return this.http.post(`${this.baseUrl}/ResetCredPassword`, payload);
     }
+
+    sendNOC(payload: UserDetails): Observable<any> {
+        return this.http.post(`${this.baseUrl}/SendNOC`, payload);
+    }
 }

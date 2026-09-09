@@ -1,0 +1,54 @@
+<div class="searchBook-container row g-3">
+    <!-- Card 1 -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded p-3 h-100">
+            <h3 class="fs-5 fw-semibold mb-3">Quick Ranges</h3>
+            <div class="d-flex gap-2 flex-wrap">
+                <p-button type="button" label="Recently Added books" class="p-button-outlined" styleClass="btn-main-outlined"
+                    (click)="searchBookDetailsForReport('Last10')" pTooltip="Recently Added 10 books"></p-button>
+                <p-button type="button" label="Added in last 30 days" class="p-button-outlined" styleClass="btn-main-outlined"
+                    (click)="searchBookDetailsForReport('Last30')"></p-button>
+                <p-button type="button" label="Added in current month" class="p-button-outlined" styleClass="btn-main-outlined"
+                    (click)="searchBookDetailsForReport('ThisMonth')"></p-button>
+                <p-button type="button" label="Added in last 3 months" class="p-button-outlined" styleClass="btn-main-outlined"
+                    (click)="searchBookDetailsForReport('Last90')"></p-button>
+                <p-button type="button" label="Added in last 6 months" class="p-button-outlined" styleClass="btn-main-outlined"
+                    (click)="searchBookDetailsForReport('Last180')"></p-button>
+                <p-button type="button" label="Added in last year" class="p-button-outlined" styleClass="btn-main-outlined"
+                    (click)="searchBookDetailsForReport('LastYear')"></p-button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Card 2 -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded p-3 h-100">
+            <h3 class="fs-5 fw-semibold mb-3">Date Ranges</h3>
+            <!-- IMPROVEMENT: Added structured classes to alignment layout for inputs -->
+            <div class="row g-2 align-items-end">
+                <div class="col-sm-5">
+                    <label class="small fw-medium text-secondary mb-1" for="fromDate">From Date</label>
+                    <p-datepicker [(ngModel)]="fromDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                        [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                        [maxDate]="maxDate" placeholder="Select From Date"
+                        styleClass="w-100" inputStyleClass="w-100" />
+                </div>
+                <div class="col-sm-5">
+                    <label class="small fw-medium text-secondary mb-1" for="toDate">To Date</label>
+                    <p-datepicker [(ngModel)]="toDate" [ngModelOptions]="{standalone: true}" appendTo="body"
+                        [showIcon]="true" [readonlyInput]="true" [showOnFocus]="true" dateFormat="dd/mm/yy"
+                        [maxDate]="maxDate" placeholder="Select To Date"
+                        styleClass="w-100" inputStyleClass="w-100" />
+                </div>
+                <div class="col-sm-2">
+                    <p-button type="button" label="Search" class="w-100 p-button-outlined" styleClass="w-100 btn-main" 
+                        (click)="searchBookDetailsForReport('DateRange')"></p-button>            
+                </div>
+            </div>
+        </div>
+    </div>
+    @if(booksManageDialogVisible) {
+    <app-view-report-book-details [statsData] = "books" [reportHeader] = "reportHeader"></app-view-report-book-details>
+    }
+    
+</div>

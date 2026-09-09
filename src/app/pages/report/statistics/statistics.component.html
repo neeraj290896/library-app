@@ -1,0 +1,56 @@
+<div class="overdue-container">
+    <div class="card border-0 shadow-sm rounded p-3">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="row pb-3" style="width: 100%;">
+                <div class="col-3 position-relative">
+                    <label class="d-block small fw-medium text-secondary mb-1" for="staticstics">
+                        Select Staticstics<sup>*</sup>
+                    </label>            
+                    <p-select #staticsticsDropdown id="staticstics" [(ngModel)]="selectedStaticstics" [showClear]="true"
+                        [ngModelOptions]="{standalone: true}" [options]="staticsticsOptions" optionLabel="label" optionValue="value" 
+                        placeholder="Select Statistics" [editable]="true" styleClass="w-100" appendTo="body" [filter]="true"
+                        (ngModelChange)="onStatisticsChange()" />
+                </div>  
+                <div class="col-3 position-relative">
+                    <div class="table-clear-filter d-flex align-items-center gap-3" style="margin-top: 1.5rem !important;">
+                        <p-button type="button" label="Download Staticstics Details" icon="pi pi-download" *ngIf="statisticsSummary.length >0"
+                            styleClass="btn-main-outlined" (click)="downloadStaticsticsDetails()"></p-button>
+
+                        <div class="d-flex align-items-center gap-1" *ngIf="statisticsSummary.length >0">
+                            <i class="pi pi-calculator text-color-secondary font-regular"></i>
+                            <span class="text-sm text-color-secondary font-regular">
+                                Total : <strong>{{ totalStatisticsCount }}</strong>
+                            </span>
+                        </div>
+                    </div>
+                    
+                </div>      
+            </div>
+        </div>
+    </div>    
+
+    <div class="row g-3" style="padding-top: 1rem !important;">
+        @for (stat of statisticsSummary; track stat.label) {
+        <div class="col-md-6 col-lg-3 cursor-pointer" (click)="openSummaryDetails(stat)">
+            <p-card>
+                <div class="large text-muted mb-2">{{ stat.label }}</div>
+                <div class="d-flex align-items-start gap-2">
+                    <!-- <div class="fs-4 fw-semibold">{{ stat.total }}</div> -->
+                    <span class="badge badge-green">
+                        {{ stat.total }}
+                    </span>
+                </div>
+            </p-card>
+        </div>
+        }
+    </div>
+
+</div>
+
+<p-dialog header="View Books" [(visible)]="booksManageDialogVisible" [modal]="true" [style]="{ width: '90vw' }"
+    appendTo="body" (onHide)="onStatisticsChange()">
+    @if(booksManageDialogVisible) {    
+     <app-view-report-book-details [statsData] = "bookDetails" [reportHeader] = "reportHeader"></app-view-report-book-details>
+    }
+</p-dialog>
